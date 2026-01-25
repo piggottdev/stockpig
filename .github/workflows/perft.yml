@@ -28,4 +28,4 @@ jobs:
 
       - name: Compare Baseline
         if: github.event_name == 'pull_request'
-        run: (( $(jq .nps ./perft_results.json)*100 < $(jq .nps .github/baseline.json)*95 )) && exit 1 || exit 0
+        run: (( $(jq .nps ./perft_results.json)*100 < $(jq .nps .github/perft_baseline.json)*95 )) && exit 1 || exit 0
