@@ -4,6 +4,14 @@ on:
   pull_request:
     paths:
       - 'src/main/java/dev/pig/stockpig/chess/**'
+  push:
+    paths:
+      - 'src/main/java/dev/pig/stockpig/chess/**'
+    branches:
+      - main
+
+permissions:
+  contents: write
 
 jobs:
   benchmark:
@@ -28,4 +36,17 @@ jobs:
 
       - name: Compare Baseline
         if: github.event_name == 'pull_request'
-        run: (( $(jq .nps ./perft_results.json)*100 < $(jq .nps .github/perft_baseline.json)*95 )) && exit 1 || exit 0
+        run: (( $(jq .nps ./perft_results.json)*100 < $(jq .nps ./.github/perft_baseline.json)*95 )) && exit 1 || exit 0
+
+      - name: Results Update
+        if: github.ref == 'refs/heads/main'
+        run: |
+          printf "$(git log -1 --pretty=%B),$(jq .nps ./perft_results.json)," >> ./.github/perft_log.csv 
+          awk "BEGIN { printf \"%+.1f%%\n\", ( $(jq .nps ./perft_results.json) - $(jq .nps ./.github/perft_baseline.json) ) * 100 / $(jq .nps ./.github/perft_baseline.json) }" >> ./.github/perft_log.csv 
+          mv ./perft_results.json ./.github/perft_baseline.json
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add ./.github/perft_baseline.json
+          git add ./.github/perft_log.csv
+          git commit -m "Update PERFT results [skip ci]" || echo "No changes"
+          git push
