@@ -1,0 +1,27 @@
+name: PERFT
+
+on:
+  pull_request:
+    paths:
+      - 'src/main/java/dev/pig/stockpig/chess/**'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build Project
+        run: mvn compile
+
+      - name: Run PERFT
+        run: java -Xms512m -Xmx512m -server -XX:+AlwaysPreTouch -XX:+UseSerialGC -XX:-TieredCompilation -XX:ActiveProcessorCount=1 -classpath target\classes dev.pig.stockpig.chess.perft.Bench

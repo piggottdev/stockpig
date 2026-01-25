@@ -1,0 +1,1 @@
+-Xms512m -Xmx512m -server -XX:+AlwaysPreTouch -XX:+UseSerialGC -XX:-TieredCompilation -XX:ActiveProcessorCount=1

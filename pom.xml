@@ -3,8 +3,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
+
+    <name>stockpig</name>
 
     <groupId>dev.pig</groupId>
     <artifactId>stockpig</artifactId>
@@ -16,19 +17,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <build>
-        <plugins>
+    <dependencies>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <release>21</release>
-                </configuration>
-            </plugin>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>6.0.1</version>
+            <scope>test</scope>
+        </dependency>
 
-        </plugins>
-    </build>
+    </dependencies>
 
 </project>
