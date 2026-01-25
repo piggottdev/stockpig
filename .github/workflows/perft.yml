@@ -20,6 +20,9 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Print Dir
+        run: pwd
+
       - name: Build Project
         run: mvn compile
 
