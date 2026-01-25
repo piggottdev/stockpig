@@ -79,6 +79,6 @@ public final class MoveList {
      */
     public void cloneInto(final MoveList clone) {
         clone.size = this.size;
-        System.arraycopy(this.moves, 0, clone.moves, 0, MAX_MOVES);
+        System.arraycopy(this.moves, 0, clone.moves, 0, this.size);
     }
 }

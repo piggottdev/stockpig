@@ -37,7 +37,7 @@ public enum Piece {
      */
     // TODO: Candidate optimisation: Test caching values() or removing Piece enum in favour of an int/byte
     public static Piece of(final Colour c, final PieceType pt) {
-        return pt == PieceType.EMPTY ? EMPTY : values()[(c == Colour.WHITE ? 0 : W_QUEEN.ordinal() + pt.ordinal())];
+        return pt == PieceType.EMPTY ? EMPTY : values()[(c == Colour.WHITE ? 0 : W_QUEEN.ordinal())+ pt.ordinal()];
     }
 
     /**

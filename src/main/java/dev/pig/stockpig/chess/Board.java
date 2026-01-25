@@ -163,7 +163,7 @@ public final class Board {
      */
     public Piece piece(final long bitboard) {
         final PieceType pt = pieceType(bitboard);
-        return Piece.of(Colour.of(Bitboard.contains(this.colourBBs[0], bitboard)), pt);
+        return Piece.of(Colour.of(Bitboard.contains(this.colourBBs[Colour.WHITE.ordinal()], bitboard)), pt);
     }
 
 

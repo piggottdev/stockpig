@@ -1,6 +1,5 @@
 package dev.pig.old.chess;
 
-import dev.pig.old.chess.Bitboard;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

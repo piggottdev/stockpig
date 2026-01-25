@@ -195,6 +195,7 @@ public final class Move {
      * @param move move
      * @return is capture move
      */
+    // TODO: Candidate optimisation: Don't need to convert to PieceType
     public static boolean isCapture(final int move) {
         return capture(move) != PieceType.EMPTY;
     }
