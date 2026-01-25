@@ -1,5 +1,9 @@
 package dev.pig.stockpig.chess.perft;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 /**
  * Bench is a runner for a suite of move enumeration PERFT tests.
  * The results of the first run are discarded in order to warmup the JVM and
@@ -11,7 +15,7 @@ public final class Bench {
      * Run move enumeration PERFT benchmarking test suite.
      * @param args args
      */
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws IOException {
 
         // Warmup
         for (final Test test : Suite.TESTS) Test.run(test);
@@ -44,6 +48,19 @@ public final class Bench {
         System.out.println("-------------------- Finished ME-PERFTs --------------------");
         System.out.printf("ME-PERFT Suite completed: %d nodes in %dms%n", totalNodes, totalRuntime/1000000);
 
+        // If a test failed then exit now
         if (!pass) System.exit(1);
+
+        // If a results file path was passed then print a json result there
+        if (args.length > 0) {
+            Files.writeString(Path.of(args[0]), String.format(
+        """
+        {
+            "runtime": %d,
+            "nodes": %d,
+            "nps": %d
+        }
+        """, totalRuntime, totalNodes, Math.round(totalNodes / (totalRuntime/1000000000d)) ));
+        }
     }
 }

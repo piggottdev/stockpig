@@ -24,4 +24,8 @@ jobs:
         run: mvn compile
 
       - name: Run PERFT
-        run: java -Xms512m -Xmx512m -server -XX:+AlwaysPreTouch -XX:+UseSerialGC -XX:-TieredCompilation -XX:ActiveProcessorCount=1 -classpath target/classes dev.pig.stockpig.chess.perft.Bench
+        run: java -Xms512m -Xmx512m -server -XX:+AlwaysPreTouch -XX:+UseSerialGC -XX:-TieredCompilation -XX:ActiveProcessorCount=1 -classpath target/classes dev.pig.stockpig.chess.perft.Bench ./perft_results.json
+
+      - name: Compare Baseline
+        if: github.event_name == 'pull_request'
+        run: (( $(jq .nps ./perft_results.json)*100 < $(jq .nps .github/baseline.json)*95 )) && exit 1 || exit 0
