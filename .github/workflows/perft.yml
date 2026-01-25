@@ -23,8 +23,5 @@ jobs:
       - name: Build Project
         run: mvn compile
 
-      - name: List dir
-        run: ls target/classes
-
       - name: Run PERFT
         run: java -Xms512m -Xmx512m -server -XX:+AlwaysPreTouch -XX:+UseSerialGC -XX:-TieredCompilation -XX:ActiveProcessorCount=1 -classpath target/classes dev.pig.stockpig.chess.perft.Bench
