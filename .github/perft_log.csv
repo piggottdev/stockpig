@@ -2,3 +2,4 @@ Description,Nps,Improvement
 Reworked,20132245,0.0%
 Add unit tests,22195171,+10.2%
 Cache Square enum values,61612865,+177.6%
+Cache Piece and PieceType enum values,70973199,+15.2%
