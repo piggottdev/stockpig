@@ -246,6 +246,7 @@ public final class Bitboard {
      * @param bb bitboard
      * @param c single occupancy bitboard consumer
      */
+    // TODO: Candidate optimisation: Test inline
     public static void forEachBit(long bb, final LongConsumer c) {
         while (bb != 0L) {
             final long lsb = Long.lowestOneBit(bb);

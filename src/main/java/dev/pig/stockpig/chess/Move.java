@@ -35,6 +35,9 @@ public final class Move {
     private static final int CAPTURE_SHIFT    = 15;
     private static final int PROMOTE_SHIFT    = 18;
 
+    // Helper mask
+    private static final int CAPTURE_MASK = SQUARE_MASK << CAPTURE_SHIFT;
+
 
     // ====================================================================================================
     //                                  Constructors and Builders
@@ -197,9 +200,8 @@ public final class Move {
      * @param move move
      * @return is capture move
      */
-    // TODO: Candidate optimisation: Don't need to convert to PieceType
     public static boolean isCapture(final int move) {
-        return capture(move) != PieceType.EMPTY;
+        return (move & CAPTURE_MASK) != 0;
     }
 
 

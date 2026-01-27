@@ -141,15 +141,15 @@
          * @param bitboard bitboard
          * @return piece type
          */
-        // TODO: Candidate optimisation: Test splitting into bespoke search function (if move generator calls this
-        // TODO:                         it's because a piece is definitely here, maybe start at 1.
         public PieceType pieceType(final long bitboard) {
-            for (int i = 0; i < this.pieceBBs.length; i++) {
-                if (Bitboard.contains(this.pieceBBs[i], bitboard)) {
-                    return PieceType.of(i);
-                }
-            }
-            return PieceType.EMPTY;
+            return
+                    Bitboard.intersects(this.pieceBBs[2], bitboard) ? PieceType.PAWN :
+                    Bitboard.intersects(this.pieceBBs[3], bitboard) ? PieceType.KNIGHT :
+                    Bitboard.intersects(this.pieceBBs[4], bitboard) ? PieceType.BISHOP :
+                    Bitboard.intersects(this.pieceBBs[5], bitboard) ? PieceType.ROOK :
+                    Bitboard.intersects(this.pieceBBs[6], bitboard) ? PieceType.QUEEN :
+                    Bitboard.intersects(this.pieceBBs[1], bitboard) ? PieceType.KING :
+                    PieceType.EMPTY;
         }
 
         /**
