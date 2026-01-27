@@ -1,5 +1,8 @@
 package dev.pig.stockpig.chess;
 
+import dev.pig.stockpig.chess.bitboard.Direction;
+import dev.pig.stockpig.chess.bitboard.Rank;
+
 /**
  * Colour is an enum for each chess team colour.
  */

@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.bitboard;
 
 import java.util.function.LongConsumer;
 

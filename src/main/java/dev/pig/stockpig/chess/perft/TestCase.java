@@ -4,7 +4,7 @@ import dev.pig.stockpig.chess.MoveList;
 import dev.pig.stockpig.chess.Position;
 
 /**
- * Test represents a move enumeration PERFT test case. Move enumeration tests construct
+ * Test case represents a move enumeration PERFT test case. Move enumeration tests construct
  * a position tree by making all legal moves up to a depth ply, the amount of nodes
  * is then compared against the known correct value to validate move generation. Monitoring
  * time elapsed for tests is a good way of benchmarking move generation.
@@ -13,7 +13,7 @@ import dev.pig.stockpig.chess.Position;
  * @param depth depth ply
  * @param expectedNodes expected node count
  */
-public record Test(String name, String fen, int depth, long expectedNodes) {
+public record TestCase(String name, String fen, int depth, long expectedNodes) {
 
     /**
      * Result is the result of a move enumeration PERFT test.
@@ -27,7 +27,7 @@ public record Test(String name, String fen, int depth, long expectedNodes) {
      * @param test move enumeration PERFT test
      * @return result
      */
-    public static Result run(final Test test) {
+    public static Result run(final TestCase test) {
         final Position pos = Position.fromFen(test.fen);
 
         final long start = System.nanoTime();

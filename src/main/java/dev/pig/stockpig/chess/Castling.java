@@ -1,5 +1,8 @@
 package dev.pig.stockpig.chess;
 
+import dev.pig.stockpig.chess.bitboard.Bitboard;
+import dev.pig.stockpig.chess.bitboard.Square;
+
 /**
  * Castling rights are stored as a single byte bitmap data structure.
  * The 4 LSBs store whether each team/side castle is possible.

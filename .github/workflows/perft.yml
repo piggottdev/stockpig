@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'src/main/java/dev/pig/stockpig/chess/**'
+    branches:
+      - main
   push:
     paths:
       - 'src/main/java/dev/pig/stockpig/chess/**'

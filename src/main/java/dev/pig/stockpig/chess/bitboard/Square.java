@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.bitboard;
 
 /**
  * Square is an enum for all co-ordinates on an 8x8 chess board,

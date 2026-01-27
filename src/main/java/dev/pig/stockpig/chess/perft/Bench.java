@@ -18,7 +18,7 @@ public final class Bench {
     public static void main(final String[] args) throws IOException {
 
         // Warmup
-        for (final Test test : Suite.TESTS) Test.run(test);
+        for (final TestCase test : Suite.TESTS) TestCase.run(test);
         System.gc();
 
         // Suite level results
@@ -28,8 +28,8 @@ public final class Bench {
 
         System.out.println("-------------------- Starting ME-PERFTs --------------------");
 
-        for (final Test test : Suite.TESTS) {
-            final Test.Result result = Test.run(test);
+        for (final TestCase test : Suite.TESTS) {
+            final TestCase.Result result = TestCase.run(test);
 
             if (result.nodes() == test.expectedNodes()) {
                 System.out.printf("ME-PERFT '%-10s' PASS: nodes=%-10s elapsed=%5sms%n",

@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.bitboard;
 
 /**
  * Attacks provides static functions for obtaining attack bitboard maps.

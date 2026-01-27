@@ -1,5 +1,7 @@
 package dev.pig.stockpig.chess;
 
+import dev.pig.stockpig.chess.bitboard.Square;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,5 +1,7 @@
 package dev.pig.stockpig.chess;
 
+import dev.pig.stockpig.chess.bitboard.Square;
+
 /**
  * Moves are encoded as single integer bitmaps. Set bit ranges encode properties
  * of the move, including some redundant move information that could be inferred
