@@ -4,6 +4,7 @@ package dev.pig.stockpig.chess.bitboard;
  * Square is an enum for all co-ordinates on an 8x8 chess board,
  * using algebraic notation, file letter, rank number.
  */
+// TODO: Candidate optimisation: Test removing enum in favour of int/byte
 public enum Square {
     // Vertically flipped, A1 (0) would appear in the bottom left visually.
     A1, B1, C1, D1, E1, F1, G1, H1,
@@ -16,16 +17,16 @@ public enum Square {
     A8, B8, C8, D8, E8, F8, G8, H8,
     EMPTY;
 
+    private static final Square[] VALUES = values();
+
 
     /**
      * Get the square for the given square index/ordinal (0...63).
      * @param i index
      * @return square
      */
-    // TODO: Candidate optimisation: Test caching values() or removing Square enum in favour of an int/byte
-    // TODO: Candidate optimisation: Remove bounds check
     public static Square of(final int i) {
-        return i < 0 || i >= values().length ? EMPTY : values()[i];
+        return VALUES[i];
     }
 
     /**
@@ -43,9 +44,8 @@ public enum Square {
      * @param bb bitboard
      * @return square
      */
-    // TODO: Candidate optimisation: Test caching values() or removing Square enum in favour of an int/byte
     public static Square fromBitboard(final long bb) {
-        return values()[Long.numberOfTrailingZeros(bb)];
+        return of(Long.numberOfTrailingZeros(bb));
     }
 
     /**
@@ -62,11 +62,8 @@ public enum Square {
      * @param d direction
      * @return moved square
      */
-    // TODO: Candidate optimisation: Test caching values() or removing Square enum in favour of an int/byte
-    // TODO: Candidate optimisation: Test removing bounds check
     public Square move(final Direction d) {
-        final int o = ordinal() + d.offset();
-        return (0 <= o && o <= 63) ? values()[o] : EMPTY;
+        return of(ordinal() + d.offset());
     }
 
     /**
