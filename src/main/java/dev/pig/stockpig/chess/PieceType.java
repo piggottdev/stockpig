@@ -3,8 +3,11 @@ package dev.pig.stockpig.chess;
 /**
  * Piece type is an enum for each type of chess piece, including the empty piece.
  */
+// TODO: Candidate optimisation: Test removing enum in favour of int/byte
 public enum PieceType {
     EMPTY, KING, PAWN, KNIGHT, BISHOP, ROOK, QUEEN;
+
+    private static final PieceType[] VALUES = values();
 
 
     /**
@@ -12,10 +15,8 @@ public enum PieceType {
      * @param i index
      * @return piece type
      */
-    // TODO: Candidate optimisation: Test caching values() or removing PieceType enum in favour of an int/byte
-    // TODO: Candidate optimisation: Remove bounds check
     public static PieceType of(final int i) {
-        return i < 0 || i >= values().length ? EMPTY : values()[i];
+        return VALUES[i];
     }
 
     /**
