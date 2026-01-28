@@ -36,7 +36,7 @@ public final class Move {
     private static final int PROMOTE_SHIFT    = 18;
 
     // Helper mask
-    private static final int CAPTURE_MASK = SQUARE_MASK << CAPTURE_SHIFT;
+    private static final int CAPTURE_MASK = PIECE_MASK << CAPTURE_SHIFT;
 
 
     // ====================================================================================================
