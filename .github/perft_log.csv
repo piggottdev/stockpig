@@ -6,3 +6,4 @@ Cache Piece and PieceType enum values,70973199,+15.2%
 Custom piece query order,71208730,+0.3%
 Optimise dead position,72606998,+2.0%
 Fix capture test,79734045,+9.8%
+Square piece mailbox for piece lookups,75481639,-5.3%
