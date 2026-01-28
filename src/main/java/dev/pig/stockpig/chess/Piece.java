@@ -39,7 +39,7 @@ public enum Piece {
      * @return piece
      */
     public static Piece of(final Colour c, final PieceType pt) {
-        return pt == PieceType.EMPTY ? EMPTY : VALUES[(c == Colour.WHITE ? 0 : W_QUEEN.ordinal())+ pt.ordinal()];
+        return pt == PieceType.EMPTY ? EMPTY : VALUES[(c == Colour.WHITE ? 0 : W_QUEEN.ordinal()) + pt.ordinal()];
     }
 
     /**

@@ -266,6 +266,8 @@ public final class MoveGenerator {
         final Direction attackDir1  = us.pawnAttackDirection1();
         final Direction attackDir2  = us.pawnAttackDirection2();
 
+        // TODO: Candidate optimisation: Test different flows like 1 pawn at a time.
+
         // Pawns that can push forward one
         final long onePushedPawns = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[VERTICAL]), forward, unoccupied);
         Bitboard.forEachBit(onePushedPawns & this.target, (final long destination) ->
