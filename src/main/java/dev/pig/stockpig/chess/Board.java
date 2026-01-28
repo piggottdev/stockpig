@@ -12,8 +12,7 @@
      */
     public final class Board {
 
-        // TODO: Candidate optimisation: Test redundant mailbox
-
+        // TODO: Candidate optimisation: Test with no unoccupied board - obtain via negation of colour union
         private final long[] pieceBBs   = new long[PieceType.values().length];
         private final long[] colourBBs  = new long[Colour.values().length];
 
@@ -168,9 +167,8 @@
          * @return piece
          */
         public Piece piece(final long bitboard) {
-            return Piece.of(
-                    Colour.of(Bitboard.contains(this.colourBBs[Colour.WHITE.ordinal()], bitboard)),
-                    pieceType(bitboard));
+            final PieceType pt = pieceType(bitboard);
+            return Piece.of(Colour.of(Bitboard.contains(this.colourBBs[Colour.WHITE.ordinal()], bitboard)), pt);
         }
 
 
@@ -247,36 +245,38 @@
          * Get whether the position is dead, insufficient material for a check mate.
          * @return is dead position
          */
+        // TODO: Candidate optimisation: Look at
         public boolean isDeadPosition() {
-            // Any pawn, rook, or queen on board => not dead
-            if ((pieces(PieceType.PAWN) | pieces(PieceType.ROOK) | pieces(PieceType.QUEEN)) != 0L) return false;
+            final int whiteTeamSize = Bitboard.count(pieces(Colour.WHITE));
+            final int blackTeamSize = Bitboard.count(pieces(Colour.BLACK));
 
-            final long knights = pieces(PieceType.KNIGHT);
-            final long bishops = pieces(PieceType.BISHOP);
-            final long minors = knights | bishops;
+            if (whiteTeamSize > 2 || blackTeamSize > 2) return false; // A team has more than two pieces
 
-            final int minorCount = Long.bitCount(minors);
+            if (whiteTeamSize == 1 && blackTeamSize == 1) return true; // Just kings
 
-            // More than 2 minor pieces
-            if (minorCount > 2) return false;
+            // Each team has at most 2 pieces and at least one team has 2 pieces...
 
-            // Kings only / King vs King + Minor
-            if (minorCount == 0 || minorCount == 1) return true;
+            final boolean whiteKnight = pieces(Colour.WHITE, PieceType.KNIGHT) != Bitboard.EMPTY;
+            final boolean whiteBishop = pieces(Colour.WHITE, PieceType.BISHOP) != Bitboard.EMPTY;
+            if (whiteTeamSize == 2 && !whiteKnight && !whiteBishop) return false; // White has a piece that can mate
 
-            // 2 Minor pieces...
+            final boolean blackKnight = pieces(Colour.BLACK, PieceType.KNIGHT) != Bitboard.EMPTY;
+            final boolean blackBishop = pieces(Colour.BLACK, PieceType.BISHOP) != Bitboard.EMPTY;
+            if (blackTeamSize == 2 && !blackKnight && !blackBishop) return false; // Black has a piece that can mate
 
-            // King + Knight vs King + Knight or Bishop
-            if (knights != Bitboard.EMPTY) return false;
+            // Only Kings, Bishops and Knights...
 
-            // 2 Bishops...
+            if (whiteTeamSize + blackTeamSize == 3) return true; // King vs King + Knight or Bishop
 
-            // Bishops are on same team
-            final long whiteBishops = bishops & pieces(Colour.WHITE);
-            if (whiteBishops == bishops || whiteBishops == Bitboard.EMPTY) return false;
+            // King + Knight or Bishop vs King + Knight or Bishop...
 
-            // Dead if bishops are on same colour
-            final long bishopsOnWhite = bishops & Bitboard.WHITE_SQUARES;
-            return bishopsOnWhite == bishops || bishopsOnWhite == Bitboard.EMPTY;
+            if (whiteKnight || blackKnight) return false; // While unlikely, checkmate is possible with knights
+
+            // King + Bishop vs King + Bishop...
+
+            // Dead if bishops are on the same colour squares
+            final int bishopsOnWhite = Bitboard.count(pieces(PieceType.BISHOP) & Bitboard.WHITE_SQUARES);
+            return bishopsOnWhite == 0 || bishopsOnWhite == 2;
         }
 
 

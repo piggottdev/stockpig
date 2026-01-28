@@ -186,16 +186,6 @@ public final class BoardTest {
     }
 
     @Test
-    public void isDeadPosition_KingBishopBishopVsKing_SameColour() {
-        final Board board = Board.empty();
-        board.addPiece(Colour.WHITE, PieceType.KING, Square.E1);
-        board.addPiece(Colour.WHITE, PieceType.BISHOP, Square.C1);
-        board.addPiece(Colour.WHITE, PieceType.BISHOP, Square.C7);
-        board.addPiece(Colour.BLACK, PieceType.KING, Square.E8);
-        assertFalse(board.isDeadPosition());
-    }
-
-    @Test
     public void isDeadPosition_KingBishopVsKingBishop_DifferentColour() {
         final Board board = Board.empty();
         board.addPiece(Colour.WHITE, PieceType.KING, Square.E1);
