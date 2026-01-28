@@ -24,11 +24,15 @@ public final class Castling {
     public static final int B_QUEEN_SIDE_MOVE = Move.castle(Square.E8, Square.C8);
     public static final int B_KING_SIDE_MOVE  = Move.castle(Square.E8, Square.G8);
 
-    // Rook move bits
-    public static final long W_QUEEN_SIDE_ROOK_MOVE = Bitboard.from(Square.A1, Square.D1);
-    public static final long W_KING_SIDE_ROOK_MOVE  = Bitboard.from(Square.F1, Square.H1);
-    public static final long B_QUEEN_SIDE_ROOK_MOVE = Bitboard.from(Square.A8, Square.D8);
-    public static final long B_KING_SIDE_ROOK_MOVE  = Bitboard.from(Square.F8, Square.H8);
+    // Rook move squares
+    public static final Square W_QUEEN_SIDE_ROOK_FROM = Square.A1;
+    public static final Square W_KING_SIDE_ROOK_FROM  = Square.H1;
+    public static final Square B_QUEEN_SIDE_ROOK_FROM = Square.A8;
+    public static final Square B_KING_SIDE_ROOK_FROM  = Square.H8;
+    public static final Square W_QUEEN_SIDE_ROOK_TO   = Square.D1;
+    public static final Square W_KING_SIDE_ROOK_TO    = Square.F1;
+    public static final Square B_QUEEN_SIDE_ROOK_TO   = Square.D8;
+    public static final Square B_KING_SIDE_ROOK_TO    = Square.F8;
 
     // Empty squares
     public static final long W_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.from(Square.B1, Square.C1, Square.D1);
@@ -66,15 +70,27 @@ public final class Castling {
     }
 
     /**
-     * Get the rook move bits for a given castle move.
+     * Get the rook from square for the given castle move.
      * @param c colour
      * @param to to square
-     * @return rook move bits
+     * @return rook from square
      */
-    public static long getRookMoveBits(final Colour c, final Square to) {
+    public static Square getRookFrom(final Colour c, final Square to) {
         return c == Colour.WHITE ?
-                to == Square.C1 ? W_QUEEN_SIDE_ROOK_MOVE : W_KING_SIDE_ROOK_MOVE :
-                to == Square.C8 ? B_QUEEN_SIDE_ROOK_MOVE : B_KING_SIDE_ROOK_MOVE;
+                to == Square.C1 ? W_QUEEN_SIDE_ROOK_FROM : W_KING_SIDE_ROOK_FROM :
+                to == Square.C8 ? B_QUEEN_SIDE_ROOK_FROM : B_KING_SIDE_ROOK_FROM;
+    }
+
+    /**
+     * Get the rook to square for the given castle move.
+     * @param c colour
+     * @param to to square
+     * @return rook to square
+     */
+    public static Square getRookTo(final Colour c, final Square to) {
+        return c == Colour.WHITE ?
+                to == Square.C1 ? W_QUEEN_SIDE_ROOK_TO : W_KING_SIDE_ROOK_TO :
+                to == Square.C8 ? B_QUEEN_SIDE_ROOK_TO : B_KING_SIDE_ROOK_TO;
     }
 
 
@@ -89,6 +105,7 @@ public final class Castling {
      * @param move move
      * @return updated castling rights
      */
+    // TODO: Candidate optimisation: Look at
     public static byte applyMove(final Colour c, byte rights, final int move) {
         if (c == Colour.WHITE) {
             if (Move.mover(move) == PieceType.KING) {

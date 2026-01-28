@@ -5,6 +5,8 @@ import dev.pig.stockpig.chess.bitboard.File;
 import dev.pig.stockpig.chess.bitboard.Rank;
 import dev.pig.stockpig.chess.bitboard.Square;
 
+import java.util.Arrays;
+
 /**
  * Board stores all piece data for a game of chess.
  * Arrays of occupancy bitboards store all piece information, the index within the array encodes the
@@ -12,26 +14,27 @@ import dev.pig.stockpig.chess.bitboard.Square;
  */
 public final class Board {
 
-    // TODO: Candidate optimisation: Test redundant mailbox
-
     private final long[] pieceBBs   = new long[PieceType.values().length];
     private final long[] colourBBs  = new long[Colour.values().length];
+
+    private final PieceType[] squares = new PieceType[64];
 
 
     // ====================================================================================================
     //                                  Constructors and Builders
     // ====================================================================================================
 
-    private Board() {}
+    private Board() {
+        this.pieceBBs[PieceType.EMPTY.ordinal()] |= Bitboard.ALL;
+        Arrays.fill(this.squares, PieceType.EMPTY);
+    }
 
     /**
      * Create an empty chess board.
      * @return empty board
      */
     public static Board empty() {
-        final Board board = new Board();
-        board.pieceBBs[PieceType.EMPTY.ordinal()] |= Bitboard.ALL;
-        return board;
+        return new Board();
     }
 
 
@@ -46,16 +49,8 @@ public final class Board {
      * @param sq square
      */
     public void addPiece(final Colour c, final PieceType pt, final Square sq) {
-        addPiece(c, pt, sq.bitboard());
-    }
-
-    /**
-     * Add a piece to board using a bitboard.
-     * @param c color
-     * @param pt piece type
-     * @param bitboard bitboard
-     */
-    public void addPiece(final Colour c, final PieceType pt, final long bitboard) {
+        final long bitboard = sq.bitboard();
+        this.squares[sq.ordinal()] = pt;
         this.colourBBs[c.ordinal()]                 |=  bitboard;
         this.pieceBBs[pt.ordinal()]                 |=  bitboard;
         this.pieceBBs[PieceType.EMPTY.ordinal()]    &=~ bitboard;
@@ -68,16 +63,8 @@ public final class Board {
      * @param sq square
      */
     public void removePiece(final Colour c, final PieceType pt, final Square sq) {
-        removePiece(c, pt, sq.bitboard());
-    }
-
-    /**
-     * Remove the piece from the bitboard.
-     * @param c colour
-     * @param pt piece type
-     * @param bitboard bitboard
-     */
-    public void removePiece(final Colour c, final PieceType pt, final long bitboard) {
+        final long bitboard = sq.bitboard();
+        this.squares[sq.ordinal()] = PieceType.EMPTY;
         this.colourBBs[c.ordinal()]                 &=~ bitboard;
         this.pieceBBs[pt.ordinal()]                 &=~ bitboard;
         this.pieceBBs[PieceType.EMPTY.ordinal()]    |=  bitboard;
@@ -138,19 +125,12 @@ public final class Board {
     // ====================================================================================================
 
     /**
-     * Get the piece type at the bitboard.
-     * @param bitboard bitboard
+     * Get the piece type at the square.
+     * @param sq square
      * @return piece type
      */
-    public PieceType pieceType(final long bitboard) {
-        return
-                Bitboard.intersects(this.pieceBBs[2], bitboard) ? PieceType.PAWN :
-                Bitboard.intersects(this.pieceBBs[3], bitboard) ? PieceType.KNIGHT :
-                Bitboard.intersects(this.pieceBBs[4], bitboard) ? PieceType.BISHOP :
-                Bitboard.intersects(this.pieceBBs[5], bitboard) ? PieceType.ROOK :
-                Bitboard.intersects(this.pieceBBs[6], bitboard) ? PieceType.QUEEN :
-                Bitboard.intersects(this.pieceBBs[1], bitboard) ? PieceType.KING :
-                PieceType.EMPTY;
+    public PieceType pieceType(final Square sq) {
+        return this.squares[sq.ordinal()];
     }
 
     /**
@@ -159,18 +139,9 @@ public final class Board {
      * @return piece
      */
     public Piece piece(final Square sq) {
-        return piece(sq.bitboard());
-    }
-
-    /**
-     * Get the piece at the bitboard.
-     * @param bitboard bitboard
-     * @return piece
-     */
-    public Piece piece(final long bitboard) {
         return Piece.of(
-                Colour.of(Bitboard.contains(this.colourBBs[Colour.WHITE.ordinal()], bitboard)),
-                pieceType(bitboard));
+                Colour.of(Bitboard.intersects(sq.bitboard(), this.colourBBs[Colour.WHITE.ordinal()])),
+                pieceType(sq));
     }
 
 
@@ -201,10 +172,8 @@ public final class Board {
 
         // If it's a castle move then move the rook
         if (Move.isCastle(move)) {
-            final long rookbits = Castling.getRookMoveBits(c, to);
-            this.pieceBBs[PieceType.ROOK.ordinal()]     ^= rookbits;
-            this.colourBBs[c.ordinal()]                 ^= rookbits;
-            this.pieceBBs[PieceType.EMPTY.ordinal()]    ^= rookbits;
+            removePiece(c, PieceType.ROOK, Castling.getRookFrom(c, to));
+            addPiece(c, PieceType.ROOK, Castling.getRookTo(c, to));
         }
     }
 
@@ -222,10 +191,8 @@ public final class Board {
 
         // If it's a castle move then move the rook
         if (Move.isCastle(move)) {
-            final long rookbits = Castling.getRookMoveBits(c, to);
-            this.pieceBBs[PieceType.ROOK.ordinal()]     ^= rookbits;
-            this.colourBBs[c.ordinal()]                 ^= rookbits;
-            this.pieceBBs[PieceType.EMPTY.ordinal()]    ^= rookbits;
+            removePiece(c, PieceType.ROOK, Castling.getRookTo(c, to));
+            addPiece(c, PieceType.ROOK, Castling.getRookFrom(c, to));
         }
 
         // Move the moving piece back to the source location (and un-promote if needed)

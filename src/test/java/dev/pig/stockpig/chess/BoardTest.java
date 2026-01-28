@@ -19,7 +19,7 @@ public final class BoardTest {
 
         board.addPiece(Colour.WHITE, PieceType.PAWN, Square.A2);
         assertEquals(Square.A2.bitboard(), board.pieces(Colour.WHITE, PieceType.PAWN));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.A2.bitboard()));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.A2));
         assertEquals(Bitboard.EMPTY ^ Square.A2.bitboard(), board.occupied());
         assertEquals(Bitboard.ALL ^ Square.A2.bitboard(), board.unoccupied());
 
@@ -37,13 +37,13 @@ public final class BoardTest {
 
         board.makeMove(Colour.WHITE, move);
         assertEquals(Square.A3.bitboard(), board.pieces(Colour.WHITE, PieceType.PAWN));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.A3.bitboard()));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.A3));
         assertEquals(Bitboard.EMPTY ^ Square.A3.bitboard(), board.occupied());
         assertEquals(Bitboard.ALL ^ Square.A3.bitboard(), board.unoccupied());
 
         board.unmakeMove(Colour.WHITE, move);
         assertEquals(Square.A2.bitboard(), board.pieces(Colour.WHITE, PieceType.PAWN));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.A2.bitboard()));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.A2));
         assertEquals(Bitboard.EMPTY ^ Square.A2.bitboard(), board.occupied());
         assertEquals(Bitboard.ALL ^ Square.A2.bitboard(), board.unoccupied());
     }
@@ -58,15 +58,15 @@ public final class BoardTest {
         board.makeMove(Colour.WHITE, move);
         assertEquals(Square.B3.bitboard(), board.pieces(Colour.WHITE, PieceType.PAWN));
         assertEquals(Bitboard.EMPTY, board.pieces(Colour.BLACK, PieceType.PAWN));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.B3.bitboard()));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.B3));
         assertEquals(Bitboard.EMPTY ^ Square.B3.bitboard(), board.occupied());
         assertEquals(Bitboard.ALL ^ Square.B3.bitboard(), board.unoccupied());
 
         board.unmakeMove(Colour.WHITE, move);
         assertEquals(Square.A2.bitboard(), board.pieces(Colour.WHITE, PieceType.PAWN));
         assertEquals(Square.B3.bitboard(), board.pieces(Colour.BLACK, PieceType.PAWN));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.A2.bitboard()));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.B3.bitboard()));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.A2));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.B3));
         assertEquals(Bitboard.EMPTY ^ (Square.A2.bitboard()|Square.B3.bitboard()), board.occupied());
         assertEquals(Bitboard.ALL ^ (Square.A2.bitboard()|Square.B3.bitboard()), board.unoccupied());
     }
@@ -80,14 +80,14 @@ public final class BoardTest {
         board.makeMove(Colour.WHITE, move);
         assertEquals(Square.A8.bitboard(), board.pieces(Colour.WHITE, PieceType.QUEEN));
         assertEquals(Bitboard.EMPTY, board.pieces(Colour.WHITE, PieceType.PAWN));
-        assertEquals(PieceType.QUEEN, board.pieceType(Square.A8.bitboard()));
+        assertEquals(PieceType.QUEEN, board.pieceType(Square.A8));
         assertEquals(Bitboard.EMPTY ^ Square.A8.bitboard(), board.occupied());
         assertEquals(Bitboard.ALL ^ Square.A8.bitboard(), board.unoccupied());
 
         board.unmakeMove(Colour.WHITE, move);
         assertEquals(Square.A7.bitboard(), board.pieces(Colour.WHITE, PieceType.PAWN));
         assertEquals(Bitboard.EMPTY, board.pieces(Colour.WHITE, PieceType.QUEEN));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.A7.bitboard()));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.A7));
         assertEquals(Bitboard.EMPTY ^ Square.A7.bitboard(), board.occupied());
         assertEquals(Bitboard.ALL ^ Square.A7.bitboard(), board.unoccupied());
     }
@@ -102,16 +102,16 @@ public final class BoardTest {
         board.makeMove(Colour.WHITE, move);
         assertEquals(Square.G1.bitboard(), board.pieces(Colour.WHITE, PieceType.KING));
         assertEquals(Square.F1.bitboard(), board.pieces(Colour.WHITE, PieceType.ROOK));
-        assertEquals(PieceType.KING, board.pieceType(Square.G1.bitboard()));
-        assertEquals(PieceType.ROOK, board.pieceType(Square.F1.bitboard()));
+        assertEquals(PieceType.KING, board.pieceType(Square.G1));
+        assertEquals(PieceType.ROOK, board.pieceType(Square.F1));
         assertEquals(Bitboard.EMPTY ^ (Bitboard.from(Square.F1, Square.G1)), board.occupied());
         assertEquals(Bitboard.ALL ^ (Bitboard.from(Square.F1, Square.G1)), board.unoccupied());
 
         board.unmakeMove(Colour.WHITE, move);
         assertEquals(Square.E1.bitboard(), board.pieces(Colour.WHITE, PieceType.KING));
         assertEquals(Square.H1.bitboard(), board.pieces(Colour.WHITE, PieceType.ROOK));
-        assertEquals(PieceType.KING, board.pieceType(Square.E1.bitboard()));
-        assertEquals(PieceType.ROOK, board.pieceType(Square.H1.bitboard()));
+        assertEquals(PieceType.KING, board.pieceType(Square.E1));
+        assertEquals(PieceType.ROOK, board.pieceType(Square.H1));
         assertEquals(Bitboard.EMPTY ^ (Bitboard.from(Square.E1, Square.H1)), board.occupied());
         assertEquals(Bitboard.ALL ^ (Bitboard.from(Square.E1, Square.H1)), board.unoccupied());
     }
@@ -126,15 +126,15 @@ public final class BoardTest {
         board.makeMove(Colour.WHITE, move);
         assertEquals(Square.D6.bitboard(), board.pieces(Colour.WHITE, PieceType.PAWN));
         assertEquals(Bitboard.EMPTY, board.pieces(Colour.BLACK, PieceType.PAWN));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.D6.bitboard()));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.D6));
         assertEquals(Bitboard.EMPTY ^ Square.D6.bitboard(), board.occupied());
         assertEquals(Bitboard.ALL ^ Square.D6.bitboard(), board.unoccupied());
 
         board.unmakeMove(Colour.WHITE, move);
         assertEquals(Square.E5.bitboard(), board.pieces(Colour.WHITE, PieceType.PAWN));
         assertEquals(Square.D5.bitboard(), board.pieces(Colour.BLACK, PieceType.PAWN));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.E5.bitboard()));
-        assertEquals(PieceType.PAWN, board.pieceType(Square.D5.bitboard()));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.E5));
+        assertEquals(PieceType.PAWN, board.pieceType(Square.D5));
         assertEquals(Bitboard.EMPTY ^ (Bitboard.from(Square.E5, Square.D5)), board.occupied());
         assertEquals(Bitboard.ALL ^ (Bitboard.from(Square.E5, Square.D5)), board.unoccupied());
     }

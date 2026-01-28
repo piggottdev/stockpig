@@ -327,7 +327,7 @@ public final class MoveGenerator {
             moves.add(Move.enPassant(from, to));
             return;
         }
-        explodePawnPromotions(moves, Move.capture(from, to, PieceType.PAWN, pos.board.pieceType(attack)), attack, promotionRank);
+        explodePawnPromotions(moves, Move.capture(from, to, PieceType.PAWN, pos.board.pieceType(to)), attack, promotionRank);
     }
 
     /**
@@ -490,11 +490,10 @@ public final class MoveGenerator {
      * @param unoccupied unoccupied bitboard
      */
     public void basicOrCapture(final Position pos, final MoveList moves, final long from, final long to, final PieceType pt, final long unoccupied) {
-        final int basicMove = Move.basic(Square.fromBitboard(from), Square.fromBitboard(to), pt);
-        moves.add(Bitboard.intersects(unoccupied, to) ?
-                basicMove :
-                Move.addCapture(basicMove, pos.board.pieceType(to))
-        );
+        final Square origin = Square.fromBitboard(from);
+        final Square destination = Square.fromBitboard(to);
+        final int basic = Move.basic(origin, destination, pt);
+        moves.add(Bitboard.intersects(unoccupied, to) ? basic : Move.addCapture(basic, pos.board.pieceType(destination)));
     }
 
     /**
