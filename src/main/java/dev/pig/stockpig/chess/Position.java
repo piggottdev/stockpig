@@ -23,13 +23,11 @@ public final class Position {
     private int turn;
 
     // History
-    // TODO: Candidate optimisation: Test different data structures (linked list, stack)
     private final List<State> history = new ArrayList<>(100);
     private record State(int move, byte castlingRights, Square enPassantTarget, int halfMoveClock){}
 
     // Moves (+ check, attack and pin information)
     private final MoveGenerator moveGenerator = new MoveGenerator();
-    // TODO: Candidate optimisation: Test if array list is exactly the same to remove move list
     private final MoveList moves = new MoveList();
 
 
