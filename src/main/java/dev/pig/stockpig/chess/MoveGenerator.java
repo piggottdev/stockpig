@@ -37,7 +37,6 @@ public final class MoveGenerator {
      * Reset all state that won't get reset during normal move generation.
      */
     public void reset() {
-        this.attacked = Bitboard.EMPTY;
         this.checkers = Bitboard.EMPTY;
         this.checkRay = Bitboard.EMPTY;
         this.pinned   = Bitboard.EMPTY;
@@ -78,10 +77,7 @@ public final class MoveGenerator {
 
         // TODO: Candidate optimisation: Kings cant check each other so this could just be an attack map
         // King attacks
-        stepAttacks(eKing, king, new Direction[]{
-                Direction.N, Direction.NE, Direction.E, Direction.SE,
-                Direction.S, Direction.SW, Direction.W, Direction.NW
-        });
+        this.attacked = Attacks.king(eKing);
         // Pawn attacks
         stepAttacks(ePawns, king, new Direction[]{
                 them.pawnAttackDirection1(), them.pawnAttackDirection2()
