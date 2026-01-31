@@ -8,3 +8,4 @@ Optimise dead position,72606998,+2.0%
 Fix capture test,79734045,+9.8%
 Square piece mailbox for piece lookups,75481639,-5.3%
 Unroll attack loops,82048795,+8.7%
+Castling rights update lookup,79646309,-2.9%
