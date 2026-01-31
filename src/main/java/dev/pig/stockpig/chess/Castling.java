@@ -3,6 +3,9 @@ package dev.pig.stockpig.chess;
 import dev.pig.stockpig.chess.bitboard.Bitboard;
 import dev.pig.stockpig.chess.bitboard.Square;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Castling rights are stored as a single byte bitmap data structure.
  * The 4 LSBs store whether each team/side castle is possible.
@@ -45,6 +48,18 @@ public final class Castling {
     public static final long W_KING_CHECK_SQUARES  = Bitboard.of(Square.F1, Square.G1);
     public static final long B_QUEEN_CHECK_SQUARES = Bitboard.of(Square.C8, Square.D8);
     public static final long B_KING_CHECK_SQUARES  = Bitboard.of(Square.F8, Square.G8);
+
+    private static final byte[] SQUARE_MASKS = new byte[64];
+    static {
+        Arrays.fill(SQUARE_MASKS, ALL);
+        SQUARE_MASKS[Square.A1.ordinal()] = ~(W_QUEEN_SIDE);
+        SQUARE_MASKS[Square.H1.ordinal()] = ~(W_KING_SIDE);
+        SQUARE_MASKS[Square.E1.ordinal()] = ~(W_QUEEN_SIDE | W_KING_SIDE);
+
+        SQUARE_MASKS[Square.A8.ordinal()] = ~(B_QUEEN_SIDE);
+        SQUARE_MASKS[Square.H8.ordinal()] = ~(B_KING_SIDE);
+        SQUARE_MASKS[Square.E8.ordinal()] = ~(B_QUEEN_SIDE | B_KING_SIDE);
+    }
 
 
     // ====================================================================================================
@@ -100,44 +115,12 @@ public final class Castling {
 
     /**
      * Get the castling rights after a given move.
-     * @param c colour
      * @param rights current castling rights
      * @param move move
      * @return updated castling rights
      */
-    // TODO: Candidate optimisation: Look at
-    static byte update(final Colour c, byte rights, final int move) {
-        if (c == Colour.WHITE) {
-            if (Move.mover(move) == PieceType.KING) {
-                rights &= ~(W_QUEEN_SIDE | W_KING_SIDE);
-            } else if (Move.from(move) == Square.A1) {
-                rights &= ~W_QUEEN_SIDE;
-            } else if (Move.from(move) == Square.H1) {
-                rights &= ~W_KING_SIDE;
-            }
-
-            if (Move.to(move) == Square.A8) {
-                rights &= ~B_QUEEN_SIDE;
-            } else if (Move.to(move) == Square.H8) {
-                rights &= ~B_KING_SIDE;
-            }
-        } else {
-            if (Move.mover(move) == PieceType.KING) {
-                rights &= ~(B_QUEEN_SIDE | B_KING_SIDE);
-            } else if (Move.from(move) == Square.A8) {
-                rights &= ~B_QUEEN_SIDE;
-            } else if (Move.from(move) == Square.H8) {
-                rights &= ~B_KING_SIDE;
-            }
-
-            if (Move.to(move) == Square.A1) {
-                rights &= ~W_QUEEN_SIDE;
-            } else if (Move.to(move) == Square.H1) {
-                rights &= ~W_KING_SIDE;
-            }
-        }
-
-        return rights;
+    static byte update(byte rights, final int move) {
+        return (byte) (rights & SQUARE_MASKS[Move.from(move).ordinal()] & SQUARE_MASKS[Move.to(move).ordinal()]);
     }
 
 

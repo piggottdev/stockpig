@@ -4,7 +4,6 @@ package dev.pig.stockpig.chess;
  * Piece is an enum for each chess piece including colour.
  * Aggregates the colour and piece type enums allowing both to be returned with a single enum.
  */
-// TODO: Candidate optimisation: Test removing enum in favour of int/byte
 public enum Piece {
     EMPTY       (null,  PieceType.EMPTY),
     W_KING      (Colour.WHITE, PieceType.KING),
