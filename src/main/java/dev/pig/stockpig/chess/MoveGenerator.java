@@ -130,7 +130,7 @@ public final class MoveGenerator {
      * @param axis axis of the directions
      * @param ds directions
      */
-    public void pins(final long king, final long friends, final long enemies, final long eSliders, final int axis, final Direction[] ds) {
+    private void pins(final long king, final long friends, final long enemies, final long eSliders, final int axis, final Direction[] ds) {
         for (final Direction d : ds) {
             pin(king, friends, enemies, eSliders, axis, d);
         }
@@ -142,7 +142,7 @@ public final class MoveGenerator {
      * @param unoccupied unoccupied bitboard
      * @param ds directions
      */
-    public void slidingAttacks(final long pieces, final long unoccupied, final Direction[] ds) {
+    private void slidingAttacks(final long pieces, final long unoccupied, final Direction[] ds) {
         for (final Direction d : ds) {
             slidingAttack(pieces, unoccupied, d);
         }
@@ -154,7 +154,7 @@ public final class MoveGenerator {
      * @param king king
      * @param ds directions
      */
-    public void stepAttacks(final long pieces, final long king, final Direction[] ds) {
+    private void stepAttacks(final long pieces, final long king, final Direction[] ds) {
         for (final Direction d : ds) {
             stepAttack(pieces, king, d);
         }
@@ -169,7 +169,7 @@ public final class MoveGenerator {
      * @param axis axis of the direction
      * @param d direction
      */
-    public void pin(final long king, final long friends, final long enemies, final long eSliders, final int axis, final Direction d) {
+    private void pin(final long king, final long friends, final long enemies, final long eSliders, final int axis, final Direction d) {
         final long line = Attacks.slide(king, ~enemies, d);
         final long pinner = line & eSliders;
 
@@ -198,7 +198,7 @@ public final class MoveGenerator {
      * @param unoccupied unoccupied bitboard
      * @param d direction
      */
-    public void slidingAttack(final long pieces, final long unoccupied, final Direction d) {
+    private void slidingAttack(final long pieces, final long unoccupied, final Direction d) {
         this.attacked |= Attacks.slide(pieces, unoccupied, d);
     }
 
@@ -208,7 +208,7 @@ public final class MoveGenerator {
      * @param king king
      * @param d direction
      */
-    public void stepAttack(final long pieces, final long king, final Direction d) {
+    private void stepAttack(final long pieces, final long king, final Direction d) {
         final long attacks = Bitboard.shift(pieces, d);
         if (Bitboard.intersects(king, attacks)) {
             this.checkers |= Bitboard.shiftRev(king, d);
@@ -271,12 +271,12 @@ public final class MoveGenerator {
         // Pawns that can push forward one
         final long onePushedPawns = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[VERTICAL]), forward, unoccupied);
         Bitboard.forEachBit(onePushedPawns & this.target, (final long destination) ->
-                explodePawnPromotions(moves, Move.basic(Square.fromBitboard(Bitboard.shiftRev(destination, forward)), Square.fromBitboard(destination), PieceType.PAWN), destination, promotionRank));
+                explodePawnPromotions(moves, Move.basic(Square.ofBitboard(Bitboard.shiftRev(destination, forward)), Square.ofBitboard(destination), PieceType.PAWN), destination, promotionRank));
 
         // Pawns that can double push
         final long twoPushedPawns = Bitboard.shiftInto(onePushedPawns & thirdRank, forward, unoccupied);
         Bitboard.forEachBit(twoPushedPawns & this.target, (final long destination) ->
-                moves.add(Move.doublePush(Square.fromBitboard(Bitboard.shift(destination, forward.offset()*-2)), Square.fromBitboard(destination))));
+                moves.add(Move.doublePush(Square.ofBitboard(Bitboard.shift(destination, forward.offset()*-2)), Square.ofBitboard(destination))));
 
         // Pawns that can attack in the diagonal direction
         final long pawnAttacks1 = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[DIAGONAL]), attackDir1, (enemies & this.target) | enPassantTarget);
@@ -297,7 +297,7 @@ public final class MoveGenerator {
      * @param to destination bitboard
      * @param promotionRank promotion rank bitboard
      */
-    public void explodePawnPromotions(final MoveList moves, final int move, final long to, final long promotionRank) {
+    private void explodePawnPromotions(final MoveList moves, final int move, final long to, final long promotionRank) {
         if (Bitboard.contains(promotionRank, to)) {
             moves.add(Move.addPromotion(move, PieceType.QUEEN));
             moves.add(Move.addPromotion(move, PieceType.KNIGHT));
@@ -318,10 +318,10 @@ public final class MoveGenerator {
      * @param enPassantTarget en passant target bitboard
      * @param promotionRank promotion rank bitboard.
      */
-    public void explodePawnCapture(final Position pos, final MoveList moves, final Direction attackDir, final long attack, final long enPassantTarget, final long promotionRank) {
+    private void explodePawnCapture(final Position pos, final MoveList moves, final Direction attackDir, final long attack, final long enPassantTarget, final long promotionRank) {
         final long pawn = Bitboard.shiftRev(attack, attackDir);
-        final Square from = Square.fromBitboard(pawn);
-        final Square to = Square.fromBitboard(attack);
+        final Square from = Square.ofBitboard(pawn);
+        final Square to = Square.ofBitboard(attack);
         if (attack == enPassantTarget) {
             if (isPinnedEnPassant(pos, pawn)) return;
             moves.add(Move.enPassant(from, to));
@@ -338,7 +338,7 @@ public final class MoveGenerator {
      * @param pawn moving pawn
      * @return is en passant illegal/pinned
      */
-    public boolean isPinnedEnPassant(final Position pos, final long pawn) {
+    private boolean isPinnedEnPassant(final Position pos, final long pawn) {
         final Colour us             = pos.sideToMove;
         final long king             = pos.board.pieces(us, PieceType.KING);
         final Direction backward    = us.backward();
@@ -489,9 +489,9 @@ public final class MoveGenerator {
      * @param pt moving piece type
      * @param unoccupied unoccupied bitboard
      */
-    public void basicOrCapture(final Position pos, final MoveList moves, final long from, final long to, final PieceType pt, final long unoccupied) {
-        final Square origin = Square.fromBitboard(from);
-        final Square destination = Square.fromBitboard(to);
+    private void basicOrCapture(final Position pos, final MoveList moves, final long from, final long to, final PieceType pt, final long unoccupied) {
+        final Square origin = Square.ofBitboard(from);
+        final Square destination = Square.ofBitboard(to);
         final int basic = Move.basic(origin, destination, pt);
         moves.add(Bitboard.intersects(unoccupied, to) ? basic : Move.addCapture(basic, pos.board.pieceType(destination)));
     }

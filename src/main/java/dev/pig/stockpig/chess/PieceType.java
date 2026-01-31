@@ -19,21 +19,23 @@ public enum PieceType {
         return VALUES[i];
     }
 
+
     /**
-     * Get a piece type from a character.
-     * @param c piece type character
+     * Get the piece type from a piece type character string.
+     * Any unknown piece types will return the empty piece type.
+     * @param s single character piece type string
      * @return piece type
      */
-    public static PieceType fromChar(final char c) {
-        return switch (Character.toLowerCase(c))
+    public static PieceType fromString(final String s) {
+        return switch (s.toLowerCase())
         {
-            case 'k' -> KING;
-            case 'p' -> PAWN;
-            case 'n' -> KNIGHT;
-            case 'b' -> BISHOP;
-            case 'r' -> ROOK;
-            case 'q' -> QUEEN;
-            default  -> EMPTY;
+            case "k" -> KING;
+            case "p" -> PAWN;
+            case "n" -> KNIGHT;
+            case "b" -> BISHOP;
+            case "r" -> ROOK;
+            case "q" -> QUEEN;
+            default -> EMPTY;
         };
     }
 

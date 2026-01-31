@@ -77,12 +77,14 @@ public enum Colour {
     }
 
     /**
-     * Get the colour from a lowercase letter string.
+     * Get the colour from a colour character string.
      * @param s lowercase letter string
      * @return colour
      */
     public static Colour fromString(final String s) {
-        return "w".equals(s) ? WHITE : BLACK;
+        if ("w".equalsIgnoreCase(s)) return WHITE;
+        if ("b".equalsIgnoreCase(s)) return BLACK;
+        throw new IllegalArgumentException("unknown colour " + s);
     }
 
     /**

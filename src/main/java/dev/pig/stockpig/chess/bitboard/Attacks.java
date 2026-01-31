@@ -1,7 +1,7 @@
 package dev.pig.stockpig.chess.bitboard;
 
 /**
- * Attacks provides static functions for obtaining attack bitboard maps.
+ * Attacks provides static functions for obtaining attack map bitboards.
  */
 public final class Attacks {
 
@@ -47,11 +47,10 @@ public final class Attacks {
      * @return bishop attack map
      */
     public static long bishop(final long bishop, final long unoccupied) {
-        long attacks = Bitboard.EMPTY;
-        for (final Direction d : new Direction[]{Direction.NE, Direction.SE, Direction.SW, Direction.NW}) {
-            attacks |= slide(bishop, unoccupied, d);
-        }
-        return attacks;
+        return  slide(bishop, unoccupied, Direction.NE) |
+                slide(bishop, unoccupied, Direction.SW) |
+                slide(bishop, unoccupied, Direction.SE) |
+                slide(bishop, unoccupied, Direction.NW);
     }
 
     /**
@@ -62,11 +61,10 @@ public final class Attacks {
      * @return rook attack map
      */
     public static long rook(final long rook, final long unoccupied) {
-        long attacks = Bitboard.EMPTY;
-        for (final Direction d : new Direction[]{Direction.N, Direction.E, Direction.S, Direction.W}) {
-            attacks |= slide(rook, unoccupied, d);
-        }
-        return attacks;
+        return  slide(rook, unoccupied, Direction.N) |
+                slide(rook, unoccupied, Direction.S) |
+                slide(rook, unoccupied, Direction.E) |
+                slide(rook, unoccupied, Direction.W);
     }
 
     /**

@@ -211,7 +211,7 @@ public final class Move {
 
     /**
      * Create a string representation of the move, this is the algebra notation of the origin
-     * square followed be the destination square, then the promoted piece type if any.
+     * square followed by the destination square, then the promoted piece type if any.
      * @param move move
      * @return algebra notation move
      */

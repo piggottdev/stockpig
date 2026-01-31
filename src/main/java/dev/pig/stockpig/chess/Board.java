@@ -141,7 +141,8 @@ public final class Board {
     public Piece piece(final Square sq) {
         return Piece.of(
                 Colour.of(Bitboard.intersects(sq.bitboard(), this.colourBBs[Colour.WHITE.ordinal()])),
-                pieceType(sq));
+                pieceType(sq)
+        );
     }
 
 
@@ -163,7 +164,7 @@ public final class Board {
 
         // If this was a capture remove that piece from the board
         if (capture != PieceType.EMPTY) {
-            removePiece(c.flip(), capture, Move.isEnPassant(move) ? to.move(c.backward()) : to);
+            removePiece(c.flip(), capture, Move.isEnPassant(move) ? to.shift(c.backward()) : to);
         }
 
         // Remove the moving piece from the's start location and add it to the destination
@@ -201,7 +202,7 @@ public final class Board {
 
         // If this was a capture add that piece to the board
         if (capture != PieceType.EMPTY) {
-            addPiece(c.flip(), capture, Move.isEnPassant(move) ? to.move(c.backward()) : to);
+            addPiece(c.flip(), capture, Move.isEnPassant(move) ? to.shift(c.backward()) : to);
         }
     }
 
@@ -266,7 +267,8 @@ public final class Board {
             if      (c == '/')              sq -= 16;
             else if (Character.isDigit(c))  sq += Character.digit(c, 10);
             else {
-                board.addPiece(Colour.of(Character.isUpperCase(c)), PieceType.fromChar(c), Square.of(sq));
+                final Piece p = Piece.fromString(Character.toString(c));
+                board.addPiece(p.colour(), p.type(), Square.of(sq));
                 sq++;
             }
         }

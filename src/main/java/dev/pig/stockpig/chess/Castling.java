@@ -35,16 +35,16 @@ public final class Castling {
     public static final Square B_KING_SIDE_ROOK_TO    = Square.F8;
 
     // Empty squares
-    public static final long W_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.from(Square.B1, Square.C1, Square.D1);
-    public static final long W_KING_SIDE_EMPTY_SQUARES  = Bitboard.from(Square.F1, Square.G1);
-    public static final long B_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.from(Square.B8, Square.C8, Square.D8);
-    public static final long B_KING_SIDE_EMPTY_SQUARES  = Bitboard.from(Square.F8, Square.G8);
+    public static final long W_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.of(Square.B1, Square.C1, Square.D1);
+    public static final long W_KING_SIDE_EMPTY_SQUARES  = Bitboard.of(Square.F1, Square.G1);
+    public static final long B_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.of(Square.B8, Square.C8, Square.D8);
+    public static final long B_KING_SIDE_EMPTY_SQUARES  = Bitboard.of(Square.F8, Square.G8);
 
     // Check squares
-    public static final long W_QUEEN_CHECK_SQUARES = Bitboard.from(Square.C1, Square.D1);
-    public static final long W_KING_CHECK_SQUARES  = Bitboard.from(Square.F1, Square.G1);
-    public static final long B_QUEEN_CHECK_SQUARES = Bitboard.from(Square.C8, Square.D8);
-    public static final long B_KING_CHECK_SQUARES  = Bitboard.from(Square.F8, Square.G8);
+    public static final long W_QUEEN_CHECK_SQUARES = Bitboard.of(Square.C1, Square.D1);
+    public static final long W_KING_CHECK_SQUARES  = Bitboard.of(Square.F1, Square.G1);
+    public static final long B_QUEEN_CHECK_SQUARES = Bitboard.of(Square.C8, Square.D8);
+    public static final long B_KING_CHECK_SQUARES  = Bitboard.of(Square.F8, Square.G8);
 
 
     // ====================================================================================================
@@ -75,7 +75,7 @@ public final class Castling {
      * @param to to square
      * @return rook from square
      */
-    public static Square getRookFrom(final Colour c, final Square to) {
+    static Square getRookFrom(final Colour c, final Square to) {
         return c == Colour.WHITE ?
                 to == Square.C1 ? W_QUEEN_SIDE_ROOK_FROM : W_KING_SIDE_ROOK_FROM :
                 to == Square.C8 ? B_QUEEN_SIDE_ROOK_FROM : B_KING_SIDE_ROOK_FROM;
@@ -87,7 +87,7 @@ public final class Castling {
      * @param to to square
      * @return rook to square
      */
-    public static Square getRookTo(final Colour c, final Square to) {
+    static Square getRookTo(final Colour c, final Square to) {
         return c == Colour.WHITE ?
                 to == Square.C1 ? W_QUEEN_SIDE_ROOK_TO : W_KING_SIDE_ROOK_TO :
                 to == Square.C8 ? B_QUEEN_SIDE_ROOK_TO : B_KING_SIDE_ROOK_TO;
@@ -106,7 +106,7 @@ public final class Castling {
      * @return updated castling rights
      */
     // TODO: Candidate optimisation: Look at
-    public static byte applyMove(final Colour c, byte rights, final int move) {
+    static byte update(final Colour c, byte rights, final int move) {
         if (c == Colour.WHITE) {
             if (Move.mover(move) == PieceType.KING) {
                 rights &= ~(W_QUEEN_SIDE | W_KING_SIDE);
@@ -153,7 +153,7 @@ public final class Castling {
      * @param attacked attacked bitboard
      * @return whether queen side castle is allowed
      */
-    public static boolean isQueenSideAllowed(final Colour c, final byte rights, final long unoccupied, final long attacked) {
+    static boolean isQueenSideAllowed(final Colour c, final byte rights, final long unoccupied, final long attacked) {
         return c == Colour.WHITE ?
                 isCastleAllowed(rights, unoccupied, attacked, W_QUEEN_SIDE, W_QUEEN_SIDE_EMPTY_SQUARES, W_QUEEN_CHECK_SQUARES) :
                 isCastleAllowed(rights, unoccupied, attacked, B_QUEEN_SIDE, B_QUEEN_SIDE_EMPTY_SQUARES, B_QUEEN_CHECK_SQUARES);
@@ -167,7 +167,7 @@ public final class Castling {
      * @param attacked attacked bitboard
      * @return whether king side castle is allowed
      */
-    public static boolean isKingSideAllowed(final Colour c, final byte rights, final long unoccupied, final long attacked) {
+    static boolean isKingSideAllowed(final Colour c, final byte rights, final long unoccupied, final long attacked) {
         return c == Colour.WHITE ?
                 isCastleAllowed(rights, unoccupied, attacked, W_KING_SIDE, W_KING_SIDE_EMPTY_SQUARES, W_KING_CHECK_SQUARES) :
                 isCastleAllowed(rights, unoccupied, attacked, B_KING_SIDE, B_KING_SIDE_EMPTY_SQUARES, B_KING_CHECK_SQUARES);
@@ -196,7 +196,7 @@ public final class Castling {
     // ====================================================================================================
 
     /**
-     * Get the castling right from a string.
+     * Get the castling rights from a string.
      * @param s castling rights string
      * @return castling rights
      */
@@ -211,10 +211,10 @@ public final class Castling {
     /**
      * Get a castling rights string from castling rights.
      * @param rights castling rights
-     * @return castling right string
+     * @return castling rights string
      */
     public static String toString(final byte rights) {
-        return  rights == 0 ? "-" :
+        return  rights == NONE ? "-" :
                 ((rights & W_KING_SIDE)     == 0 ? "" : "K") +
                 ((rights & W_QUEEN_SIDE)    == 0 ? "" : "Q") +
                 ((rights & B_KING_SIDE)     == 0 ? "" : "k") +

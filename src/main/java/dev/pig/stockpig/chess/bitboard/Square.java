@@ -36,7 +36,7 @@ public enum Square {
      * @return square at the intersection of file and rank
      */
     public static Square of(final File f, final Rank r) {
-        return fromBitboard(f.bitboard() & r.bitboard());
+        return ofBitboard(f.bitboard() & r.bitboard());
     }
 
     /**
@@ -44,7 +44,7 @@ public enum Square {
      * @param bb bitboard
      * @return square
      */
-    public static Square fromBitboard(final long bb) {
+    public static Square ofBitboard(final long bb) {
         return of(Long.numberOfTrailingZeros(bb));
     }
 
@@ -62,16 +62,22 @@ public enum Square {
      * @param d direction
      * @return moved square
      */
-    public Square move(final Direction d) {
+    public Square shift(final Direction d) {
         return of(ordinal() + d.offset());
     }
 
     /**
      * Get the square from an algebraic notation string.
+     * Any unknown square notation will return the empty square.
+     * @param s algebraic notation square string
      * @return square
      */
     public static Square fromString(final String s) {
-        return "-".equals(s) ? EMPTY : valueOf(s.toUpperCase());
+        try {
+            return valueOf(s.toUpperCase());
+        } catch (final IllegalArgumentException iae) {
+            return EMPTY;
+        }
     }
 
     /**

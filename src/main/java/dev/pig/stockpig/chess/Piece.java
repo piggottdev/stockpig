@@ -59,12 +59,17 @@ public enum Piece {
     }
 
     /**
-     * Get a piece from a character.
-     * @param c piece character
+     * Get the piece from a piece character string.
+     * Any unknown pieces will return the empty piece.
+     * @param s single character piece string
      * @return piece
      */
-    public static Piece fromChar(final char c) {
-        return Piece.of(Character.isUpperCase(c) ? Colour.WHITE : Colour.BLACK, PieceType.fromChar(c));
+    public static Piece fromString(final String s) {
+        if (s.isEmpty()) return EMPTY;
+        return Piece.of(
+                Character.isUpperCase(s.charAt(0)) ? Colour.WHITE : Colour.BLACK,
+                PieceType.fromString(s)
+        );
     }
 
     /**

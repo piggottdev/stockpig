@@ -4,7 +4,6 @@ package dev.pig.stockpig.chess.bitboard;
  * Direction is an enum for all possible directions a piece can move on a chess board,
  * including knight L-shapes. The enum uses compass directions as looking at the board with
  * A1 in the bottom left.
- * The offset and mask are stored with the enum to be used when bitboard shifting.
  */
 public enum Direction {
     N   (8,     Bitboard.ALL),
@@ -43,7 +42,7 @@ public enum Direction {
     }
 
     /**
-     * Return the post-shift mask that prevents file wrap around of the direction.
+     * Return the post-shift mask that prevents file wrap around in the direction.
      * @return mask
      */
     public long mask() {

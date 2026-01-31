@@ -104,16 +104,16 @@ public final class BoardTest {
         assertEquals(Square.F1.bitboard(), board.pieces(Colour.WHITE, PieceType.ROOK));
         assertEquals(PieceType.KING, board.pieceType(Square.G1));
         assertEquals(PieceType.ROOK, board.pieceType(Square.F1));
-        assertEquals(Bitboard.EMPTY ^ (Bitboard.from(Square.F1, Square.G1)), board.occupied());
-        assertEquals(Bitboard.ALL ^ (Bitboard.from(Square.F1, Square.G1)), board.unoccupied());
+        assertEquals(Bitboard.EMPTY ^ (Bitboard.of(Square.F1, Square.G1)), board.occupied());
+        assertEquals(Bitboard.ALL ^ (Bitboard.of(Square.F1, Square.G1)), board.unoccupied());
 
         board.unmakeMove(Colour.WHITE, move);
         assertEquals(Square.E1.bitboard(), board.pieces(Colour.WHITE, PieceType.KING));
         assertEquals(Square.H1.bitboard(), board.pieces(Colour.WHITE, PieceType.ROOK));
         assertEquals(PieceType.KING, board.pieceType(Square.E1));
         assertEquals(PieceType.ROOK, board.pieceType(Square.H1));
-        assertEquals(Bitboard.EMPTY ^ (Bitboard.from(Square.E1, Square.H1)), board.occupied());
-        assertEquals(Bitboard.ALL ^ (Bitboard.from(Square.E1, Square.H1)), board.unoccupied());
+        assertEquals(Bitboard.EMPTY ^ (Bitboard.of(Square.E1, Square.H1)), board.occupied());
+        assertEquals(Bitboard.ALL ^ (Bitboard.of(Square.E1, Square.H1)), board.unoccupied());
     }
 
     @Test
@@ -135,8 +135,8 @@ public final class BoardTest {
         assertEquals(Square.D5.bitboard(), board.pieces(Colour.BLACK, PieceType.PAWN));
         assertEquals(PieceType.PAWN, board.pieceType(Square.E5));
         assertEquals(PieceType.PAWN, board.pieceType(Square.D5));
-        assertEquals(Bitboard.EMPTY ^ (Bitboard.from(Square.E5, Square.D5)), board.occupied());
-        assertEquals(Bitboard.ALL ^ (Bitboard.from(Square.E5, Square.D5)), board.unoccupied());
+        assertEquals(Bitboard.EMPTY ^ (Bitboard.of(Square.E5, Square.D5)), board.occupied());
+        assertEquals(Bitboard.ALL ^ (Bitboard.of(Square.E5, Square.D5)), board.unoccupied());
     }
 
     @Test

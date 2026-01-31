@@ -103,8 +103,8 @@ public final class Position {
         this.history.add(new State(move, this.castlingRights, this.enPassantTarget, this.halfMoveClock));
 
         this.board.makeMove(this.sideToMove, move);
-        this.castlingRights = Castling.applyMove(this.sideToMove, this.castlingRights, move);
-        this.enPassantTarget = Move.isDoublePush(move) ? Move.from(move).move(this.sideToMove.forward()) : Square.EMPTY;
+        this.castlingRights = Castling.update(this.sideToMove, this.castlingRights, move);
+        this.enPassantTarget = Move.isDoublePush(move) ? Move.from(move).shift(this.sideToMove.forward()) : Square.EMPTY;
         this.halfMoveClock = Move.isCapture(move) || Move.mover(move) == PieceType.PAWN ? 0 : this.halfMoveClock + 1;
         this.sideToMove = this.sideToMove.flip();
         if (this.sideToMove == Colour.WHITE) this.turn++;

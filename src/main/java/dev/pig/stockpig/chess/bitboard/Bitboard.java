@@ -3,7 +3,7 @@ package dev.pig.stockpig.chess.bitboard;
 import java.util.function.LongConsumer;
 
 /**
- * Bitboard is a single long bitmap data structure encoding occupancy on a chess board.
+ * Bitboard is a single long bitmap data structure encoding occupancy of a chess board.
  * Each bit in the long is a bit flag for whether a chess square is occupied.
  * We can use several of these to represent the whole state of a chess board.
  * Bitwise operators also provide an efficient way to carry out certain operations.
@@ -44,7 +44,7 @@ public final class Bitboard {
      * @param sqs squares
      * @return bitboard
      */
-    public static long from(final Square...sqs) {
+    public static long of(final Square...sqs) {
         long bb = EMPTY;
         for (final Square sq : sqs) {
             bb |= sq.bitboard();
@@ -98,7 +98,7 @@ public final class Bitboard {
     }
 
     /**
-     * Get the intersection of two bitboards, that is the AND of every bit.
+     * Get the intersection of two bitboards, that is bitwise AND.
      * @param bb1 bitboard
      * @param bb2 bitboard
      * @return intersection bitboard
@@ -108,7 +108,7 @@ public final class Bitboard {
     }
 
     /**
-     * Get the union of two bitboards, that is the OR of every bit.
+     * Get the union of two bitboards, that is bitwise OR.
      * @param bb1 bitboard
      * @param bb2 bitboard
      * @return union bitboard
@@ -118,7 +118,17 @@ public final class Bitboard {
     }
 
     /**
-     * Get the inverse or complement of a bitboard, that is the one and zero bits switched.
+     * Get the exclusive or of two bitboards, that is bitwise XOR.
+     * @param bb1 bitboard
+     * @param bb2 bitboard
+     * @return exclusive or bitboard
+     */
+    public static long xor(final long bb1, final long bb2) {
+        return bb1 ^ bb2;
+    }
+
+    /**
+     * Get the inverse or complement of a bitboard, that is bitwise NOT.
      * @param bb bitboard
      * @return inverted bitboard
      */
@@ -232,7 +242,7 @@ public final class Bitboard {
      * @param bb bitboard
      * @return flipped bitboard
      */
-    public static long flipv(final long bb) {
+    public static long mirrorx(final long bb) {
         return Long.reverseBytes(bb);
     }
 

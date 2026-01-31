@@ -13,80 +13,82 @@ import static org.junit.jupiter.api.Assertions.*;
 public final class CastlingTest {
 
     @Test
-    public void applyMove_WhiteKing() {
+    public void update_WhiteKing() {
         assertEquals(
                 Castling.B_QUEEN_SIDE | Castling.B_KING_SIDE,
-                Castling.applyMove(Colour.WHITE, Castling.ALL, Move.basic(Square.E1, Square.G1, PieceType.KING)));
+                Castling.update(Colour.WHITE, Castling.ALL, Move.basic(Square.E1, Square.G1, PieceType.KING))
+        );
     }
 
     @Test
-    public void applyMove_BlackKing() {
+    public void update_BlackKing() {
         assertEquals(
                 Castling.W_QUEEN_SIDE | Castling.W_KING_SIDE,
-                Castling.applyMove(Colour.BLACK, Castling.ALL, Move.basic(Square.E8, Square.G8, PieceType.KING)));
+                Castling.update(Colour.BLACK, Castling.ALL, Move.basic(Square.E8, Square.G8, PieceType.KING))
+        );
     }
 
     @Test
-    public void applyMove_WhiteQueenRook() {
+    public void update_WhiteQueenRook() {
         assertEquals(
                 Castling.W_KING_SIDE | Castling.B_QUEEN_SIDE | Castling.B_KING_SIDE,
-                Castling.applyMove(Colour.WHITE, Castling.ALL, Move.basic(Square.A1, Square.A2, PieceType.ROOK))
+                Castling.update(Colour.WHITE, Castling.ALL, Move.basic(Square.A1, Square.A2, PieceType.ROOK))
         );
     }
 
     @Test
-    public void applyMove_WhiteKingRook() {
+    public void update_WhiteKingRook() {
         assertEquals(
                 Castling.W_QUEEN_SIDE | Castling.B_QUEEN_SIDE | Castling.B_KING_SIDE,
-                Castling.applyMove(Colour.WHITE, Castling.ALL, Move.basic(Square.H1, Square.H2, PieceType.ROOK))
+                Castling.update(Colour.WHITE, Castling.ALL, Move.basic(Square.H1, Square.H2, PieceType.ROOK))
         );
     }
 
     @Test
-    public void applyMove_BlackQueenRook() {
+    public void update_BlackQueenRook() {
         assertEquals(
                 Castling.W_QUEEN_SIDE | Castling.W_KING_SIDE | Castling.B_KING_SIDE,
-                Castling.applyMove(Colour.BLACK, Castling.ALL, Move.basic(Square.A8, Square.A7, PieceType.ROOK))
+                Castling.update(Colour.BLACK, Castling.ALL, Move.basic(Square.A8, Square.A7, PieceType.ROOK))
         );
     }
 
     @Test
-    public void applyMove_BlackKingRook() {
+    public void update_BlackKingRook() {
         assertEquals(
                 Castling.W_QUEEN_SIDE | Castling.W_KING_SIDE | Castling.B_QUEEN_SIDE,
-                Castling.applyMove(Colour.BLACK, Castling.ALL, Move.basic(Square.H8, Square.H7, PieceType.ROOK))
+                Castling.update(Colour.BLACK, Castling.ALL, Move.basic(Square.H8, Square.H7, PieceType.ROOK))
         );
     }
 
     @Test
-    public void applyMove_WhiteTakesBlackQueenRook() {
+    public void update_WhiteTakesBlackQueenRook() {
         assertEquals(
                 Castling.W_QUEEN_SIDE | Castling.W_KING_SIDE | Castling.B_KING_SIDE,
-                Castling.applyMove(Colour.WHITE, Castling.ALL, Move.capture(Square.A7, Square.A8, PieceType.QUEEN, PieceType.ROOK))
+                Castling.update(Colour.WHITE, Castling.ALL, Move.capture(Square.A7, Square.A8, PieceType.QUEEN, PieceType.ROOK))
         );
     }
 
     @Test
-    public void applyMove_WhiteTakesBlackKingRook() {
+    public void update_WhiteTakesBlackKingRook() {
         assertEquals(
                 Castling.W_QUEEN_SIDE | Castling.W_KING_SIDE | Castling.B_QUEEN_SIDE,
-                Castling.applyMove(Colour.WHITE, Castling.ALL, Move.capture(Square.H7, Square.H8, PieceType.QUEEN, PieceType.ROOK))
+                Castling.update(Colour.WHITE, Castling.ALL, Move.capture(Square.H7, Square.H8, PieceType.QUEEN, PieceType.ROOK))
         );
     }
 
     @Test
-    public void applyMove_BlackTakesWhiteQueenRook() {
+    public void update_BlackTakesWhiteQueenRook() {
         assertEquals(
                 Castling.W_KING_SIDE | Castling.B_QUEEN_SIDE | Castling.B_KING_SIDE,
-                Castling.applyMove(Colour.BLACK, Castling.ALL, Move.capture(Square.A2, Square.A1, PieceType.QUEEN, PieceType.ROOK))
+                Castling.update(Colour.BLACK, Castling.ALL, Move.capture(Square.A2, Square.A1, PieceType.QUEEN, PieceType.ROOK))
         );
     }
 
     @Test
-    public void applyMove_BlackTakesWhiteKingRook() {
+    public void update_BlackTakesWhiteKingRook() {
         assertEquals(
                 Castling.W_QUEEN_SIDE | Castling.B_QUEEN_SIDE | Castling.B_KING_SIDE,
-                Castling.applyMove(Colour.BLACK, Castling.ALL, Move.capture(Square.H2, Square.H1, PieceType.QUEEN, PieceType.ROOK))
+                Castling.update(Colour.BLACK, Castling.ALL, Move.capture(Square.H2, Square.H1, PieceType.QUEEN, PieceType.ROOK))
         );
     }
 
