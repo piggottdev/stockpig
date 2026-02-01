@@ -204,5 +204,6 @@ public final class Castling {
                 ((rights & B_QUEEN_SIDE)    == 0 ? "" : "q");
     }
 
+
     private Castling() {}
 }

@@ -75,7 +75,6 @@ public final class MoveGenerator {
         // TODO: Candidate optimisation: Move towards attack maps to calculate checks threats and pins
         // TODO: Candidate optimisation: Adding a line[from][king] should remove the need to calculate pins in different directions
 
-        // TODO: Candidate optimisation: Kings cant check each other so this could just be an attack map
         // King attacks
         this.attacked = Attacks.king(eKing);
         // Pawn attacks
@@ -266,22 +265,22 @@ public final class MoveGenerator {
 
         // Pawns that can push forward one
         final long onePushedPawns = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[VERTICAL]), forward, unoccupied);
-        Bitboard.forEachBit(onePushedPawns & this.target, (final long destination) ->
+        Bitboard.forEach(onePushedPawns & this.target, (final long destination) ->
                 explodePawnPromotions(moves, Move.basic(Square.ofBitboard(Bitboard.shiftRev(destination, forward)), Square.ofBitboard(destination), PieceType.PAWN), destination, promotionRank));
 
         // Pawns that can double push
         final long twoPushedPawns = Bitboard.shiftInto(onePushedPawns & thirdRank, forward, unoccupied);
-        Bitboard.forEachBit(twoPushedPawns & this.target, (final long destination) ->
+        Bitboard.forEach(twoPushedPawns & this.target, (final long destination) ->
                 moves.add(Move.doublePush(Square.ofBitboard(Bitboard.shift(destination, forward.offset()*-2)), Square.ofBitboard(destination))));
 
         // Pawns that can attack in the diagonal direction
         final long pawnAttacks1 = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[DIAGONAL]), attackDir1, (enemies & this.target) | enPassantTarget);
-        Bitboard.forEachBit(pawnAttacks1, (final long attack) ->
+        Bitboard.forEach(pawnAttacks1, (final long attack) ->
                 explodePawnCapture(pos, moves, attackDir1, attack, enPassantTarget, promotionRank));
 
         // Pawns that can attack in the anti-diagonal direction
         final long pawnAttacks2 = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[ANTI_DIAGONAL]), attackDir2, (enemies & this.target) | enPassantTarget);
-        Bitboard.forEachBit(pawnAttacks2, (final long attack) ->
+        Bitboard.forEach(pawnAttacks2, (final long attack) ->
                 explodePawnCapture(pos, moves, attackDir2, attack, enPassantTarget, promotionRank));
     }
 
@@ -362,7 +361,7 @@ public final class MoveGenerator {
         final long unoccupied       = pos.board.unoccupied();
         final long enemies          = pos.board.pieces(us.flip());
 
-        Bitboard.forEachBit(
+        Bitboard.forEach(
                 Attacks.king(king) & ~this.attacked & (unoccupied | enemies),
                 (final long destination) -> basicOrCapture(pos, moves, king, destination, PieceType.KING, unoccupied));
     }
@@ -394,9 +393,9 @@ public final class MoveGenerator {
         final long unoccupied       = pos.board.unoccupied();
 
         // For each knight
-        Bitboard.forEachBit(knights & ~this.pins[ALL], (final long knight) ->
+        Bitboard.forEach(knights & ~this.pins[ALL], (final long knight) ->
                 // For each legal destination
-                Bitboard.forEachBit(
+                Bitboard.forEach(
                         Attacks.knight(knight) & this.target,
                         (final long destination) -> basicOrCapture(pos, moves, knight, destination, PieceType.KNIGHT, unoccupied)));
     }
@@ -417,9 +416,9 @@ public final class MoveGenerator {
         final long unoccupied       = pos.board.unoccupied();
 
         // For each queen
-        Bitboard.forEachBit(queens, (final long queen) ->
+        Bitboard.forEach(queens, (final long queen) ->
                 // For each legal destination
-                Bitboard.forEachBit(
+                Bitboard.forEach(
                         Attacks.queen(queen, unoccupied) & legalTargetsOf(queen),
                         (final long destination) -> basicOrCapture(pos, moves, queen, destination, PieceType.QUEEN, unoccupied)));
     }
@@ -440,9 +439,9 @@ public final class MoveGenerator {
         final long unoccupied       = pos.board.unoccupied();
 
         // For each rook
-        Bitboard.forEachBit(rooks, (final long rook) ->
+        Bitboard.forEach(rooks, (final long rook) ->
                 // For each legal destination
-                Bitboard.forEachBit(
+                Bitboard.forEach(
                         Attacks.rook(rook, unoccupied) & legalTargetsOf(rook),
                         (final long destination) -> basicOrCapture(pos, moves, rook, destination, PieceType.ROOK, unoccupied)));
     }
@@ -463,9 +462,9 @@ public final class MoveGenerator {
         final long unoccupied       = pos.board.unoccupied();
 
         // For each bishop
-        Bitboard.forEachBit(bishops, (final long bishop) ->
+        Bitboard.forEach(bishops, (final long bishop) ->
                 // For each legal destination
-                Bitboard.forEachBit(
+                Bitboard.forEach(
                         Attacks.bishop(bishop, unoccupied) & legalTargetsOf(bishop),
                         (final long destination) -> basicOrCapture(pos, moves, bishop, destination, PieceType.BISHOP, unoccupied)));
     }
@@ -499,9 +498,9 @@ public final class MoveGenerator {
      * @return legal target bitboard
      */
     public long legalTargetsOf(final long piece) {
-        if (Bitboard.contains(this.pins[HORIZONTAL], piece)) return this.target & this.pins[HORIZONTAL];
-        if (Bitboard.contains(this.pins[VERTICAL], piece)) return this.target & this.pins[VERTICAL];
-        if (Bitboard.contains(this.pins[DIAGONAL], piece)) return this.target & this.pins[DIAGONAL];
+        if (Bitboard.contains(this.pins[HORIZONTAL], piece))    return this.target & this.pins[HORIZONTAL];
+        if (Bitboard.contains(this.pins[VERTICAL], piece))      return this.target & this.pins[VERTICAL];
+        if (Bitboard.contains(this.pins[DIAGONAL], piece))      return this.target & this.pins[DIAGONAL];
         if (Bitboard.contains(this.pins[ANTI_DIAGONAL], piece)) return this.target & this.pins[ANTI_DIAGONAL];
         return this.target;
     }

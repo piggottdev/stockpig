@@ -7,36 +7,6 @@ public final class Attacks {
 
     // TODO: Candidate optimisation: Magics
 
-    private static final long[] KING_ATTACKS = new long[64];
-    static {
-        for (int i = 0; i < KING_ATTACKS.length; i++) {
-            final long king = Square.of(i).bitboard();
-            KING_ATTACKS[i] = Bitboard.shift(king, Direction.N)  |
-                    Bitboard.shift(king, Direction.NE) |
-                    Bitboard.shift(king, Direction.E)  |
-                    Bitboard.shift(king, Direction.SE) |
-                    Bitboard.shift(king, Direction.S)  |
-                    Bitboard.shift(king, Direction.SW) |
-                    Bitboard.shift(king, Direction.W)  |
-                    Bitboard.shift(king, Direction.NW);
-        }
-    }
-
-    private static final long[] KNIGHT_ATTACKS = new long[64];
-    static {
-        for (int i = 0; i < KNIGHT_ATTACKS.length; i++) {
-            final long knight = Square.of(i).bitboard();
-            KNIGHT_ATTACKS[i] = Bitboard.shift(knight, Direction.NNE) |
-                    Bitboard.shift(knight, Direction.NEE) |
-                    Bitboard.shift(knight, Direction.SEE) |
-                    Bitboard.shift(knight, Direction.SSE) |
-                    Bitboard.shift(knight, Direction.SSW) |
-                    Bitboard.shift(knight, Direction.SWW) |
-                    Bitboard.shift(knight, Direction.NWW) |
-                    Bitboard.shift(knight, Direction.NNW);
-        }
-    }
-
     /**
      * Get an attack bitboard for a single occupancy king bitboard.
      * @param king single king bitboard
@@ -52,7 +22,7 @@ public final class Attacks {
      * @return knight attack map
      */
     public static long knight(final long knight) {
-        return  KNIGHT_ATTACKS[Square.ofBitboard(knight).ordinal()];
+        return KNIGHT_ATTACKS[Square.ofBitboard(knight).ordinal()];
     }
 
     /**
@@ -105,6 +75,44 @@ public final class Attacks {
     public static long slide(final long pieces, final long unoccupied, final Direction d) {
         return Bitboard.shift(Bitboard.fillInto(pieces, d, unoccupied), d);
     }
+
+
+    // ====================================================================================================
+    //                                  Pre-computed Lookups
+    // ====================================================================================================
+
+    private static final long[] KING_ATTACKS = new long[64];
+    static {
+        for (int i = 0; i < KING_ATTACKS.length; i++) {
+            final long king = Square.of(i).bitboard();
+            KING_ATTACKS[i] =
+                    Bitboard.shift(king, Direction.N)  |
+                    Bitboard.shift(king, Direction.NE) |
+                    Bitboard.shift(king, Direction.E)  |
+                    Bitboard.shift(king, Direction.SE) |
+                    Bitboard.shift(king, Direction.S)  |
+                    Bitboard.shift(king, Direction.SW) |
+                    Bitboard.shift(king, Direction.W)  |
+                    Bitboard.shift(king, Direction.NW);
+        }
+    }
+
+    private static final long[] KNIGHT_ATTACKS = new long[64];
+    static {
+        for (int i = 0; i < KNIGHT_ATTACKS.length; i++) {
+            final long knight = Square.of(i).bitboard();
+            KNIGHT_ATTACKS[i] =
+                    Bitboard.shift(knight, Direction.NNE) |
+                    Bitboard.shift(knight, Direction.NEE) |
+                    Bitboard.shift(knight, Direction.SEE) |
+                    Bitboard.shift(knight, Direction.SSE) |
+                    Bitboard.shift(knight, Direction.SSW) |
+                    Bitboard.shift(knight, Direction.SWW) |
+                    Bitboard.shift(knight, Direction.NWW) |
+                    Bitboard.shift(knight, Direction.NNW);
+        }
+    }
+
 
     private Attacks() {}
 }

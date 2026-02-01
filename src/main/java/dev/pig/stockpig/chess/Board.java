@@ -212,7 +212,7 @@ public final class Board {
     // ====================================================================================================
 
     /**
-     * Get whether the position is dead, insufficient material for a check mate.
+     * Get whether the position is dead, insufficient material for a checkmate.
      * @return is dead position
      */
     public boolean isDeadPosition() {

@@ -219,5 +219,6 @@ public final class Move {
         return from(move).toString() + to(move).toString() + promote(move).toString();
     }
 
+
     private Move() {}
 }

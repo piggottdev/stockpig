@@ -64,22 +64,25 @@ public final class Position {
 
 
     // ====================================================================================================
-    //                                  Accessors
+    //                                  Game States
     // ====================================================================================================
 
     /**
-     * Get list of legal moves.
-     * @return legal move list
+     * Get whether the position is terminal, whether from checkmate, stalemate or other
+     * draw states.
+     * @return is game over
      */
-    public MoveList moves() {
-        return this.moves;
+    public boolean isGameOver() {
+        return this.moves.isEmpty();
     }
 
-
-    // ====================================================================================================
-    //                                  Piece and Board Queries
-    // ====================================================================================================
-
+    /**
+     * Get whether the position is currently checkmate.
+     * @return is checkmate
+     */
+    public boolean isCheckmate() {
+        return this.moves.isEmpty() && isCheck();
+    }
 
 
     // ====================================================================================================
@@ -91,7 +94,8 @@ public final class Position {
      */
     public void generateMoves() {
         this.moves.clear();
-        if (halfMoveClock >= 50 || this.board.isDeadPosition()) return; // TODO: I think it's possible to return black/white win for dead position/half move clock if last move was check
+        this.moveGenerator.isCheck = false;
+        if (halfMoveClock >= 50 || this.board.isDeadPosition()) return;
         this.moveGenerator.generate(this, this.moves);
     }
 
@@ -133,5 +137,220 @@ public final class Position {
         this.enPassantTarget = prev.enPassantTarget;
         this.halfMoveClock = prev.halfMoveClock;
         if (this.sideToMove == Colour.BLACK) this.turn--;
+    }
+
+
+    // ====================================================================================================
+    //                                  Accessors
+    // ====================================================================================================
+
+    /**
+     * Get the list of legal moves.
+     * @return legal move list
+     */
+    public MoveList moves() {
+        return this.moves;
+    }
+
+    /**
+     * Get the current team, the side to move.
+     * @return side to move
+     */
+    public Colour sideToMove() {
+        return this.sideToMove;
+    }
+
+    /**
+     * Get the castling rights of both teams.
+     * @return castling rights
+     */
+    public byte castlingRights() {
+        return this.castlingRights;
+    }
+
+    /**
+     * Get the en passant target, if any.
+     * @return en passant target
+     */
+    public Square enPassantTarget() {
+        return this.enPassantTarget;
+    }
+
+    /**
+     * Get the half move clock, amount of moves without a capture or pawn push.
+     * @return half move clock
+     */
+    public int halfMoveClock() {
+        return this.halfMoveClock;
+    }
+
+    /**
+     * Get the turn number.
+     * @return turn number
+     */
+    public int turn() {
+        return this.turn;
+    }
+
+
+    // ====================================================================================================
+    //                                  Board Delegators
+    // ====================================================================================================
+
+    /**
+     * Add a piece to a square on the board
+     * @param piece piece
+     * @param sq square
+     */
+    public void addPiece(final Piece piece, final Square sq) {
+        this.board.addPiece(piece.colour(), piece.type(), sq);
+    }
+
+    /**
+     * Remove a piece from a square on the board.
+     * @param piece piece
+     * @param sq square
+     */
+    public void removePiece(final Piece piece, final Square sq) {
+        this.board.removePiece(piece.colour(), piece.type(), sq);
+    }
+
+    /**
+     * Get the bitboard for a given colour's pieces.
+     * @param c colour
+     * @return pieces
+     */
+    public long pieces(final Colour c) {
+        return this.board.pieces(c);
+    }
+
+    /**
+     * Get the bitboard for a given piece type.
+     * @param pt piece type
+     * @return pieces
+     */
+    public long pieces(final PieceType pt) {
+        return this.board.pieces(pt);
+    }
+
+    /**
+     * Get the bitboard for a given piece.
+     * @param p piece
+     * @return pieces
+     */
+    public long pieces(final Piece p) {
+        return this.board.pieces(p.colour(), p.type());
+    }
+
+    /**
+     * Get the unoccupied bitboard.
+     * @return unoccupied bitboard
+     */
+    public long unoccupied() {
+        return this.board.unoccupied();
+    }
+
+    /**
+     * Get the occupied bitboard.
+     * @return occupied bitboard
+     */
+    public long occupied() {
+        return this.board.occupied();
+    }
+
+    /**
+     * Get the piece type on a square on the board.
+     * @param sq square
+     * @return piece type
+     */
+    public PieceType pieceTypeAt(final Square sq) {
+        return this.board.pieceType(sq);
+    }
+
+    /**
+     * Get the piece on a square on the board.
+     * @param sq square
+     * @return piece
+     */
+    public Piece pieceAt(final Square sq) {
+        return this.board.piece(sq);
+    }
+
+    /**
+     * Get whether the position is dead, insufficient material for a checkmate.
+     * @return is position dead
+     */
+    public boolean isDeadPosition() {
+        return this.board.isDeadPosition();
+    }
+
+
+    // ====================================================================================================
+    //                                  Move Generator Delegators
+    // ====================================================================================================
+
+    /**
+     * Get whether the current side's king is in check.
+     * @return is king in check
+     */
+    public boolean isCheck() {
+        return this.moveGenerator.isCheck;
+    }
+
+    /**
+     * Get whether the current side's king is in double check.
+     * @return is king in double check
+     */
+    public boolean isDoubleCheck() {
+        return this.moveGenerator.isDoubleCheck;
+    }
+
+    /**
+     * Get the bitboard of squares attacked/threatened by the other side.
+     * @return attacked bitboard
+     */
+    public long attacked() {
+        return this.moveGenerator.attacked;
+    }
+
+    /**
+     * Get the bitboard of all currently checking pieces.
+     * @return checking pieces bitboard
+     */
+    public long checkers() {
+        return this.moveGenerator.checkers;
+    }
+
+    /**
+     * Get the check ray bitboard, this is the line from a sliding piece causing check.
+     * @return check ray bitboard
+     */
+    public long checkray() {
+        return this.moveGenerator.checkRay;
+    }
+
+    /**
+     * Get the bitboard of currently pinned pieces.
+     * @return pinned pieces bitboard
+     */
+    public long pinned() {
+        return this.moveGenerator.pinned;
+    }
+
+    /**
+     * Get all current pins.
+     * @return pins bitboard
+     */
+    public long pins() {
+        return this.moveGenerator.pins[MoveGenerator.ALL];
+    }
+
+    /**
+     * Get the current side's target square bitboard. This is the checkray/checkers if
+     * the position in check or all enemy and unoccupied pieces if not.
+     * @return target bitboard
+     */
+    public long target() {
+        return this.moveGenerator.target;
     }
 }

@@ -10,6 +10,7 @@ public final class MoveList {
 
     private static final int MAX_MOVES = 256;
 
+
     private final int[] moves = new int[MAX_MOVES];
     private int size = 0;
 
