@@ -19,12 +19,9 @@ final class BoardView extends JPanel {
 
     BoardView() {
         super(new GridLayout(0, 9));
-        setBackground(Look.BACKGROUND_COLOUR);
 
         Rank.forEach(rank -> {
-            final JLabel rankLabel = new JLabel(rank.toString(), SwingConstants.CENTER);
-            rankLabel.setForeground(Look.TEXT_COLOUR);
-            add(rankLabel);
+            add(new JLabel(rank.toString(), SwingConstants.CENTER));
 
             File.forEach(file -> {
                 final Square square = Square.of(file, rank);
@@ -34,11 +31,7 @@ final class BoardView extends JPanel {
             });
         });
         add(new JLabel(""));
-        File.forEach(file -> {
-            final JLabel fileLabel = new JLabel(file.toString().toUpperCase(), SwingConstants.CENTER);
-            fileLabel.setForeground(Look.TEXT_COLOUR);
-            add(fileLabel);
-        });
+        File.forEach(file -> add(new JLabel(file.toString().toUpperCase(), SwingConstants.CENTER)));
     }
 
     /**

@@ -13,9 +13,11 @@ final class StockpigFrame extends JFrame {
         // On close, exit the app
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        setIconImage(Look.STOCKPIG_ICON);
+        setBackground(Look.BACKGROUND_COLOUR);
+
         // Add the view to the frame
         add(view);
-        setBackground(Look.BACKGROUND_COLOUR);
 
         // Size and make frame visible
         setLocationByPlatform(true);

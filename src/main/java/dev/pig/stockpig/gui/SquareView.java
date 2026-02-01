@@ -19,7 +19,6 @@ final class SquareView extends JButton {
         this.isWhiteSquare = ((index/8) + (index%8)) % 2 == 0;
 
         setBorder(new EmptyBorder(5, 5, 5, 5));
-        setFocusPainted(false);
         clearColour();
     }
 

@@ -9,6 +9,7 @@ public final class StockpigGUI {
 
     public static void main(final String[] args) {
         SwingUtilities.invokeLater(() -> {
+            Look.init();
             // Create a view
             final StockpigView stockpigView = new StockpigView();
             // Create a controller

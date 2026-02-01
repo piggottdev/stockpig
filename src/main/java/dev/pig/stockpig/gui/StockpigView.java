@@ -13,11 +13,12 @@ import java.util.List;
 final class StockpigView extends JPanel {
 
     private final BoardView board = new BoardView();
+    private final DebugPanelView debug = new DebugPanelView();
 
     StockpigView() {
         super(new BorderLayout(3, 3));
-        setBackground(Look.BACKGROUND_COLOUR);
         add(this.board);
+        add(this.debug, BorderLayout.LINE_END);
     }
 
     /**
