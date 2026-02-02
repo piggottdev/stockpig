@@ -3,7 +3,6 @@ package dev.pig.stockpig.gui;
 import dev.pig.stockpig.chess.Piece;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 /**
  * View for a chess board square.
@@ -15,10 +14,11 @@ final class SquareView extends JButton {
     private final boolean isWhiteSquare; ;
 
     SquareView(final int index) {
+        super();
         this.index = index;
         this.isWhiteSquare = ((index/8) + (index%8)) % 2 == 0;
 
-        setBorder(new EmptyBorder(5, 5, 5, 5));
+        setBorder(null); // Let the icons determine the size
         clearColour();
     }
 

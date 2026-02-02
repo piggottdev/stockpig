@@ -4,7 +4,6 @@ import dev.pig.stockpig.chess.Move;
 import dev.pig.stockpig.chess.MoveList;
 import dev.pig.stockpig.chess.Piece;
 import dev.pig.stockpig.chess.Position;
-import dev.pig.stockpig.chess.bitboard.Bitboard;
 import dev.pig.stockpig.chess.bitboard.Square;
 
 import java.util.ArrayList;
@@ -58,6 +57,14 @@ final class StockpigModel {
     void newGame() {
         this.position = Position.starting();
         clear();
+    }
+
+    /**
+     * Get the current position's FEN string.
+     * @return FEN string
+     */
+    String fen() {
+        return this.position.toFen();
     }
 
     /**
@@ -180,26 +187,66 @@ final class StockpigModel {
     }
 
     /**
-     * Get the currently attacked squares as a square index list.
-     * @return attacked square index list
+     * Get the unoccupied bitboard
+     * @return unoccupied bitboard
      */
-    List<Integer> attacked() {
-        return Bitboard.toSquareIndexList(this.position.attacked());
+    long unoccupied() {
+        return this.position.unoccupied();
     }
 
     /**
-     * Get the target squares for the current team as a square index list.
-     * @return targets square index list
+     * Get the occupied bitboard
+     * @return occupied bitboard
      */
-    List<Integer> target() {
-        return Bitboard.toSquareIndexList(this.position.target());
+    long occupied() {
+        return this.position.occupied();
     }
 
     /**
-     * Get the pin lines as a square index list.
-     * @return pins square index list
+     * Get the currently attacked squares bitboard
+     * @return attacked bitboard
      */
-    List<Integer> pins() {
-        return Bitboard.toSquareIndexList(this.position.pins());
+    long attacked() {
+        return this.position.attacked();
+    }
+
+    /**
+     * Get the target squares for the current team bitboard.
+     * @return target bitboard
+     */
+    long target() {
+        return this.position.target();
+    }
+
+    /**
+     * Get the checking pieces bitboard.
+     * @return checkers bitboard
+     */
+    long checkers() {
+        return this.position.checkers();
+    }
+
+    /**
+     * Get the checks bitboard.
+     * @return checks bitboard
+     */
+    long checks() {
+        return this.position.checkray();
+    }
+
+    /**
+     * Get the pinned pieces bitboard.
+     * @return pinned pieces bitboard
+     */
+    long pinned() {
+        return this.position.pinned();
+    }
+
+    /**
+     * Get the pins bitboard.
+     * @return pins bitboard
+     */
+    long pins() {
+        return this.position.pins();
     }
 }

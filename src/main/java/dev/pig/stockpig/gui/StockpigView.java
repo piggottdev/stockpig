@@ -13,12 +13,14 @@ import java.util.List;
 final class StockpigView extends JPanel {
 
     private final BoardView board = new BoardView();
-    private final DebugPanelView debug = new DebugPanelView();
+    private final SidePanelView sidePanel = new SidePanelView();
+    private final FenView fen = new FenView();
 
     StockpigView() {
         super(new BorderLayout(3, 3));
         add(this.board);
-        add(this.debug, BorderLayout.LINE_END);
+        add(this.sidePanel, BorderLayout.LINE_END);
+        add(this.fen, BorderLayout.PAGE_END);
     }
 
     /**
@@ -27,7 +29,8 @@ final class StockpigView extends JPanel {
      */
     void addController(final StockpigController controller) {
         this.board.addController(controller);
-        this.debug.addController(controller);
+        this.sidePanel.addController(controller);
+        this.fen.addController(controller);
     }
 
 
@@ -76,10 +79,18 @@ final class StockpigView extends JPanel {
     }
 
     /**
+     * Set the fen string for the game details panel.
+     * @param fen FEN string
+     */
+    void setFen(final String fen) {
+        this.fen.setFen(fen);
+    }
+
+    /**
      * Set the bitboard for the bitboard editor panel.
      * @param bitboard bitboard
      */
     void setBitboard(final long bitboard) {
-        this.debug.setBitboard(bitboard);
+        this.sidePanel.setBitboard(bitboard);
     }
 }

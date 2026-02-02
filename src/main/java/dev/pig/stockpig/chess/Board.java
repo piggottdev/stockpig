@@ -276,6 +276,41 @@ public final class Board {
     }
 
     /**
+     * Create the board part of FEN string from the board.
+     * @return board part FEN string
+     */
+    public String toFen() {
+        final StringBuilder fen = new StringBuilder();
+        Rank.forEach(rank -> {
+            final int[] emptyRun = {0}; // Let it be final
+
+            File.forEach(file -> {
+                final Square sq = Square.of(file, rank);
+                final Piece piece = piece(sq);
+
+                if (piece == Piece.EMPTY) {
+                    emptyRun[0]++;
+                } else {
+                    if (emptyRun[0] > 0) {
+                        fen.append(emptyRun[0]);
+                        emptyRun[0] = 0;
+                    }
+                    fen.append(piece.toString());
+                }
+            });
+            if (emptyRun[0] > 0) {
+                fen.append(emptyRun[0]);
+                emptyRun[0] = 0;
+            }
+            if (rank != Rank.r1) {
+                fen.append("/");
+            }
+        });
+
+        return fen.toString();
+    }
+
+    /**
      * Create a pretty printed debug string of the board.
      * @return pretty debug string
      */

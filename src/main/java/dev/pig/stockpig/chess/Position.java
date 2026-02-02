@@ -62,6 +62,20 @@ public final class Position {
         return new Position(fen);
     }
 
+    /**
+     * Create a FEN string from the position
+     * @return FEN string
+     */
+    public String toFen() {
+        return
+                this.board.toFen() + " " +
+                this.sideToMove.toString() + " " +
+                Castling.toString(this.castlingRights) + " " +
+                this.enPassantTarget.toString() + " " +
+                this.halfMoveClock + " " +
+                this.turn;
+    }
+
 
     // ====================================================================================================
     //                                  Game States

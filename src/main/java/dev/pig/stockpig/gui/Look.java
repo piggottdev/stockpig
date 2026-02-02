@@ -2,6 +2,7 @@ package dev.pig.stockpig.gui;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,9 +23,11 @@ final class Look {
     static final Color SELECTED_SQUARE_COLOUR          = new Color(140, 150, 0);
     static final Color HIGHLIGHTED_SQUARE_COLOUR       = new Color(250, 100, 100);
 
-    static final ImageIcon BLANK_ICON = new ImageIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB));
-    static final ImageIcon[] PIECE_ICONS = loadPieceIcons();
     static final Image STOCKPIG_ICON = loadImage("ico.png");
+
+    static final int ICON_SIZE = 96;
+    static final ImageIcon BLANK_ICON = new ImageIcon(new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB));
+    static final ImageIcon[] PIECE_ICONS = loadPieceIcons();
 
     /**
      * Initialise UI manager constants for all components to avoid doing it in each
@@ -32,29 +35,39 @@ final class Look {
      */
     static void init() {
         final Color transparent = new Color(0,0,0,0);
+        final Font font = UIManager.getFont("Button.font").deriveFont(14f);
 
         UIManager.put("Panel.foreground", Look.TEXT_COLOUR);
         UIManager.put("Panel.background", Look.BACKGROUND_COLOUR);
 
         UIManager.put("Label.foreground", Look.TEXT_COLOUR);
         UIManager.put("Label.background", Look.BACKGROUND_COLOUR);
+        UIManager.put("Label.font", font);
 
         UIManager.put("TextField.foreground", Look.TEXT_COLOUR);
-        UIManager.put("TextField.background", Look.BACKGROUND_COLOUR);
+        UIManager.put("TextField.background", Look.HIGHLIGHTED_BACKGROUND_COLOUR);
+        UIManager.put("TextField.border", false);
+        UIManager.put("TextField.font", font);
 
         UIManager.put("TabbedPane.foreground", Look.TEXT_COLOUR);
         UIManager.put("TabbedPane.selected", Look.HIGHLIGHTED_BACKGROUND_COLOUR);
         UIManager.put("TabbedPane.background", Look.BACKGROUND_COLOUR);
-
         UIManager.put("TabbedPane.contentAreaColor", transparent);
         UIManager.put("TabbedPane.borderHightlightColor", transparent);
         UIManager.put("TabbedPane.light", transparent);
-        UIManager.put("TabbedPane.highlight", transparent);
-        UIManager.put("TabbedPane.shadow", transparent);
-        UIManager.put("TabbedPane.darkShadow", transparent);
+        UIManager.put("TabbedPane.darkShadow", HIGHLIGHTED_BACKGROUND_COLOUR);
         UIManager.put("TabbedPane.focus", transparent);
+        UIManager.put("TabbedPane.tabInsets", new Insets(8,8,8,8));
+        UIManager.put("TabbedPane.font", font);
 
         UIManager.put("Button.focus", transparent);
+        UIManager.put("Button.border", new EmptyBorder(10,15,10,15));
+        UIManager.put("Button.foreground", Look.TEXT_COLOUR);
+        UIManager.put("Button.background", HIGHLIGHTED_BACKGROUND_COLOUR);
+        UIManager.put("Button.font", font);
+
+        UIManager.put("ToolBar.foreground", Look.TEXT_COLOUR);
+        UIManager.put("ToolBar.background", Look.HIGHLIGHTED_BACKGROUND_COLOUR);
     }
 
     /**
@@ -86,7 +99,7 @@ final class Look {
      */
     private static ImageIcon loadIcon(final String path) {
         final ImageIcon icon = new ImageIcon(loadImage(path));
-        return new ImageIcon(icon.getImage().getScaledInstance(96, 96, Image.SCALE_SMOOTH));
+        return new ImageIcon(icon.getImage().getScaledInstance(ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
     }
 
     /**

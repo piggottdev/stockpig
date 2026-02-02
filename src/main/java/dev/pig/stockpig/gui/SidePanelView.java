@@ -4,16 +4,17 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * View for the debug side panel.
+ * View for the side panel.
  */
-final class DebugPanelView extends JTabbedPane {
+final class SidePanelView extends JTabbedPane {
 
+    private final GamePanelView gamePanel = new GamePanelView();
     private final BitboardEditorPanelView bitboardEditor = new BitboardEditorPanelView();
 
-    DebugPanelView() {
+    SidePanelView() {
         super();
         setPreferredSize(new Dimension(330, 0));
-        add("Game Details", new JPanel());
+        add("Game Details", this.gamePanel);
         add("Bitboard Editor", this.bitboardEditor);
     }
 
@@ -22,6 +23,8 @@ final class DebugPanelView extends JTabbedPane {
      * @param controller controller
      */
     void addController(final StockpigController controller) {
+        this.gamePanel.addController(controller);
+        this.bitboardEditor.addController(controller);
         addChangeListener(e -> controller.setBitboardEditorMode(getSelectedIndex() == 1));
     }
 
