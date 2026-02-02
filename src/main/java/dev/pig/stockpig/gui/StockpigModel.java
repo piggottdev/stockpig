@@ -39,7 +39,7 @@ public final class StockpigModel {
      * @param bb bitboard
      * @return list of square indexes
      */
-    private static List<Integer> bitboardToSquareIndexList(final long bb) {
+    static List<Integer> bitboardToSquareIndexList(final long bb) {
         final List<Integer> squares = new ArrayList<>(Bitboard.count(bb));
         Bitboard.forEach(bb, bit -> squares.add(Square.ofBitboard(bit).ordinal()));
         return squares;

@@ -13,6 +13,7 @@ final class DebugPanelView extends JTabbedPane {
     DebugPanelView() {
         super();
         setPreferredSize(new Dimension(330, 0));
+        add("Game Details", new JPanel());
         add("Bitboard Editor", this.bitboardEditor);
     }
 
@@ -21,6 +22,19 @@ final class DebugPanelView extends JTabbedPane {
      * @param controller controller
      */
     void addController(final StockpigController controller) {
+        addChangeListener(e -> controller.setBitboardEditorMode(getSelectedIndex() == 1));
     }
 
+
+    // ====================================================================================================
+    //                                  Draw Functions
+    // ====================================================================================================
+
+    /**
+     * Update bitboard editor with the bitboard.
+     * @param bitboard bitboard
+     */
+    void setBitboard(final long bitboard) {
+        this.bitboardEditor.setBitboard(bitboard);
+    }
 }

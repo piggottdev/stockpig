@@ -1,17 +1,27 @@
 package dev.pig.stockpig.gui;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * View for the bitboard editor panel.
  */
 final class BitboardEditorPanelView extends JPanel {
 
-    private final JLabel label = new JLabel("0x0");
+    private final JTextField hex = new JTextField("0x0");
 
     BitboardEditorPanelView() {
-        super();
-        add(this.label);
+        super(new BorderLayout(3, 3));
+        this.hex.setEditable(false);
+        this.hex.setBorder(null);
+        add(this.hex);
+        this.hex.addMouseListener(new MouseAdapter() {
+            public void mousePressed(final MouseEvent e) {
+                hex.selectAll();
+            }
+        });
     }
 
 
@@ -24,6 +34,6 @@ final class BitboardEditorPanelView extends JPanel {
      * @param bitboard bitboard
      */
     void setBitboard(final long bitboard) {
-        this.label.setText(String.format("0x%016X", bitboard));
+        this.hex.setText(String.format("0x%016X", bitboard));
     }
 }

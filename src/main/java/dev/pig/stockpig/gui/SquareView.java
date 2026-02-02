@@ -40,7 +40,7 @@ final class SquareView extends JButton {
      * @param piece piece
      */
     void setPiece(final Piece piece) {
-        setIcon(Look.ICONS[piece.ordinal()]);
+        setIcon(Look.PIECE_ICONS[piece.ordinal()]);
     }
 
     /**

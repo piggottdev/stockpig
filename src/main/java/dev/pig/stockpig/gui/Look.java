@@ -20,11 +20,10 @@ public final class Look {
     public static final Color TINTED_WHITE_SQUARE_COLOUR      = new Color(90, 90, 90);
     public static final Color TINTED_BLACK_SQUARE_COLOUR      = new Color(70, 70, 70);
     public static final Color SELECTED_SQUARE_COLOUR          = new Color(140, 150, 0);
-    public static final Color HIGHLIGHTED_SQUARE_COLOUR       = Color.RED.brighter();
+    public static final Color HIGHLIGHTED_SQUARE_COLOUR       = new Color(250, 100, 100);
 
     public static final ImageIcon BLANK_ICON = new ImageIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB));
-    public static final ImageIcon[] ICONS = loadPieceIcons();
-
+    public static final ImageIcon[] PIECE_ICONS = loadPieceIcons();
     public static final Image STOCKPIG_ICON = loadImage("ico.png");
 
     /**
@@ -39,6 +38,9 @@ public final class Look {
 
         UIManager.put("Label.foreground", Look.TEXT_COLOUR);
         UIManager.put("Label.background", Look.BACKGROUND_COLOUR);
+
+        UIManager.put("TextField.foreground", Look.TEXT_COLOUR);
+        UIManager.put("TextField.background", Look.BACKGROUND_COLOUR);
 
         UIManager.put("TabbedPane.foreground", Look.TEXT_COLOUR);
         UIManager.put("TabbedPane.selected", Look.HIGHLIGHTED_BACKGROUND_COLOUR);

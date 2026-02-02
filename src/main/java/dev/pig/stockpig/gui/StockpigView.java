@@ -27,6 +27,7 @@ final class StockpigView extends JPanel {
      */
     void addController(final StockpigController controller) {
         this.board.addController(controller);
+        this.debug.addController(controller);
     }
 
 
@@ -72,5 +73,13 @@ final class StockpigView extends JPanel {
      */
     void highlightSquares(final List<Integer> squares) {
         this.board.highlightSquares(squares);
+    }
+
+    /**
+     * Set the bitboard for the bitboard editor panel.
+     * @param bitboard bitboard
+     */
+    void setBitboard(final long bitboard) {
+        this.debug.setBitboard(bitboard);
     }
 }
