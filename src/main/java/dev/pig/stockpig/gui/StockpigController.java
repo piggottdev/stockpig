@@ -1,5 +1,6 @@
 package dev.pig.stockpig.gui;
 
+import dev.pig.stockpig.chess.bitboard.Bitboard;
 import dev.pig.stockpig.chess.bitboard.Square;
 
 /**
@@ -22,10 +23,13 @@ final class StockpigController {
      * Redraw everything.
      */
     void redraw() {
-        this.view.redrawPieces(this.model.pieces());
+        this.view.drawPieces(this.model.pieces());
+
         this.view.clearColours();
         this.view.tintSquares(this.model.destinations());
         this.view.selectSquares(this.model.selected());
+        this.view.selectSquares(this.model.previousFrom());
+        this.view.selectSquares(this.model.previousTo());
     }
 
 
@@ -55,7 +59,7 @@ final class StockpigController {
     // This is horrible - if another mode appears, abstract this into a mode interface
 
     private boolean bitboardMode = false;
-    private long bitboard;
+    private long bitboard = 0L;
 
     /**
      * Set whether the controller is in bitboard editor mode.
@@ -90,6 +94,6 @@ final class StockpigController {
     void drawBits() {
         this.view.setBitboard(this.bitboard);
         this.view.clearColours();
-        this.view.highlightSquares(StockpigModel.bitboardToSquareIndexList(this.bitboard));
+        this.view.highlightSquares(Bitboard.toSquareIndexList(this.bitboard));
     }
 }

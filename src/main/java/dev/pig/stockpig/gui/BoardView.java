@@ -54,7 +54,7 @@ final class BoardView extends JPanel {
      * empty squares should use {@link Piece#EMPTY}.
      * @param pieces pieces
      */
-    void redrawPieces(final List<Piece> pieces) {
+    void drawPieces(final List<Piece> pieces) {
         for (int i = 0; i < 64; i++) {
             this.squares[i].setPiece(pieces.get(i));
         }
@@ -90,7 +90,7 @@ final class BoardView extends JPanel {
     }
 
     /**
-     * Mark and colour the squares as selected, only indexes within the list will be highlighted.
+     * Mark and colour the squares as highlighted, only indexes within the list will be highlighted.
      * @param squares squares
      */
     void highlightSquares(final List<Integer> squares) {

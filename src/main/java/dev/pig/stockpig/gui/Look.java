@@ -10,21 +10,21 @@ import java.io.IOException;
  * Look holds all the static look/theme variables.
  * Most colours and visuals can be modified in this file.
  */
-public final class Look {
+final class Look {
 
-    public static final Color BACKGROUND_COLOUR               = new Color(0x252526);
-    public static final Color HIGHLIGHTED_BACKGROUND_COLOUR   = new Color(90, 90, 90);
-    public static final Color TEXT_COLOUR                     = new Color(0xD4D4D4);
-    public static final Color WHITE_SQUARE_COLOUR             = new Color(205, 180, 174);
-    public static final Color BLACK_SQUARE_COLOUR             = new Color(140, 93, 56);
-    public static final Color TINTED_WHITE_SQUARE_COLOUR      = new Color(90, 90, 90);
-    public static final Color TINTED_BLACK_SQUARE_COLOUR      = new Color(70, 70, 70);
-    public static final Color SELECTED_SQUARE_COLOUR          = new Color(140, 150, 0);
-    public static final Color HIGHLIGHTED_SQUARE_COLOUR       = new Color(250, 100, 100);
+    static final Color BACKGROUND_COLOUR               = new Color(0x252526);
+    static final Color HIGHLIGHTED_BACKGROUND_COLOUR   = new Color(90, 90, 90);
+    static final Color TEXT_COLOUR                     = new Color(0xD4D4D4);
+    static final Color WHITE_SQUARE_COLOUR             = new Color(205, 180, 174);
+    static final Color BLACK_SQUARE_COLOUR             = new Color(140, 93, 56);
+    static final Color TINTED_WHITE_SQUARE_COLOUR      = new Color(90, 90, 90);
+    static final Color TINTED_BLACK_SQUARE_COLOUR      = new Color(70, 70, 70);
+    static final Color SELECTED_SQUARE_COLOUR          = new Color(140, 150, 0);
+    static final Color HIGHLIGHTED_SQUARE_COLOUR       = new Color(250, 100, 100);
 
-    public static final ImageIcon BLANK_ICON = new ImageIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB));
-    public static final ImageIcon[] PIECE_ICONS = loadPieceIcons();
-    public static final Image STOCKPIG_ICON = loadImage("ico.png");
+    static final ImageIcon BLANK_ICON = new ImageIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB));
+    static final ImageIcon[] PIECE_ICONS = loadPieceIcons();
+    static final Image STOCKPIG_ICON = loadImage("ico.png");
 
     /**
      * Initialise UI manager constants for all components to avoid doing it in each

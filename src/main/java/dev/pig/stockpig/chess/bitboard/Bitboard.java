@@ -1,5 +1,7 @@
 package dev.pig.stockpig.chess.bitboard;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.LongConsumer;
 
 /**
@@ -268,6 +270,28 @@ public final class Bitboard {
     // ====================================================================================================
     //                                  Utils
     // ====================================================================================================
+
+    /**
+     * Get a list of each square within the bitboard, ordered from LSB to MSB.
+     * @param bitboard bitboard
+     * @return square list
+     */
+    public static List<Square> toSquareList(final long bitboard) {
+        final List<Square> squares = new ArrayList<>(Bitboard.count(bitboard));
+        forEach(bitboard, bit -> squares.add(Square.ofBitboard(bit)));
+        return squares;
+    }
+
+    /**
+     * Get a list of each square index within the bitboard, ordered from LSB to MSB.
+     * @param bitboard bitboard
+     * @return square index list
+     */
+    public static List<Integer> toSquareIndexList(final long bitboard) {
+        final List<Integer> squares = new ArrayList<>(Bitboard.count(bitboard));
+        forEach(bitboard, bit -> squares.add(Square.ofBitboard(bit).ordinal()));
+        return squares;
+    }
 
     /**
      * Create a pretty 0/1 debug string of a bitboard.

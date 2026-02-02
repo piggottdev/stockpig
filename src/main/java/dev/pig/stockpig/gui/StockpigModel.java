@@ -14,11 +14,13 @@ import java.util.List;
  * Chess model is an adapter between a chess position and the GUI.
  * Manages interactions on a chess board such as selecting a piece.
  */
-public final class StockpigModel {
+final class StockpigModel {
 
     private Position position         = Position.starting();
-    private Square selected           = Square.EMPTY;
     private final MoveList legalMoves = new MoveList();
+    private Square selected           = Square.EMPTY;
+    private Square previousFrom       = Square.EMPTY;
+    private Square previousTo         = Square.EMPTY;
 
 
     // ====================================================================================================
@@ -26,23 +28,100 @@ public final class StockpigModel {
     // ====================================================================================================
 
     /**
-     * Clear the selected square and legal moves, state that must be reset on most
+     * Clear the legal moves and selected squares, state that must be reset on most
      * operations.
      */
-    public void clear() {
-        this.selected = Square.EMPTY;
+    void clear() {
         this.legalMoves.clear();
+        this.selected = Square.EMPTY;
+        this.previousFrom = Square.EMPTY;
+        this.previousTo = Square.EMPTY;
     }
 
     /**
-     * Create a list of square index integers from a bitboard.
-     * @param bb bitboard
-     * @return list of square indexes
+     * Get the square as a square index list, empty list if square is empty.
+     * @param sq square
+     * @return square index list
      */
-    static List<Integer> bitboardToSquareIndexList(final long bb) {
-        final List<Integer> squares = new ArrayList<>(Bitboard.count(bb));
-        Bitboard.forEach(bb, bit -> squares.add(Square.ofBitboard(bit).ordinal()));
-        return squares;
+    private List<Integer> squareToSquareIndexList(final Square sq) {
+        return sq == Square.EMPTY ? new ArrayList<>(2) : new ArrayList<>(List.of(sq.ordinal()));
+    }
+
+
+    // ====================================================================================================
+    //                                  Game Operations
+    // ====================================================================================================
+
+    /**
+     * Start a new game from the starting position.
+     */
+    void newGame() {
+        this.position = Position.starting();
+        clear();
+    }
+
+    /**
+     * Load a position from a fen string.
+     * @param fen fen string
+     */
+    void loadFen(final String fen) {
+        this.position = Position.fromFen(fen);
+        clear();
+    }
+
+    /**
+     * Undo the last move.
+     */
+    void undo() {
+        this.position.undo();
+        clear();
+    }
+
+
+    // ====================================================================================================
+    //                                  Square Selection and Move Making
+    // ====================================================================================================
+
+    /**
+     * Attempt to select a square. This will select a piece if it is able to move.
+     * If a piece is already selected it will attempt to make the move if legal.
+     * @param sqi selected square index
+     * @return whether a move has been made (pieces must be redrawn)
+     */
+    boolean select(final int sqi) {
+        final Square sq = Square.of(sqi);
+
+        // Piece already selected, attempt to make move
+        if (this.selected != Square.EMPTY) {
+
+            for (int i = 0; i < this.legalMoves.size(); i++) {
+                final int move = this.legalMoves.get(i);
+
+                if (Move.to(move) == sq) {
+                    this.position.makeMove(move);
+                    clear();
+                    this.previousFrom = Move.from(move);
+                    this.previousTo = Move.to(move);
+                    return true;
+                }
+            }
+        }
+
+        // Either new select or square selected did not result in legal move,
+        // in either case, try and select that new square
+        this.selected = Square.EMPTY;
+        this.legalMoves.clear();
+
+        for (int i = 0; i < this.position.moves().size(); i++) {
+            final int move = this.position.moves().get(i);
+
+            if (Move.from(move) == sq) {
+                this.legalMoves.add(move);
+            }
+        }
+
+        if (!this.legalMoves.isEmpty()) this.selected = sq;
+        return false;
     }
 
 
@@ -51,18 +130,11 @@ public final class StockpigModel {
     // ====================================================================================================
 
     /**
-     * Get the currently selected square a list. Empty list if not selected.
-     * @return selected square list
-     */
-    public List<Integer> selected() {
-        return this.selected == Square.EMPTY ? List.of() : List.of(this.selected.ordinal());
-    }
-
-    /**
-     * Get the pieces on the board in square index order.
+     * Get the pieces on the board in square index order. Empty squares will be {@link Piece#EMPTY} within
+     * the list.
      * @return pieces in square order
      */
-    public List<Piece> pieces() {
+    List<Piece> pieces() {
         final List<Piece> pieces = new ArrayList<>(64);
         for (int i = 0; i < 64; i++) {
             pieces.add(this.position.pieceAt(Square.of(i)));
@@ -71,10 +143,34 @@ public final class StockpigModel {
     }
 
     /**
-     * Get the currently selected pieces possible destination squares.
-     * @return destination squares
+     * Get the currently selected square as a square index list. Empty list if not selected.
+     * @return selected square index list
      */
-    public List<Integer> destinations() {
+    List<Integer> selected() {
+        return squareToSquareIndexList(this.selected);
+    }
+
+    /**
+     * Get the origin square of the last move as a square index list. Empty list if not selected.
+     * @return origin square index list
+     */
+    List<Integer> previousFrom() {
+        return squareToSquareIndexList(this.previousFrom);
+    }
+
+    /**
+     * Get the destination square of the last move as a square index list. Empty list if not selected.
+     * @return destination square index list
+     */
+    List<Integer> previousTo() {
+        return squareToSquareIndexList(this.previousTo);
+    }
+
+    /**
+     * Get the currently selected piece's possible destination squares as a square index list.
+     * @return destinations square index list
+     */
+    List<Integer> destinations() {
         final List<Integer> squares = new ArrayList<>();
         for (int i = 0; i < this.legalMoves.size(); i++) {
             final int move = this.legalMoves.get(i);
@@ -84,93 +180,26 @@ public final class StockpigModel {
     }
 
     /**
-     * Get the currently attacked squares.
-     * @return attacked squares
+     * Get the currently attacked squares as a square index list.
+     * @return attacked square index list
      */
-    public List<Integer> attacked() {
-        return bitboardToSquareIndexList(this.position.attacked());
+    List<Integer> attacked() {
+        return Bitboard.toSquareIndexList(this.position.attacked());
     }
 
     /**
-     * Get the target squares for the current team.
-     * @return target squares
+     * Get the target squares for the current team as a square index list.
+     * @return targets square index list
      */
-    public List<Integer> target() {
-        return bitboardToSquareIndexList(this.position.target());
+    List<Integer> target() {
+        return Bitboard.toSquareIndexList(this.position.target());
     }
 
     /**
-     * Get the pin line squares.
-     * @return pin squares
+     * Get the pin lines as a square index list.
+     * @return pins square index list
      */
-    public List<Integer> pins() {
-        return bitboardToSquareIndexList(this.position.pins());
-    }
-
-
-    // ====================================================================================================
-    //                                  Operations
-    // ====================================================================================================
-
-    /**
-     * Start a new game from the starting position.
-     */
-    public void newGame() {
-        this.position = Position.starting();
-        clear();
-    }
-
-    /**
-     * Load a position from a fen string.
-     * @param fen fen string
-     */
-    public void loadFen(final String fen) {
-        this.position = Position.fromFen(fen);
-        clear();
-    }
-
-    /**
-     * Undo the last move.
-     */
-    public void undo() {
-        this.position.undo();
-        clear();
-    }
-
-
-    // ====================================================================================================
-    //                                  Square Selection
-    // ====================================================================================================
-
-    /**
-     * Attempt to select a square. This will select a piece if is able to move.
-     * If a piece is already selected it will attempt to make the move if legal.
-     * @param sqi selected square index
-     * @return whether a move has been made (pieces must be redrawn)
-     */
-    public boolean select(final int sqi) {
-        final Square sq = Square.of(sqi);
-
-        // Piece already selected, attempt to make move
-        if (this.selected != Square.EMPTY) {
-            for (int i = 0; i < this.legalMoves.size(); i++) {
-                if (Move.to(this.legalMoves.get(i)) == sq) {
-                    this.position.makeMove(this.legalMoves.get(i));
-                    clear();
-                    return true;
-                }
-            }
-        }
-        clear();
-
-        // This is a new selection
-        for (int i = 0; i < this.position.moves().size(); i++) {
-            if (Move.from(this.position.moves().get(i)) == sq) {
-                this.legalMoves.add(this.position.moves().get(i));
-            }
-        }
-
-        if (!this.legalMoves.isEmpty()) this.selected = sq;
-        return false;
+    List<Integer> pins() {
+        return Bitboard.toSquareIndexList(this.position.pins());
     }
 }

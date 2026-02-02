@@ -40,8 +40,8 @@ final class StockpigView extends JPanel {
      * empty squares should use {@link Piece#EMPTY}.
      * @param pieces pieces
      */
-    void redrawPieces(final List<Piece> pieces) {
-        this.board.redrawPieces(pieces);
+    void drawPieces(final List<Piece> pieces) {
+        this.board.drawPieces(pieces);
     }
 
     /**

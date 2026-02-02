@@ -17,6 +17,7 @@ final class BitboardEditorPanelView extends JPanel {
         this.hex.setEditable(false);
         this.hex.setBorder(null);
         add(this.hex);
+        // Clicking the field selects it all
         this.hex.addMouseListener(new MouseAdapter() {
             public void mousePressed(final MouseEvent e) {
                 hex.selectAll();
@@ -30,7 +31,7 @@ final class BitboardEditorPanelView extends JPanel {
     // ====================================================================================================
 
     /**
-     * Update the label with the hex of the selected bitboard.
+     * Update the text field with the hex of the selected bitboard.
      * @param bitboard bitboard
      */
     void setBitboard(final long bitboard) {
