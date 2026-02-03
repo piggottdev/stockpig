@@ -204,10 +204,29 @@ public final class Move {
         return (move & CAPTURE_MASK) != 0;
     }
 
+    /**
+     * Get whether the move is a promotion move.
+     * @param move move
+     * @return is promotion move
+     */
+    public static boolean isPromotion(final int move) {
+        return ((move >> PROMOTE_SHIFT) & PIECE_MASK) != 0;
+    }
+
 
     // ====================================================================================================
     //                                  Utils
     // ====================================================================================================
+
+    /**
+     * Overwrites the promotion piece type with a new piece type.
+     * @param move move
+     * @param promote promote piece type
+     * @return promotion move
+     */
+    public static int overwritePromotion(final int move, final PieceType promote) {
+        return addPromotion(move & ~(PIECE_MASK << PROMOTE_SHIFT), promote);
+    }
 
     /**
      * Create a string representation of the move, this is the algebra notation of the origin

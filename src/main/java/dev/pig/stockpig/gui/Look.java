@@ -68,6 +68,9 @@ final class Look {
 
         UIManager.put("ToolBar.foreground", Look.TEXT_COLOUR);
         UIManager.put("ToolBar.background", Look.HIGHLIGHTED_BACKGROUND_COLOUR);
+
+        UIManager.put("OptionPane.messageForeground", Look.TEXT_COLOUR);
+        UIManager.put("OptionPane.background", Look.BACKGROUND_COLOUR);
     }
 
     /**
@@ -93,7 +96,7 @@ final class Look {
     }
 
     /**
-     * Load a 96x96 image icon from a resource path.
+     * Load an image icon from a resource path.
      * @param path resource path
      * @return image icon
      */
@@ -103,7 +106,7 @@ final class Look {
     }
 
     /**
-     * Load an image from a resource path
+     * Load an image from a resource path.
      * @param path resource path
      * @return image
      */

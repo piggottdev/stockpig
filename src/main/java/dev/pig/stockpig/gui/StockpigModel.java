@@ -1,9 +1,6 @@
 package dev.pig.stockpig.gui;
 
-import dev.pig.stockpig.chess.Move;
-import dev.pig.stockpig.chess.MoveList;
-import dev.pig.stockpig.chess.Piece;
-import dev.pig.stockpig.chess.Position;
+import dev.pig.stockpig.chess.*;
 import dev.pig.stockpig.chess.bitboard.Square;
 
 import java.util.ArrayList;
@@ -95,16 +92,23 @@ final class StockpigModel {
      * @param sqi selected square index
      * @return whether a move has been made (pieces must be redrawn)
      */
-    boolean select(final int sqi) {
+    boolean select(final int sqi, final StockpigView view) {
         final Square sq = Square.of(sqi);
 
         // Piece already selected, attempt to make move
         if (this.selected != Square.EMPTY) {
 
             for (int i = 0; i < this.legalMoves.size(); i++) {
-                final int move = this.legalMoves.get(i);
+                int move = this.legalMoves.get(i);
 
                 if (Move.to(move) == sq) {
+
+                    if (Move.isPromotion(move)) {
+                        final PieceType promoteTo = PromotionPopup.getPromoteToPiece(view);
+                        if (promoteTo == PieceType.EMPTY) return false;
+                        move = Move.overwritePromotion(move, promoteTo);
+                    }
+
                     this.position.makeMove(move);
                     clear();
                     this.previousFrom = Move.from(move);

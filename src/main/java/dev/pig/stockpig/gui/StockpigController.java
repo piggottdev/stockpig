@@ -74,7 +74,7 @@ final class StockpigController {
             return;
         }
 
-         this.model.select(i);
+         this.model.select(i, this.view);
          redraw();
     }
 
@@ -112,7 +112,8 @@ final class StockpigController {
      * @param label the bitboard value type
      */
     void addOrSetBitboard(final boolean isSet, final String label) {
-        final long bitboard = switch (label) {
+        final long bitboard = switch (label)
+        {
             case "Attacked"   -> this.model.attacked();
             case "Target"     -> this.model.target();
             case "Pinned"     -> this.model.pinned();
