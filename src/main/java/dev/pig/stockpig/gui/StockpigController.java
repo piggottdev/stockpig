@@ -74,7 +74,9 @@ final class StockpigController {
             return;
         }
 
-         this.model.select(i, this.view);
+         if (this.model.select(i, this.view)) {
+             MoveSoundPlayer.play();
+         }
          redraw();
     }
 
