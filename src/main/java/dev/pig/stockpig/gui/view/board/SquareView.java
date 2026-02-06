@@ -1,19 +1,20 @@
-package dev.pig.stockpig.gui;
+package dev.pig.stockpig.gui.view.board;
 
 import dev.pig.stockpig.chess.Piece;
+import dev.pig.stockpig.gui.controller.StockpigController;
+import dev.pig.stockpig.gui.style.Look;
 
 import javax.swing.*;
 
 /**
  * View for a chess board square.
- * Registers square press event with controller.
  */
-final class SquareView extends JButton {
+public final class SquareView extends JButton {
 
     private final int index;
-    private final boolean isWhiteSquare; ;
+    private final boolean isWhiteSquare;
 
-    SquareView(final int index) {
+    public SquareView(final int index) {
         super();
         this.index = index;
         this.isWhiteSquare = ((index/8) + (index%8)) % 2 == 0;
@@ -26,7 +27,7 @@ final class SquareView extends JButton {
      * Register square press with the controller.
      * @param controller controller
      */
-    void addController(final StockpigController controller) {
+    public void addController(final StockpigController controller) {
         addActionListener(e -> controller.onSquarePressed(this.index));
     }
 
@@ -36,38 +37,38 @@ final class SquareView extends JButton {
     // ====================================================================================================
 
     /**
-     * Set the piece for the square, draws the piece icon on the square, allows {@link Piece#EMPTY}.
+     * Draw the piece icon on the square, allows {@link Piece#EMPTY}.
      * @param piece piece
      */
-    void setPiece(final Piece piece) {
+    public void setPiece(final Piece piece) {
         setIcon(Look.PIECE_ICONS[piece.ordinal()]);
     }
 
     /**
      * Reset the colour of the square back to the default.
      */
-    void clearColour() {
+    public void clearColour() {
         setBackground(this.isWhiteSquare ? Look.WHITE_SQUARE_COLOUR : Look.BLACK_SQUARE_COLOUR);
     }
 
     /**
-     * Set the square as tinted, and colour it appropriately.
+     * Tint colour the square.
      */
-    void tint() {
+    public void tint() {
         setBackground(this.isWhiteSquare ? Look.TINTED_WHITE_SQUARE_COLOUR : Look.TINTED_BLACK_SQUARE_COLOUR);
     }
 
     /**
-     * Set the square as selected, and colour it appropriately.
+     * Select colour the square.
      */
-    void select() {
+    public void select() {
         setBackground(Look.SELECTED_SQUARE_COLOUR);
     }
 
     /**
-     * Set the square as highlighted, and colour it appropriately.
+     * Highlight colour the square.
      */
-    void highlight() {
+    public void highlight() {
         setBackground(Look.HIGHLIGHTED_SQUARE_COLOUR);
     }
 }

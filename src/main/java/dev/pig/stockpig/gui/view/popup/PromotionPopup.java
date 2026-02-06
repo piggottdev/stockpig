@@ -1,13 +1,14 @@
-package dev.pig.stockpig.gui;
+package dev.pig.stockpig.gui.view.popup;
 
 import dev.pig.stockpig.chess.PieceType;
+import dev.pig.stockpig.gui.view.root.StockpigView;
 
 import javax.swing.*;
 
 /**
  * Popup dialog box for selecting which piece to promote to.
  */
-final class PromotionPopup {
+public final class PromotionPopup {
 
     private static final String[] OPTIONS = new String[]{"Queen", "Knight", "Rook", "Bishop"};
 
@@ -16,7 +17,7 @@ final class PromotionPopup {
      * @param view view
      * @return piece to promote
      */
-    static PieceType getPromoteToPiece(final StockpigView view) {
+    public static PieceType getPromoteToPiece(final StockpigView view) {
         final int option = JOptionPane.showOptionDialog(view,
                 "Promote to:", "Promotion",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,

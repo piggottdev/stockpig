@@ -1,4 +1,7 @@
-package dev.pig.stockpig.gui;
+package dev.pig.stockpig.gui.view.fen;
+
+import dev.pig.stockpig.gui.controller.StockpigController;
+import dev.pig.stockpig.gui.model.StockpigModel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,11 +11,11 @@ import java.awt.event.MouseEvent;
 /**
  * View for the FEN toolbar.
  */
-class FenView extends JToolBar {
+public final class FenView extends JToolBar {
 
     private final JTextField fen = new JTextField();
 
-    FenView() {
+    public FenView() {
         super();
         setFloatable(false);
 
@@ -30,11 +33,11 @@ class FenView extends JToolBar {
     }
 
     /**
-     * Register submitting fen string with controller.
+     * Register submitting FEN string with controller.
      * @param controller controller
      */
-    void addController(final StockpigController controller) {
-        this.fen.addActionListener(e -> controller.setFen(fen.getText()));
+    public void addController(final StockpigController controller) {
+        this.fen.addActionListener(e -> controller.fenSubmitted(this.fen.getText()));
     }
 
 
@@ -43,10 +46,10 @@ class FenView extends JToolBar {
     // ====================================================================================================
 
     /**
-     * Set the fen string for the game details panel.
-     * @param fen FEN string
+     * Redraw the FEN string from the model.
+     * @param model model
      */
-    void setFen(final String fen) {
-        this.fen.setText(fen);
+    public void redraw(final StockpigModel model) {
+        this.fen.setText(model.chess.fen());
     }
 }

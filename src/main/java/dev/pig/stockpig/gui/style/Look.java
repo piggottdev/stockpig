@@ -1,4 +1,4 @@
-package dev.pig.stockpig.gui;
+package dev.pig.stockpig.gui.style;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -6,34 +6,35 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Look holds all the static look/theme variables.
  * Most colours and visuals can be modified in this file.
  */
-final class Look {
+public final class Look {
 
-    static final Color BACKGROUND_COLOUR               = new Color(0x252526);
-    static final Color HIGHLIGHTED_BACKGROUND_COLOUR   = new Color(90, 90, 90);
-    static final Color TEXT_COLOUR                     = new Color(0xD4D4D4);
-    static final Color WHITE_SQUARE_COLOUR             = new Color(205, 180, 174);
-    static final Color BLACK_SQUARE_COLOUR             = new Color(140, 93, 56);
-    static final Color TINTED_WHITE_SQUARE_COLOUR      = new Color(90, 90, 90);
-    static final Color TINTED_BLACK_SQUARE_COLOUR      = new Color(70, 70, 70);
-    static final Color SELECTED_SQUARE_COLOUR          = new Color(140, 150, 0);
-    static final Color HIGHLIGHTED_SQUARE_COLOUR       = new Color(250, 100, 100);
+    public static final Color BACKGROUND_COLOUR               = new Color(0x252526);
+    public static final Color HIGHLIGHTED_BACKGROUND_COLOUR   = new Color(90, 90, 90);
+    public static final Color TEXT_COLOUR                     = new Color(0xD4D4D4);
+    public static final Color WHITE_SQUARE_COLOUR             = new Color(205, 180, 174);
+    public static final Color BLACK_SQUARE_COLOUR             = new Color(140, 93, 56);
+    public static final Color TINTED_WHITE_SQUARE_COLOUR      = new Color(90, 90, 90);
+    public static final Color TINTED_BLACK_SQUARE_COLOUR      = new Color(70, 70, 70);
+    public static final Color SELECTED_SQUARE_COLOUR          = new Color(140, 150, 0);
+    public static final Color HIGHLIGHTED_SQUARE_COLOUR       = new Color(250, 100, 100);
 
-    static final Image STOCKPIG_ICON = loadImage("ico.png");
+    public static final Image STOCKPIG_ICON = loadImage("ico.png");
 
-    static final int ICON_SIZE = 96;
-    static final ImageIcon BLANK_ICON = new ImageIcon(new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB));
-    static final ImageIcon[] PIECE_ICONS = loadPieceIcons();
+    public static final int ICON_SIZE = 96;
+    public static final ImageIcon BLANK_ICON = new ImageIcon(new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB));
+    public static final ImageIcon[] PIECE_ICONS = loadPieceIcons();
 
     /**
      * Initialise UI manager constants for all components to avoid doing it in each
      * component.
      */
-    static void init() {
+    public static void init() {
         final Color transparent = new Color(0,0,0,0);
         final Font font = UIManager.getFont("Button.font").deriveFont(14f);
 
@@ -79,16 +80,16 @@ final class Look {
      */
     private static ImageIcon[] loadPieceIcons() {
         final ImageIcon[] icons = new ImageIcon[13];
-        icons[0] =  BLANK_ICON;
-        icons[1] =  loadIcon("wKing.svg.png");
-        icons[2] =  loadIcon("wPawn.svg.png");
-        icons[3] =  loadIcon("wKnight.svg.png");
-        icons[4] =  loadIcon("wBishop.svg.png");
-        icons[5] =  loadIcon("wRook.svg.png");
-        icons[6] =  loadIcon("wQueen.svg.png");
-        icons[7] =  loadIcon("bKing.svg.png");
-        icons[8] =  loadIcon("bPawn.svg.png");
-        icons[9] =  loadIcon("bKnight.svg.png");
+        icons[0]  =  BLANK_ICON;
+        icons[1]  = loadIcon("wKing.svg.png");
+        icons[2]  = loadIcon("wPawn.svg.png");
+        icons[3]  = loadIcon("wKnight.svg.png");
+        icons[4]  = loadIcon("wBishop.svg.png");
+        icons[5]  = loadIcon("wRook.svg.png");
+        icons[6]  = loadIcon("wQueen.svg.png");
+        icons[7]  = loadIcon("bKing.svg.png");
+        icons[8]  = loadIcon("bPawn.svg.png");
+        icons[9]  = loadIcon("bKnight.svg.png");
         icons[10] = loadIcon("bBishop.svg.png");
         icons[11] = loadIcon("bRook.svg.png");
         icons[12] = loadIcon("bQueen.svg.png");
@@ -112,7 +113,7 @@ final class Look {
      */
     private static Image loadImage(final String path) {
         try {
-            return ImageIO.read(Look.class.getClassLoader().getResourceAsStream(path));
+            return ImageIO.read(Objects.requireNonNull(Look.class.getClassLoader().getResourceAsStream(path)));
         } catch (final IOException ioException) {
             throw new RuntimeException("Error loading image " + path, ioException);
         }

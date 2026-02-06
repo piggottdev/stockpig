@@ -1,4 +1,8 @@
-package dev.pig.stockpig.gui;
+package dev.pig.stockpig.gui.app;
+
+import dev.pig.stockpig.gui.controller.StockpigController;
+import dev.pig.stockpig.gui.view.root.StockpigView;
+import dev.pig.stockpig.gui.style.Look;
 
 import javax.swing.*;
 

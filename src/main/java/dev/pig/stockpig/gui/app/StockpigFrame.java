@@ -1,13 +1,16 @@
-package dev.pig.stockpig.gui;
+package dev.pig.stockpig.gui.app;
+
+import dev.pig.stockpig.gui.view.root.StockpigView;
+import dev.pig.stockpig.gui.style.Look;
 
 import javax.swing.*;
 
 /**
  * Top level frame component of the stockpig GUI.
  */
-final class StockpigFrame extends JFrame {
+public final class StockpigFrame extends JFrame {
 
-    StockpigFrame(final StockpigView view) {
+    public StockpigFrame(final StockpigView view) {
         super("stockpig");
 
         // On close, exit the app

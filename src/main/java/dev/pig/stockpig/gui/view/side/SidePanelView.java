@@ -1,4 +1,7 @@
-package dev.pig.stockpig.gui;
+package dev.pig.stockpig.gui.view.side;
+
+import dev.pig.stockpig.gui.controller.StockpigController;
+import dev.pig.stockpig.gui.model.StockpigModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,12 +9,12 @@ import java.awt.*;
 /**
  * View for the side panel.
  */
-final class SidePanelView extends JTabbedPane {
+public final class SidePanelView extends JTabbedPane {
 
     private final GamePanelView gamePanel = new GamePanelView();
     private final BitboardEditorPanelView bitboardEditor = new BitboardEditorPanelView();
 
-    SidePanelView() {
+    public SidePanelView() {
         super();
         setPreferredSize(new Dimension(330, 0));
         add("Game Details", this.gamePanel);
@@ -19,13 +22,13 @@ final class SidePanelView extends JTabbedPane {
     }
 
     /**
-     * Registers any controller callbacks and forwards to tab views.
+     * Registers tab selection with the controller and forward controller to tab views.
      * @param controller controller
      */
-    void addController(final StockpigController controller) {
+    public void addController(final StockpigController controller) {
+        addChangeListener(e -> controller.setBitboardEditorMode(getSelectedIndex() == 1));
         this.gamePanel.addController(controller);
         this.bitboardEditor.addController(controller);
-        addChangeListener(e -> controller.setBitboardEditorMode(getSelectedIndex() == 1));
     }
 
 
@@ -34,10 +37,10 @@ final class SidePanelView extends JTabbedPane {
     // ====================================================================================================
 
     /**
-     * Update bitboard editor with the bitboard.
-     * @param bitboard bitboard
+     * Forward the model to tabs to redraw themselves.
+     * @param model model
      */
-    void setBitboard(final long bitboard) {
-        this.bitboardEditor.setBitboard(bitboard);
+    public void redraw(final StockpigModel model) {
+        this.bitboardEditor.redraw(model);
     }
 }
