@@ -10,6 +10,7 @@ import dev.pig.stockpig.gui.model.StockpigModel;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * View for a chess board.
@@ -67,19 +68,19 @@ public final class BoardView extends JPanel {
 
         tintSquares(model.chess.destinations());
 
-        final Square from = model.chess.from();
-        final Square to = model.chess.to();
-        final Square selected = model.chess.selected();
+        doIfNotEmpty(model.chess.from(), SquareView::select);
+        doIfNotEmpty(model.chess.to(), SquareView::select);
+        doIfNotEmpty(model.chess.selected(), SquareView::select);
+    }
 
-        if (from != Square.EMPTY) {
-            this.squares[from.ordinal()].select();
-        }
-        if (to != Square.EMPTY) {
-            this.squares[to.ordinal()].select();
-        }
-        if (selected != Square.EMPTY) {
-            this.squares[selected.ordinal()].select();
-        }
+    /**
+     * Helper for colouring a single square any colour.
+     * @param sq square
+     * @param c square colour method.
+     */
+    private void doIfNotEmpty(final Square sq, final Consumer<SquareView> c) {
+        if (sq == Square.EMPTY) return;
+        c.accept(this.squares[sq.ordinal()]);
     }
 
     /**

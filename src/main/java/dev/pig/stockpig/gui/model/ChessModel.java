@@ -87,7 +87,7 @@ public final class ChessModel {
         if (this.selected != Square.EMPTY) {
 
             for (int i = 0; i < this.legalMoves.size(); i++) {
-                int move = this.legalMoves.get(i);
+                final int move = this.legalMoves.get(i);
 
                 if (Move.to(move) != sq) {
                     continue;
