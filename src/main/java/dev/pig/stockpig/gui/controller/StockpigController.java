@@ -1,8 +1,10 @@
 package dev.pig.stockpig.gui.controller;
 
+import dev.pig.stockpig.chess.PieceType;
 import dev.pig.stockpig.gui.model.BitboardEditorModel;
 import dev.pig.stockpig.gui.model.ChessModel;
 import dev.pig.stockpig.gui.model.StockpigModel;
+import dev.pig.stockpig.gui.view.popup.PromotionPopup;
 import dev.pig.stockpig.gui.view.root.StockpigView;
 import dev.pig.stockpig.gui.sound.MoveSoundPlayer;
 
@@ -71,7 +73,16 @@ public final class StockpigController {
         }
 
         final ChessModel.GameEvent event = this.model.chess.selectSquare(i);
-        if (event == ChessModel.GameEvent.MOVE) MoveSoundPlayer.play();
+        switch (event) {
+            case MOVE ->  MoveSoundPlayer.play();
+            case PROMOTION -> {
+                final PieceType pt = PromotionPopup.getPromoteToPiece(this.view);
+                if (pt != PieceType.EMPTY) {
+                    this.model.chess.finishPromotion(pt);
+                    MoveSoundPlayer.play();
+                }
+            }
+        }
         redraw();
     }
 

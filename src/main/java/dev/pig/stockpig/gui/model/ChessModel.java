@@ -1,9 +1,6 @@
 package dev.pig.stockpig.gui.model;
 
-import dev.pig.stockpig.chess.Move;
-import dev.pig.stockpig.chess.MoveList;
-import dev.pig.stockpig.chess.Piece;
-import dev.pig.stockpig.chess.Position;
+import dev.pig.stockpig.chess.*;
 import dev.pig.stockpig.chess.bitboard.Square;
 
 import java.util.ArrayList;
@@ -129,6 +126,19 @@ public final class ChessModel {
         SELECTION_CHANGE,
         MOVE,
         PROMOTION
+    }
+
+    /**
+     * Finish the promotion move once a piece type has been selected.
+     * @param pt promotion piece type
+     */
+    public void finishPromotion(final PieceType pt) {
+        final int move = Move.overwritePromotion(this.promotionMove, pt);
+        this.position.makeMove(move);
+        this.legalMoves.clear();
+        this.selected = Square.EMPTY;
+        this.from = Move.from(move);
+        this.to = Move.to(move);
     }
 
 
