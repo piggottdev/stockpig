@@ -214,6 +214,31 @@ public final class BitboardTest {
         );
     }
 
+    @Test
+    public void slide() {
+        assertBitboardEquals(
+                Bitboard.of(Square.F3, Square.G2, Square.H1),
+                Bitboard.slide(
+                        Square.E4.bitboard(),
+                        Bitboard.ALL,
+                        Direction.SE)
+        );
+        assertBitboardEquals(
+                Bitboard.of(Square.D8, Square.E8, Square.F8),
+                Bitboard.slide(
+                        Square.C8.bitboard(),
+                        Bitboard.of(Square.D8, Square.E8),
+                        Direction.E)
+        );
+        assertBitboardEquals(
+                Bitboard.of(Square.C4, Square.B5),
+                Bitboard.slide(
+                        Square.D3.bitboard(),
+                        Bitboard.of(Square.C4),
+                        Direction.NW)
+        );
+    }
+
     private void assertBitboardEquals(final long expected, final long actual) {
         assertEquals(expected, actual, String.format("Expected:%n%sGot:%n%s%n",
                 Bitboard.toString(expected), Bitboard.toString(actual)));

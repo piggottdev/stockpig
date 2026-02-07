@@ -62,7 +62,7 @@ public final class BoardView extends JPanel {
         }
 
         if (model.isBitboardMode) {
-            highlightSquares(Bitboard.toSquareIndexList(model.bitboardEditor.bitboard()));
+            Bitboard.forEachSquare(model.bitboardEditor.bitboard(), sq -> this.squares[sq.ordinal()].highlight());
             return;
         }
 

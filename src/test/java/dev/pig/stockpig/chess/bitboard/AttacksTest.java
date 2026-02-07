@@ -63,7 +63,7 @@ public final class AttacksTest {
                 Bitboard.of(Square.B5, Square.B7, Square.A8, Square.D7, Square.E8, Square.D5, Square.E4, Square.F3, Square.G2, Square.H1),
                 Attacks.bishop(
                         Square.C6.bitboard(),
-                        Bitboard.of(Square.B7, Square.A8, Square.D7, Square.D5, Square.E4, Square.F3, Square.G2, Square.H1))
+                        ~Bitboard.of(Square.B7, Square.A8, Square.D7, Square.D5, Square.E4, Square.F3, Square.G2, Square.H1))
         );
     }
 
@@ -73,7 +73,7 @@ public final class AttacksTest {
                 Bitboard.of(Square.C7, Square.C8, Square.B6, Square.A6, Square.C5, Square.D6, Square.E6, Square.F6, Square.G6, Square.H6),
                 Attacks.rook(
                         Square.C6.bitboard(),
-                        Bitboard.of(Square.B6, Square.C7, Square.C8, Square.D6, Square.E6, Square.F6, Square.G6, Square.H6))
+                        ~Bitboard.of(Square.B6, Square.C7, Square.C8, Square.D6, Square.E6, Square.F6, Square.G6, Square.H6))
         );
     }
 
@@ -84,33 +84,8 @@ public final class AttacksTest {
                               Square.B5, Square.B7, Square.A8, Square.D7, Square.E8, Square.D5, Square.E4, Square.F3, Square.G2, Square.H1),
                 Attacks.queen(
                         Square.C6.bitboard(),
-                        Bitboard.of(Square.B6, Square.C7, Square.C8, Square.D6, Square.E6, Square.F6, Square.G6, Square.H6,
+                        ~Bitboard.of(Square.B6, Square.C7, Square.C8, Square.D6, Square.E6, Square.F6, Square.G6, Square.H6,
                                       Square.B7, Square.A8, Square.D7, Square.D5, Square.E4, Square.F3, Square.G2, Square.H1))
-        );
-    }
-
-    @Test
-    public void slideAttacks() {
-        assertBitboardEquals(
-                Bitboard.of(Square.F3, Square.G2, Square.H1),
-                Attacks.slide(
-                        Square.E4.bitboard(),
-                        Bitboard.ALL,
-                        Direction.SE)
-        );
-        assertBitboardEquals(
-                Bitboard.of(Square.D8, Square.E8, Square.F8),
-                Attacks.slide(
-                        Square.C8.bitboard(),
-                        Bitboard.of(Square.D8, Square.E8),
-                        Direction.E)
-        );
-        assertBitboardEquals(
-                Bitboard.of(Square.C4, Square.B5),
-                Attacks.slide(
-                        Square.D3.bitboard(),
-                        Bitboard.of(Square.C4),
-                        Direction.NW)
         );
     }
 

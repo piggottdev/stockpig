@@ -5,8 +5,6 @@ package dev.pig.stockpig.chess.bitboard;
  */
 public final class Attacks {
 
-    // TODO: Candidate optimisation: Magics
-
     /**
      * Get an attack bitboard for a single occupancy king bitboard.
      * @param king single king bitboard
@@ -27,53 +25,35 @@ public final class Attacks {
 
     /**
      * Get an attack bitboard for a single occupancy bishop bitboard.
-     * Unoccupied squares are required to determine slide stop.
+     * Occupied squares are required to determine slide stop.
      * @param bishop single bishop bitboard
-     * @param unoccupied unoccupied bitboard
+     * @param occupied occupied bitboard
      * @return bishop attack map
      */
-    public static long bishop(final long bishop, final long unoccupied) {
-        return  slide(bishop, unoccupied, Direction.NE) |
-                slide(bishop, unoccupied, Direction.SW) |
-                slide(bishop, unoccupied, Direction.SE) |
-                slide(bishop, unoccupied, Direction.NW);
+    public static long bishop(final long bishop, final long occupied) {
+        return Magics.bAttack(Square.ofBitboard(bishop).ordinal(), occupied);
     }
 
     /**
      * Get an attack bitboard for a single occupancy rook bitboard.
-     * Unoccupied squares are required to determine slide stop.
+     * Occupied squares are required to determine slide stop.
      * @param rook single rook bitboard
-     * @param unoccupied unoccupied bitboard
+     * @param occupied occupied bitboard
      * @return rook attack map
      */
-    public static long rook(final long rook, final long unoccupied) {
-        return  slide(rook, unoccupied, Direction.N) |
-                slide(rook, unoccupied, Direction.S) |
-                slide(rook, unoccupied, Direction.E) |
-                slide(rook, unoccupied, Direction.W);
+    public static long rook(final long rook, final long occupied) {
+        return Magics.rAttack(Square.ofBitboard(rook).ordinal(), occupied);
     }
 
     /**
      * Get an attack bitboard for a single occupancy queen bitboard.
-     * Unoccupied squares are required to determine slide stop.
+     * Occupied squares are required to determine slide stop.
      * @param queen single queen bitboard
-     * @param unoccupied unoccupied bitboard
+     * @param occupied occupied bitboard
      * @return queen attack map
      */
-    public static long queen(final long queen, final long unoccupied) {
-        return rook(queen, unoccupied) | bishop(queen, unoccupied);
-    }
-
-    /**
-     * Get an attack bitboard for sliding pieces.
-     * Usable with multiple occupancy piece bitboards.
-     * @param pieces pieces bitboard
-     * @param unoccupied unoccupied bitboard
-     * @param d direction
-     * @return piece attack map
-     */
-    public static long slide(final long pieces, final long unoccupied, final Direction d) {
-        return Bitboard.shift(Bitboard.fillInto(pieces, d, unoccupied), d);
+    public static long queen(final long queen, final long occupied) {
+        return rook(queen, occupied) | bishop(queen, occupied);
     }
 
 

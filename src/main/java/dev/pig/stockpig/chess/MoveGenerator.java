@@ -165,7 +165,7 @@ public final class MoveGenerator {
      * @param d direction
      */
     private void pin(final long king, final long friends, final long enemies, final long eSliders, final int axis, final Direction d) {
-        final long line = Attacks.slide(king, ~enemies, d);
+        final long line = Bitboard.slide(king, ~enemies, d);
         final long pinner = line & eSliders;
 
         if (pinner == Bitboard.EMPTY) return; // No enemies that can pin
@@ -194,7 +194,7 @@ public final class MoveGenerator {
      * @param d direction
      */
     private void slidingAttack(final long pieces, final long unoccupied, final Direction d) {
-        this.attacked |= Attacks.slide(pieces, unoccupied, d);
+        this.attacked |= Bitboard.slide(pieces, unoccupied, d);
     }
 
     /**
@@ -337,11 +337,11 @@ public final class MoveGenerator {
         final Colour us             = pos.sideToMove;
         final long king             = pos.board.pieces(us, PieceType.KING);
         final Direction backward    = us.backward();
-        final long unoccupied       = pos.board.unoccupied();
+        final long occupied         = pos.board.occupied();
         final long enPassantTarget  = pos.enPassantTarget.bitboard();
         final long capturedPawn     = Bitboard.shift(enPassantTarget, backward.offset());
 
-        return Bitboard.intersects(Attacks.rook(king, (unoccupied | pawn | capturedPawn) ^ enPassantTarget),
+        return Bitboard.intersects(Attacks.rook(king, occupied ^ enPassantTarget ^ pawn ^ capturedPawn),
                 pos.board.pieces(us.flip(), PieceType.ROOK) | pos.board.pieces(us.flip(), PieceType.QUEEN));
     }
 
@@ -419,7 +419,7 @@ public final class MoveGenerator {
         Bitboard.forEach(queens, (final long queen) ->
                 // For each legal destination
                 Bitboard.forEach(
-                        Attacks.queen(queen, unoccupied) & legalTargetsOf(queen),
+                        Attacks.queen(queen, ~unoccupied) & legalTargetsOf(queen),
                         (final long destination) -> basicOrCapture(pos, moves, queen, destination, PieceType.QUEEN, unoccupied)));
     }
 
@@ -442,7 +442,7 @@ public final class MoveGenerator {
         Bitboard.forEach(rooks, (final long rook) ->
                 // For each legal destination
                 Bitboard.forEach(
-                        Attacks.rook(rook, unoccupied) & legalTargetsOf(rook),
+                        Attacks.rook(rook, ~unoccupied) & legalTargetsOf(rook),
                         (final long destination) -> basicOrCapture(pos, moves, rook, destination, PieceType.ROOK, unoccupied)));
     }
 
@@ -465,7 +465,7 @@ public final class MoveGenerator {
         Bitboard.forEach(bishops, (final long bishop) ->
                 // For each legal destination
                 Bitboard.forEach(
-                        Attacks.bishop(bishop, unoccupied) & legalTargetsOf(bishop),
+                        Attacks.bishop(bishop, ~unoccupied) & legalTargetsOf(bishop),
                         (final long destination) -> basicOrCapture(pos, moves, bishop, destination, PieceType.BISHOP, unoccupied)));
     }
 

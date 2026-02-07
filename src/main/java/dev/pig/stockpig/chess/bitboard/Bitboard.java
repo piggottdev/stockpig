@@ -1,7 +1,6 @@
 package dev.pig.stockpig.chess.bitboard;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
 /**
@@ -46,7 +45,7 @@ public final class Bitboard {
      * @param sqs squares
      * @return bitboard
      */
-    public static long of(final Square...sqs) {
+    public static long of(final Square ...sqs) {
         long bb = EMPTY;
         for (final Square sq : sqs) {
             bb |= sq.bitboard();
@@ -201,7 +200,7 @@ public final class Bitboard {
 
 
     // ====================================================================================================
-    //                                  Fills
+    //                                  Fills and Slides
     // ====================================================================================================
 
     /**
@@ -232,6 +231,54 @@ public final class Bitboard {
 
         bb |= area & shift(bb, d.offset() * 4);
         return bb;
+    }
+
+    /**
+     * Fill a bitboard in a given direction when unblocked, then shift the fill one in the direction.
+     * This results in a slide attack map for the pieces, including the first blocker encountered.
+     * @param pieces pieces bitboard
+     * @param unoccupied unoccupied bitboard
+     * @param d direction
+     * @return pieces attack map
+     */
+    public static long slide(final long pieces, final long unoccupied, final Direction d) {
+        return shift(fillInto(pieces, d, unoccupied), d);
+    }
+
+    /**
+     * Slide a bitboard in all orthogonal directions (like a rook).
+     * @param pieces pieces bitboard
+     * @param unoccupied unoccupied bitboard
+     * @return pieces attack map
+     */
+    public static long slideOrthogonal(final long pieces, final long unoccupied) {
+        return  slide(pieces, unoccupied, Direction.N) |
+                slide(pieces, unoccupied, Direction.S) |
+                slide(pieces, unoccupied, Direction.E) |
+                slide(pieces, unoccupied, Direction.W);
+    }
+
+    /**
+     * Slide a bitboard in all diagonal directions (like a bishop).
+     * @param pieces pieces bitboard
+     * @param unoccupied unoccupied bitboard
+     * @return pieces attack map
+     */
+    public static long slideDiagonal(final long pieces, final long unoccupied) {
+        return  slide(pieces, unoccupied, Direction.NE) |
+                slide(pieces, unoccupied, Direction.SW) |
+                slide(pieces, unoccupied, Direction.SE) |
+                slide(pieces, unoccupied, Direction.NW);
+    }
+
+    /**
+     * Slide a bitboard in all directions (like a queen).
+     * @param pieces pieces bitboard
+     * @param unoccupied unoccupied bitboard
+     * @return pieces attack map
+     */
+    public static long slideAll(final long pieces, final long unoccupied) {
+        return slideOrthogonal(pieces, unoccupied) | slideDiagonal(pieces, unoccupied);
     }
 
 
@@ -266,32 +313,23 @@ public final class Bitboard {
         }
     }
 
+    /**
+     * Call the consumer with each square within a bitboard (LSB...MSB).
+     * @param bb bitboard
+     * @param c square consumer
+     */
+    public static void forEachSquare(long bb, final Consumer<Square> c) {
+        while (bb != 0L) {
+            final long lsb = Long.lowestOneBit(bb);
+            c.accept(Square.ofBitboard(lsb));
+            bb ^= lsb;
+        }
+    }
+
 
     // ====================================================================================================
     //                                  Utils
     // ====================================================================================================
-
-    /**
-     * Get a list of each square within the bitboard, ordered from LSB to MSB.
-     * @param bitboard bitboard
-     * @return square list
-     */
-    public static List<Square> toSquareList(final long bitboard) {
-        final List<Square> squares = new ArrayList<>(Bitboard.count(bitboard));
-        forEach(bitboard, bit -> squares.add(Square.ofBitboard(bit)));
-        return squares;
-    }
-
-    /**
-     * Get a list of each square index within the bitboard, ordered from LSB to MSB.
-     * @param bitboard bitboard
-     * @return square index list
-     */
-    public static List<Integer> toSquareIndexList(final long bitboard) {
-        final List<Integer> squares = new ArrayList<>(Bitboard.count(bitboard));
-        forEach(bitboard, bit -> squares.add(Square.ofBitboard(bit).ordinal()));
-        return squares;
-    }
 
     /**
      * Create a pretty 0/1 debug string of a bitboard.
