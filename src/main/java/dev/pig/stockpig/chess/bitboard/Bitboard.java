@@ -122,6 +122,15 @@ public final class Bitboard {
         return Long.bitCount(bb);
     }
 
+    /**
+     * Get whether the bitboard contains only a single one bit.
+     * @param bb bitboard
+     * @return is single
+     */
+    public static boolean isSingle(final long bb) {
+        return Bitboard.isEmpty(bb ^ Long.lowestOneBit(bb));
+    }
+
 
     // ====================================================================================================
     //                                  Shifts

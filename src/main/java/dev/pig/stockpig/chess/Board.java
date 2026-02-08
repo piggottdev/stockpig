@@ -223,7 +223,7 @@ public final class Board {
         final long bishops = pieces(PieceType.BISHOP);
         final long minors = knights | bishops;
 
-        final int minorCount = Long.bitCount(minors);
+        final int minorCount = Bitboard.count(minors);
 
         // More than 2 minor pieces
         if (minorCount > 2) return false;

@@ -109,9 +109,8 @@ public final class MoveGenerator {
                 Direction.NW, Direction.SE
         });
 
-        final int checkCount = Bitboard.count(this.checkers);
-        this.isCheck = checkCount > 0;
-        this.isDoubleCheck = checkCount > 1;
+        this.isCheck = !Bitboard.isEmpty(this.checkers);
+        this.isDoubleCheck = this.isCheck && !Bitboard.isSingle(this.checkers);
 
         this.target = this.isCheck ? this.checkRay | this.checkers : enemies | unoccupied;
     }
