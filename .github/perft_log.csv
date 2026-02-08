@@ -13,3 +13,4 @@ King attacks uses map,81729701,+2.6%
 Pre-compute king and knight attacks,90539093,+10.8%
 Add promotion popup to GUI,88382190,-1.5%
 Magic bitboards,99328808,+12.4%
+IsSingle bitboard method,105508741,+6.2%
