@@ -23,7 +23,7 @@ import java.util.function.LongConsumer;
  */
 public final class Bitboard {
 
-    // Common constants
+    // Common Constants
     public static final long EMPTY          = 0L;
     public static final long ALL            = -1L;
     public static final long BLACK_SQUARES  = 0xAA55AA55AA55AA55L;
@@ -106,35 +106,6 @@ public final class Bitboard {
      */
     public static long intersection(final long bb1, final long bb2) {
         return bb1 & bb2;
-    }
-
-    /**
-     * Get the union of two bitboards, that is bitwise OR.
-     * @param bb1 bitboard
-     * @param bb2 bitboard
-     * @return union bitboard
-     */
-    public static long union(final long bb1, final long bb2) {
-        return bb1 | bb2;
-    }
-
-    /**
-     * Get the exclusive or of two bitboards, that is bitwise XOR.
-     * @param bb1 bitboard
-     * @param bb2 bitboard
-     * @return exclusive or bitboard
-     */
-    public static long xor(final long bb1, final long bb2) {
-        return bb1 ^ bb2;
-    }
-
-    /**
-     * Get the inverse or complement of a bitboard, that is bitwise NOT.
-     * @param bb bitboard
-     * @return inverted bitboard
-     */
-    public static long inverse(final long bb) {
-        return ~bb;
     }
 
 
@@ -234,8 +205,8 @@ public final class Bitboard {
     }
 
     /**
-     * Fill a bitboard in a given direction when unblocked, then shift the fill one in the direction.
-     * This results in a slide attack map for the pieces, including the first blocker encountered.
+     * Fill a bitboard in a given direction into unoccupied spaces, then shift the result in the direction.
+     * The result is a slide attack map for the pieces, including the first blocker encountered.
      * @param pieces pieces bitboard
      * @param unoccupied unoccupied bitboard
      * @param d direction
@@ -319,11 +290,7 @@ public final class Bitboard {
      * @param c square consumer
      */
     public static void forEachSquare(long bb, final Consumer<Square> c) {
-        while (bb != 0L) {
-            final long lsb = Long.lowestOneBit(bb);
-            c.accept(Square.ofBitboard(lsb));
-            bb ^= lsb;
-        }
+        forEach(bb, bit -> c.accept(Square.ofBitboard(bit)));
     }
 
 

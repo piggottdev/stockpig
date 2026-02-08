@@ -78,42 +78,6 @@ public final class BitboardTest {
     }
 
     @Test
-    public void union() {
-        assertBitboardEquals(
-                Bitboard.union(Bitboard.WHITE_SQUARES, Bitboard.BLACK_SQUARES),
-                Bitboard.ALL
-        );
-        assertBitboardEquals(
-                Bitboard.union(Bitboard.of(Square.C7, Square.C4), Bitboard.of(Square.C4)),
-                Bitboard.of(Square.C7, Square.C4)
-        );
-    }
-
-    @Test
-    public void xor() {
-        assertBitboardEquals(
-                Bitboard.xor(Bitboard.WHITE_SQUARES, Bitboard.BLACK_SQUARES),
-                Bitboard.ALL
-        );
-        assertBitboardEquals(
-                Bitboard.xor(Bitboard.of(Square.C7, Square.C4), Bitboard.of(Square.C4)),
-                Square.C7.bitboard()
-        );
-    }
-
-    @Test
-    public void inverse() {
-        assertBitboardEquals(
-                Bitboard.inverse(Bitboard.ALL),
-                Bitboard.EMPTY
-        );
-        assertBitboardEquals(
-                Bitboard.inverse(Bitboard.WHITE_SQUARES),
-                Bitboard.BLACK_SQUARES
-        );
-    }
-
-    @Test
     public void count() {
         assertEquals(0, Bitboard.count(Bitboard.EMPTY));
         assertEquals(1, Bitboard.count(Square.A4.bitboard()));

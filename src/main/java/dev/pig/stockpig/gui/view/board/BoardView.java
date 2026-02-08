@@ -66,11 +66,11 @@ public final class BoardView extends JPanel {
             return;
         }
 
-        tintSquares(model.chess.destinations());
-
         doIfNotEmpty(model.chess.from(), SquareView::select);
         doIfNotEmpty(model.chess.to(), SquareView::select);
         doIfNotEmpty(model.chess.selected(), SquareView::select);
+
+        tintSquares(model.chess.destinations());
     }
 
     /**

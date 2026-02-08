@@ -256,19 +256,19 @@ public final class Magics {
 
         long occ = 0L;
         do {
-            final int index = (int) ((occ * magic) >>> (64 - bits));
+            final int idx = (int) ((occ * magic) >>> (64 - bits));
             final long attack = isRook ?
                     Bitboard.slideOrthogonal(piece, ~(occ | piece)) :
                     Bitboard.slideDiagonal(piece, ~(occ | piece));
 
-            if (!used[index]) {
-                attacks[index] = attack;
-                used[index] = true;
-            } else if (attacks[index] != attack) {
+            if (!used[idx]) {
+                attacks[idx] = attack;
+                used[idx] = true;
+            } else if (attacks[idx] != attack) {
                 return false;
             }
 
-            occ = (occ-mask) & mask;
+            occ = (occ - mask) & mask;
         } while (occ != 0L);
 
         return true;
@@ -284,7 +284,7 @@ public final class Magics {
      * @param square square index
      * @return occupancy mask
      */
-    public static long occupancyMask(final int square, final boolean isRook) {
+    private static long occupancyMask(final int square, final boolean isRook) {
         final long bb = Square.of(square).bitboard();
         return bb ^ (isRook ?   Bitboard.fillInto(bb, Direction.E, Bitboard.NOT_FILE_H) |
                                 Bitboard.fillInto(bb, Direction.W, Bitboard.NOT_FILE_A) |
@@ -297,12 +297,12 @@ public final class Magics {
     }
 
     /**
-     * Call the consumer with every subset of the mask.
+     * Call the consumer with every subset permutation of the mask.
      * Used for finding magics.
      * @param occupancy occupancy mask
      * @param c occupancy consumer
      */
-    public static void forEachOccupancy(final long occupancy, final LongConsumer c) {
+    private static void forEachOccupancy(final long occupancy, final LongConsumer c) {
         long occ = 0L;
         do {
             c.accept(occ);
@@ -320,14 +320,13 @@ public final class Magics {
      */
     private static long[] attacks(final long magic, final int square, final int bits, final boolean isRook) {
         final long mask = occupancyMask(square, isRook);
-        final Square sq = Square.of(square);
-        final long piece = sq.bitboard();
+        final long piece = Square.of(square).bitboard();
         final long[] attacks = new long[1 << bits];
 
         forEachOccupancy(mask, occ -> {
-            final long occupied = occ | piece;
+            final long unocc = ~(occ | piece);
             final int idx = (int) ((occ * magic) >>> (64 - bits));
-            attacks[idx] = isRook ? Bitboard.slideOrthogonal(piece, ~occupied) : Bitboard.slideDiagonal(piece, ~occupied);
+            attacks[idx] = isRook ? Bitboard.slideOrthogonal(piece, unocc) : Bitboard.slideDiagonal(piece, unocc);
         });
 
         return attacks;
