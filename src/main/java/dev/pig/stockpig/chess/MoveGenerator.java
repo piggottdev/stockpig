@@ -7,31 +7,100 @@ import dev.pig.stockpig.chess.bitboard.Square;
 
 /**
  * Move Generator generates legal moves for a given chess position into a
- * move list.
+ * move list. Also, calculates and caches check, attack and pin information.
  */
 public final class MoveGenerator {
+
+    private boolean isCheck;
+    private boolean isDoubleCheck;
+
+    private long attacked;
+    private long checkers;
+    private long checkRay;
+    private long pinned;
+    private long target;
+    private final long[] pins = new long[5];
+
+    // Pin Axis'
+    private static final int ALL            = 0;
+    private static final int HORIZONTAL     = 1;
+    private static final int VERTICAL       = 2;
+    private static final int DIAGONAL       = 3;
+    private static final int ANTI_DIAGONAL  = 4;
+
+
+    // =================================================================================
+    //  Accessors
+    // =================================================================================
+
+    /**
+     * Get whether the position is currently in check.
+     * @return is in check
+     */
+    public boolean isCheck () {
+        return this.isCheck;
+    }
+
+    /**
+     * Get the bitboard of squares attacked/threatened by the other side.
+     * @return attacked bitboard
+     */
+    public long attacked() {
+        return this.attacked;
+    }
+
+    /**
+     * Get the bitboard of all currently checking pieces.
+     * @return checking pieces bitboard
+     */
+    public long checkers() {
+        return this.checkers;
+    }
+
+    /**
+     * Get the check ray bitboard, this is the line from a sliding piece causing check.
+     * @return check ray bitboard
+     */
+    public long checkray() {
+        return this.checkRay;
+    }
+
+    /**
+     * Get the current side's target square bitboard. This is the checkray/checkers if
+     * the position is in check or all enemy and unoccupied squares if not.
+     * @return target bitboard
+     */
+    public long target() {
+        return this.target;
+    }
+
+    /**
+     * Get the bitboard of currently pinned pieces.
+     * @return pinned pieces bitboard
+     */
+    public long pinned() {
+        return this.pinned;
+    }
+
+    /**
+     * Get all current pins.
+     * @return pins bitboard
+     */
+    public long pins() {
+        return this.pins[MoveGenerator.ALL];
+    }
 
 
     // =================================================================================
     //  Checks, Attacks and Pins (required before move gen)
     // =================================================================================
 
-    long attacked;
-    long checkers;
-    long checkRay;
-    long pinned;
-
-    boolean isCheck;
-    boolean isDoubleCheck;
-
-    long target;
-
-    final long[] pins = new long[5];
-    static final int ALL            = 0;
-    static final int HORIZONTAL     = 1;
-    static final int VERTICAL       = 2;
-    static final int DIAGONAL       = 3;
-    static final int ANTI_DIAGONAL  = 4;
+    /**
+     * Set is check to false.
+     */
+    public void resetCheck() {
+        this.isCheck = false;
+    }
 
     /**
      * Reset all state that won't get reset during normal move generation.
@@ -55,20 +124,20 @@ public final class MoveGenerator {
     public void attackAnalysis(final Position pos) {
         reset();
 
-        final long unoccupied = pos.board.unoccupied();
+        final long unoccupied = pos.board().unoccupied();
 
-        final Colour us = pos.sideToMove;
-        final long friends = pos.board.pieces(us);
-        final long king = pos.board.pieces(PieceType.KING) & friends;
+        final Colour us = pos.sideToMove();
+        final long friends = pos.board().pieces(us);
+        final long king = pos.board().pieces(PieceType.KING) & friends;
 
         final Colour them = us.flip();
-        final long enemies = pos.board.pieces(them);
-        final long eKing = pos.board.pieces(PieceType.KING) & enemies;
-        final long ePawns = pos.board.pieces(PieceType.PAWN) & enemies;
-        final long eKnights = pos.board.pieces(PieceType.KNIGHT) & enemies;
-        final long eBishops = pos.board.pieces(PieceType.BISHOP) & enemies;
-        final long eRooks = pos.board.pieces(PieceType.ROOK) & enemies;
-        final long eQueens = pos.board.pieces(PieceType.QUEEN) & enemies;
+        final long enemies = pos.board().pieces(them);
+        final long eKing = pos.board().pieces(PieceType.KING) & enemies;
+        final long ePawns = pos.board().pieces(PieceType.PAWN) & enemies;
+        final long eKnights = pos.board().pieces(PieceType.KNIGHT) & enemies;
+        final long eBishops = pos.board().pieces(PieceType.BISHOP) & enemies;
+        final long eRooks = pos.board().pieces(PieceType.ROOK) & enemies;
+        final long eQueens = pos.board().pieces(PieceType.QUEEN) & enemies;
 
         // Attacks
 
@@ -249,14 +318,14 @@ public final class MoveGenerator {
      * @param moves move list
      */
     public void pawnMoves(final Position pos, final MoveList moves) {
-        final Colour us             = pos.sideToMove;
-        final long pawns            = pos.board.pieces(us, PieceType.PAWN);
-        final long unoccupied       = pos.board.unoccupied();
-        final long enemies          = pos.board.pieces(us.flip());
+        final Colour us             = pos.sideToMove();
+        final long pawns            = pos.board().pieces(us, PieceType.PAWN);
+        final long unoccupied       = pos.board().unoccupied();
+        final long enemies          = pos.board().pieces(us.flip());
         final Direction forward     = us.forward();
         final long thirdRank        = us.rank3().bitboard();
         final long promotionRank    = us.rank8().bitboard();
-        final long enPassantTarget  = pos.enPassantTarget.bitboard();
+        final long enPassantTarget  = pos.enPassantTarget().bitboard();
         final Direction attackDir1  = us.pawnAttackDirection1();
         final Direction attackDir2  = us.pawnAttackDirection2();
 
@@ -321,7 +390,7 @@ public final class MoveGenerator {
             moves.add(Move.enPassant(from, to));
             return;
         }
-        explodePawnPromotions(moves, Move.capture(from, to, PieceType.PAWN, pos.board.pieceType(to)), attack, promotionRank);
+        explodePawnPromotions(moves, Move.capture(from, to, PieceType.PAWN, pos.board().pieceType(to)), attack, promotionRank);
     }
 
     /**
@@ -333,15 +402,15 @@ public final class MoveGenerator {
      * @return is en passant illegal/pinned
      */
     private boolean isPinnedEnPassant(final Position pos, final long pawn) {
-        final Colour us             = pos.sideToMove;
-        final long king             = pos.board.pieces(us, PieceType.KING);
+        final Colour us             = pos.sideToMove();
+        final long king             = pos.board().pieces(us, PieceType.KING);
         final Direction backward    = us.backward();
-        final long occupied         = pos.board.occupied();
-        final long enPassantTarget  = pos.enPassantTarget.bitboard();
+        final long occupied         = pos.board().occupied();
+        final long enPassantTarget  = pos.enPassantTarget().bitboard();
         final long capturedPawn     = Bitboard.shift(enPassantTarget, backward.offset());
 
         return Bitboard.intersects(Attack.rook(king, occupied ^ enPassantTarget ^ pawn ^ capturedPawn),
-                pos.board.pieces(us.flip(), PieceType.ROOK) | pos.board.pieces(us.flip(), PieceType.QUEEN));
+                pos.board().pieces(us.flip(), PieceType.ROOK) | pos.board().pieces(us.flip(), PieceType.QUEEN));
     }
 
 
@@ -355,10 +424,10 @@ public final class MoveGenerator {
      * @param moves move list
      */
     public void kingMoves(final Position pos, final MoveList moves) {
-        final Colour us             = pos.sideToMove;
-        final long king             = pos.board.pieces(us, PieceType.KING);
-        final long unoccupied       = pos.board.unoccupied();
-        final long enemies          = pos.board.pieces(us.flip());
+        final Colour us             = pos.sideToMove();
+        final long king             = pos.board().pieces(us, PieceType.KING);
+        final long unoccupied       = pos.board().unoccupied();
+        final long enemies          = pos.board().pieces(us.flip());
 
         Bitboard.forEach(
                 Attack.king(king) & ~this.attacked & (unoccupied | enemies),
@@ -371,9 +440,9 @@ public final class MoveGenerator {
      * @param moves move list
      */
     public void castleMoves(final Position pos, final MoveList moves) {
-        final long unoccupied = pos.board.unoccupied();
-        if (Castling.isKingSideAllowed(pos.sideToMove, pos.castlingRights, unoccupied, this.attacked)) moves.add(Castling.getKingSideMove(pos.sideToMove));
-        if (Castling.isQueenSideAllowed(pos.sideToMove, pos.castlingRights, unoccupied, this.attacked)) moves.add(Castling.getQueenSideMove(pos.sideToMove));
+        final long unoccupied = pos.board().unoccupied();
+        if (Castling.isKingSideAllowed(pos.sideToMove(), pos.castlingRights(), unoccupied, this.attacked)) moves.add(Castling.getKingSideMove(pos.sideToMove()));
+        if (Castling.isQueenSideAllowed(pos.sideToMove(), pos.castlingRights(), unoccupied, this.attacked)) moves.add(Castling.getQueenSideMove(pos.sideToMove()));
     }
 
 
@@ -387,9 +456,9 @@ public final class MoveGenerator {
      * @param moves move list
      */
     public void knightMoves(final Position pos, final MoveList moves) {
-        final Colour us             = pos.sideToMove;
-        final long knights          = pos.board.pieces(us, PieceType.KNIGHT);
-        final long unoccupied       = pos.board.unoccupied();
+        final Colour us             = pos.sideToMove();
+        final long knights          = pos.board().pieces(us, PieceType.KNIGHT);
+        final long unoccupied       = pos.board().unoccupied();
 
         // For each knight
         Bitboard.forEach(knights & ~this.pins[ALL], (final long knight) ->
@@ -410,9 +479,9 @@ public final class MoveGenerator {
      * @param moves move list
      */
     public void queenMoves(final Position pos, final MoveList moves) {
-        final Colour us             = pos.sideToMove;
-        final long queens           = pos.board.pieces(us, PieceType.QUEEN);
-        final long unoccupied       = pos.board.unoccupied();
+        final Colour us             = pos.sideToMove();
+        final long queens           = pos.board().pieces(us, PieceType.QUEEN);
+        final long unoccupied       = pos.board().unoccupied();
 
         // For each queen
         Bitboard.forEach(queens, (final long queen) ->
@@ -433,9 +502,9 @@ public final class MoveGenerator {
      * @param moves move list
      */
     public void rookMoves(final Position pos, final MoveList moves) {
-        final Colour us             = pos.sideToMove;
-        final long rooks            = pos.board.pieces(us, PieceType.ROOK);
-        final long unoccupied       = pos.board.unoccupied();
+        final Colour us             = pos.sideToMove();
+        final long rooks            = pos.board().pieces(us, PieceType.ROOK);
+        final long unoccupied       = pos.board().unoccupied();
 
         // For each rook
         Bitboard.forEach(rooks, (final long rook) ->
@@ -456,9 +525,9 @@ public final class MoveGenerator {
      * @param moves move list
      */
     public void bishopMoves(final Position pos, final MoveList moves) {
-        final Colour us             = pos.sideToMove;
-        final long bishops          = pos.board.pieces(us, PieceType.BISHOP);
-        final long unoccupied       = pos.board.unoccupied();
+        final Colour us             = pos.sideToMove();
+        final long bishops          = pos.board().pieces(us, PieceType.BISHOP);
+        final long unoccupied       = pos.board().unoccupied();
 
         // For each bishop
         Bitboard.forEach(bishops, (final long bishop) ->
@@ -487,7 +556,7 @@ public final class MoveGenerator {
         final Square origin = Square.ofBitboard(from);
         final Square destination = Square.ofBitboard(to);
         final int basic = Move.basic(origin, destination, pt);
-        moves.add(Bitboard.intersects(unoccupied, to) ? basic : Move.addCapture(basic, pos.board.pieceType(destination)));
+        moves.add(Bitboard.intersects(unoccupied, to) ? basic : Move.addCapture(basic, pos.board().pieceType(destination)));
     }
 
     /**

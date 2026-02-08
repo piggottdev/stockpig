@@ -8,7 +8,7 @@ import dev.pig.stockpig.chess.bitboard.Square;
 import java.util.Arrays;
 
 /**
- * Board stores all piece data for a game of chess.
+ * Board stores all piece/material state for a chess position.
  * Arrays of occupancy bitboards store all piece information, the index within the array encodes the
  * piece type.
  */
@@ -251,64 +251,6 @@ public final class Board {
     // ====================================================================================================
     //                                  Utils
     // ====================================================================================================
-
-    /**
-     * Create a chess board from the material part of a FEN string.
-     * @param fen board part fen string
-     * @return board
-     */
-    public static Board fromFen(final String fen) {
-        final Board board = empty();
-
-        int sq = 56;
-        for (int i = 0; i < fen.length(); i++) {
-            final char c = fen.charAt(i);
-
-            if      (c == '/')              sq -= 16;
-            else if (Character.isDigit(c))  sq += Character.digit(c, 10);
-            else {
-                final Piece p = Piece.fromString(Character.toString(c));
-                board.addPiece(p.colour(), p.type(), Square.of(sq));
-                sq++;
-            }
-        }
-        return board;
-    }
-
-    /**
-     * Create the board part of FEN string from the board.
-     * @return board part FEN string
-     */
-    public String toFen() {
-        final StringBuilder fen = new StringBuilder();
-        Rank.forEach(rank -> {
-            final int[] emptyRun = {0}; // Let it be final
-
-            File.forEach(file -> {
-                final Square sq = Square.of(file, rank);
-                final Piece piece = piece(sq);
-
-                if (piece == Piece.EMPTY) {
-                    emptyRun[0]++;
-                } else {
-                    if (emptyRun[0] > 0) {
-                        fen.append(emptyRun[0]);
-                        emptyRun[0] = 0;
-                    }
-                    fen.append(piece.toString());
-                }
-            });
-            if (emptyRun[0] > 0) {
-                fen.append(emptyRun[0]);
-                emptyRun[0] = 0;
-            }
-            if (rank != Rank.r1) {
-                fen.append("/");
-            }
-        });
-
-        return fen.toString();
-    }
 
     /**
      * Create a pretty printed debug string of the board.

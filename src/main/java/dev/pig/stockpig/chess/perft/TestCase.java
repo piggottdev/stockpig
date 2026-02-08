@@ -2,6 +2,7 @@ package dev.pig.stockpig.chess.perft;
 
 import dev.pig.stockpig.chess.MoveList;
 import dev.pig.stockpig.chess.Position;
+import dev.pig.stockpig.chess.notation.Fen;
 
 /**
  * Test case represents a move enumeration PERFT test case. Move enumeration tests construct
@@ -27,7 +28,7 @@ public record TestCase(String name, String fen, int depth, long expectedNodes) {
      * @param test move enumeration PERFT test
      * @return result
      */
-    public static Result run(final TestCase test) {
+    public static Result run(final TestCase test) throws Fen.ParseException {
         final Position pos = Position.fromFen(test.fen);
 
         final long start = System.nanoTime();

@@ -23,7 +23,7 @@ public final class Move {
     private static final int SQUARE_MASK  = 0b111111;
     private static final int PIECE_MASK   = 0b111;
 
-    // Flag masks
+    // Flag Masks
     private static final int DOUBLE_PUSH_MASK   = 1 << 21;
     private static final int CASTLE_MASK        = 1 << 22;
     private static final int EN_PASSANT_MASK    = 1 << 23;
@@ -35,7 +35,7 @@ public final class Move {
     private static final int CAPTURE_SHIFT    = 15;
     private static final int PROMOTE_SHIFT    = 18;
 
-    // Helper mask
+    // Helper Mask
     private static final int CAPTURE_MASK = PIECE_MASK << CAPTURE_SHIFT;
 
 

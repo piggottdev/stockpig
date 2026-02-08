@@ -2,6 +2,7 @@ package dev.pig.stockpig.gui.model;
 
 import dev.pig.stockpig.chess.*;
 import dev.pig.stockpig.chess.bitboard.Square;
+import dev.pig.stockpig.chess.notation.Fen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public final class ChessModel {
      * Load the position from the FEN string.
      * @param fen FEN string
      */
-    public void fromFen(final String fen) {
+    public void fromFen(final String fen) throws Fen.ParseException {
         this.position = Position.fromFen(fen);
         clear();
     }
@@ -152,7 +153,7 @@ public final class ChessModel {
      * @return piece
      */
     public Piece pieceAt(final int i) {
-        return this.position.pieceAt(Square.of(i));
+        return this.position.board().piece(Square.of(i));
     }
 
     /**

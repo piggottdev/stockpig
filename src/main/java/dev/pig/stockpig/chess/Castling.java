@@ -21,13 +21,13 @@ public final class Castling {
     public static final byte B_QUEEN_SIDE = 1 << 2;
     public static final byte B_KING_SIDE  = 1 << 3;
 
-    // Castle moves
+    // Castle Moves
     public static final int W_QUEEN_SIDE_MOVE = Move.castle(Square.E1, Square.C1);
     public static final int W_KING_SIDE_MOVE  = Move.castle(Square.E1, Square.G1);
     public static final int B_QUEEN_SIDE_MOVE = Move.castle(Square.E8, Square.C8);
     public static final int B_KING_SIDE_MOVE  = Move.castle(Square.E8, Square.G8);
 
-    // Rook move squares
+    // Rook Move Squares
     public static final Square W_QUEEN_SIDE_ROOK_FROM = Square.A1;
     public static final Square W_KING_SIDE_ROOK_FROM  = Square.H1;
     public static final Square B_QUEEN_SIDE_ROOK_FROM = Square.A8;
@@ -37,13 +37,13 @@ public final class Castling {
     public static final Square B_QUEEN_SIDE_ROOK_TO   = Square.D8;
     public static final Square B_KING_SIDE_ROOK_TO    = Square.F8;
 
-    // Empty squares
+    // Empty Squares
     public static final long W_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.of(Square.B1, Square.C1, Square.D1);
     public static final long W_KING_SIDE_EMPTY_SQUARES  = Bitboard.of(Square.F1, Square.G1);
     public static final long B_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.of(Square.B8, Square.C8, Square.D8);
     public static final long B_KING_SIDE_EMPTY_SQUARES  = Bitboard.of(Square.F8, Square.G8);
 
-    // Check squares
+    // Check Squares
     public static final long W_QUEEN_CHECK_SQUARES = Bitboard.of(Square.C1, Square.D1);
     public static final long W_KING_CHECK_SQUARES  = Bitboard.of(Square.F1, Square.G1);
     public static final long B_QUEEN_CHECK_SQUARES = Bitboard.of(Square.C8, Square.D8);

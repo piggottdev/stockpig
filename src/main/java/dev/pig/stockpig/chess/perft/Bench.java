@@ -1,5 +1,7 @@
 package dev.pig.stockpig.chess.perft;
 
+import dev.pig.stockpig.chess.notation.Fen;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +17,7 @@ public final class Bench {
      * Run move enumeration PERFT benchmarking test suite.
      * @param args args
      */
-    public static void main(final String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException, Fen.ParseException {
 
         // Warmup
         for (final TestCase test : Suite.TESTS) TestCase.run(test);

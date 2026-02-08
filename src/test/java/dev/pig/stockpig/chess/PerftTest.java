@@ -1,5 +1,6 @@
 package dev.pig.stockpig.chess;
 
+import dev.pig.stockpig.chess.notation.Fen;
 import dev.pig.stockpig.chess.perft.Suite;
 import dev.pig.stockpig.chess.perft.TestCase;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public final class PerftTest {
 
     @Test
-    public void PerftSuite() {
+    public void PerftSuite() throws Fen.ParseException {
         for (final TestCase test: Suite.TESTS) {
             final TestCase.Result result = TestCase.run(test);
             assertEquals(test.expectedNodes(), result.nodes(), test.name());

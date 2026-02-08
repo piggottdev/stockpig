@@ -76,14 +76,14 @@ public final class BitboardEditorModel {
     private long getBitboard(final BitboardSelector selector, final Position pos) {
         return switch (selector)
         {
-            case Attacked -> pos.attacked();
-            case Target -> pos.target();
-            case Pinned -> pos.pinned();
-            case Pins -> pos.pins();
-            case Checkers -> pos.checkers();
-            case Checks -> pos.checkray();
-            case Unoccupied -> pos.unoccupied();
-            case Occupied -> pos.occupied();
+            case Attacked -> pos.moveGenerator().attacked();
+            case Target -> pos.moveGenerator().target();
+            case Pinned -> pos.moveGenerator().pinned();
+            case Pins -> pos.moveGenerator().pins();
+            case Checkers -> pos.moveGenerator().checkers();
+            case Checks -> pos.moveGenerator().checkray();
+            case Unoccupied -> pos.board().unoccupied();
+            case Occupied -> pos.board().occupied();
         };
     }
 }

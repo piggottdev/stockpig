@@ -3,6 +3,9 @@ package dev.pig.stockpig.chess.bitboard;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.LongConsumer;
 
+/**
+ * Magics provides attack map lookups by occupancy using magic bitboards.
+ */
 public final class Magics {
 
     /**
@@ -200,9 +203,8 @@ public final class Magics {
      * @param args empty
      */
     public static void main(final String[] args) {
-        final long[] rookMagics = findMagics(12, true);
-        for (int i = 0; i < rookMagics.length; i++) {
-            System.out.printf("ROOK_MAGICS[%d] = %dL;%n", i, rookMagics[i]);
+        for (int i = 1; i < 64; i++) {
+            System.out.printf("ROOK_MAGICS[%d] = %dL;%n", i, findMagic(i, 12, true));
         }
         System.out.println();
         final long[] bishopMagics = findMagics(10, false);
@@ -329,4 +331,7 @@ public final class Magics {
 
         return attacks;
     }
+
+
+    private Magics() {};
 }

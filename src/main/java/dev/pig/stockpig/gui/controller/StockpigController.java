@@ -1,6 +1,7 @@
 package dev.pig.stockpig.gui.controller;
 
 import dev.pig.stockpig.chess.PieceType;
+import dev.pig.stockpig.chess.notation.Fen;
 import dev.pig.stockpig.gui.model.BitboardEditorModel;
 import dev.pig.stockpig.gui.model.ChessModel;
 import dev.pig.stockpig.gui.model.StockpigModel;
@@ -49,7 +50,9 @@ public final class StockpigController {
      * @param fen FEN string
      */
     public void fenSubmitted(final String fen) {
-        this.model.chess.fromFen(fen);
+        try {
+            this.model.chess.fromFen(fen);
+        } catch (final Fen.ParseException ignored) {}
         redraw();
     }
 
