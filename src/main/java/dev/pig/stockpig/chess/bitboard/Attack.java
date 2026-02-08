@@ -3,7 +3,7 @@ package dev.pig.stockpig.chess.bitboard;
 /**
  * Attacks provides static functions for obtaining attack map bitboards.
  */
-public final class Attacks {
+public final class Attack {
 
     /**
      * Get an attack bitboard for a single occupancy king bitboard.
@@ -94,5 +94,5 @@ public final class Attacks {
     }
 
 
-    private Attacks() {}
+    private Attack() {}
 }

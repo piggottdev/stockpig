@@ -31,7 +31,7 @@ public final class Magics {
 
 
     // ====================================================================================================
-    //                                  Pre-compute Lookups
+    //                                  Pre-computed Lookups
     // ====================================================================================================
 
     private static final int ROOK_BITS = 13;
@@ -200,12 +200,12 @@ public final class Magics {
      * @param args empty
      */
     public static void main(final String[] args) {
-        final long[] rookMagics = findMagics(13, true);
+        final long[] rookMagics = findMagics(12, true);
         for (int i = 0; i < rookMagics.length; i++) {
             System.out.printf("ROOK_MAGICS[%d] = %dL;%n", i, rookMagics[i]);
         }
         System.out.println();
-        final long[] bishopMagics = findMagics(11, false);
+        final long[] bishopMagics = findMagics(10, false);
         for (int i = 0; i < bishopMagics.length; i++) {
             System.out.printf("BISHOP_MAGICS[%d] = %dL;%n", i, bishopMagics[i]);
         }
@@ -257,9 +257,7 @@ public final class Magics {
         long occ = 0L;
         do {
             final int idx = (int) ((occ * magic) >>> (64 - bits));
-            final long attack = isRook ?
-                    Bitboard.slideOrthogonal(piece, ~(occ | piece)) :
-                    Bitboard.slideDiagonal(piece, ~(occ | piece));
+            final long attack = isRook ? Bitboard.slideOrthogonal(piece, ~(occ | piece)) : Bitboard.slideDiagonal(piece, ~(occ | piece));
 
             if (!used[idx]) {
                 attacks[idx] = attack;
@@ -280,23 +278,6 @@ public final class Magics {
     // ====================================================================================================
 
     /**
-     * Build the occupancy mask for a given square.
-     * @param square square index
-     * @return occupancy mask
-     */
-    private static long occupancyMask(final int square, final boolean isRook) {
-        final long bb = Square.of(square).bitboard();
-        return bb ^ (isRook ?   Bitboard.fillInto(bb, Direction.E, Bitboard.NOT_FILE_H) |
-                                Bitboard.fillInto(bb, Direction.W, Bitboard.NOT_FILE_A) |
-                                Bitboard.fillInto(bb, Direction.N, ~Rank.r8.bitboard()) |
-                                Bitboard.fillInto(bb, Direction.S, ~Rank.r1.bitboard())
-                            :   Bitboard.fillInto(bb, Direction.NE, ~(File.H.bitboard() | Rank.r8.bitboard())) |
-                                Bitboard.fillInto(bb, Direction.NW, ~(File.A.bitboard() | Rank.r8.bitboard())) |
-                                Bitboard.fillInto(bb, Direction.SE, ~(File.H.bitboard() | Rank.r1.bitboard())) |
-                                Bitboard.fillInto(bb, Direction.SW, ~(File.A.bitboard() | Rank.r1.bitboard())));
-    }
-
-    /**
      * Call the consumer with every subset permutation of the mask.
      * Used for finding magics.
      * @param occupancy occupancy mask
@@ -308,6 +289,23 @@ public final class Magics {
             c.accept(occ);
             occ = (occ - occupancy) & occupancy;
         } while (occ != 0L);
+    }
+
+    /**
+     * Build the occupancy mask for a given square.
+     * @param square square index
+     * @return occupancy mask
+     */
+    private static long occupancyMask(final int square, final boolean isRook) {
+        final long bb = Square.of(square).bitboard();
+        return bb ^ (isRook ?   Bitboard.fillInto(bb, Direction.E, ~File.H.bitboard()) |
+                                Bitboard.fillInto(bb, Direction.W, ~File.A.bitboard()) |
+                                Bitboard.fillInto(bb, Direction.N, ~Rank.r8.bitboard()) |
+                                Bitboard.fillInto(bb, Direction.S, ~Rank.r1.bitboard())
+                            :   Bitboard.fillInto(bb, Direction.NE, ~(File.H.bitboard() | Rank.r8.bitboard())) |
+                                Bitboard.fillInto(bb, Direction.NW, ~(File.A.bitboard() | Rank.r8.bitboard())) |
+                                Bitboard.fillInto(bb, Direction.SE, ~(File.H.bitboard() | Rank.r1.bitboard())) |
+                                Bitboard.fillInto(bb, Direction.SW, ~(File.A.bitboard() | Rank.r1.bitboard())));
     }
 
     /**
