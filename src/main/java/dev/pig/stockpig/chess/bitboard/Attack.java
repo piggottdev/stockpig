@@ -6,53 +6,53 @@ package dev.pig.stockpig.chess.bitboard;
 public final class Attack {
 
     /**
-     * Get an attack bitboard for a single occupancy king bitboard.
-     * @param king single king bitboard
+     * Get an attack bitboard for a king on a given square.
+     * @param king king square
      * @return king attack map
      */
-    public static long king(final long king) {
-        return KING_ATTACKS[Square.ofBitboard(king).ordinal()];
+    public static long king(final Square king) {
+        return KING_ATTACKS[king.ordinal()];
     }
 
     /**
-     * Get an attack bitboard for a single occupancy knight bitboard.
-     * @param knight single knight bitboard
+     * Get an attack bitboard for a knight on a given square.
+     * @param knight knight square
      * @return knight attack map
      */
-    public static long knight(final long knight) {
-        return KNIGHT_ATTACKS[Square.ofBitboard(knight).ordinal()];
+    public static long knight(final Square knight) {
+        return KNIGHT_ATTACKS[knight.ordinal()];
     }
 
     /**
-     * Get an attack bitboard for a single occupancy bishop bitboard.
+     * Get an attack bitboard for a bishop on a given square.
      * Occupied squares are required to determine slide stop.
-     * @param bishop single bishop bitboard
+     * @param bishop bishop square
      * @param occupied occupied bitboard
      * @return bishop attack map
      */
-    public static long bishop(final long bishop, final long occupied) {
-        return Magics.bAttack(Square.ofBitboard(bishop).ordinal(), occupied);
+    public static long bishop(final Square bishop, final long occupied) {
+        return Magics.bAttack(bishop.ordinal(), occupied);
     }
 
     /**
-     * Get an attack bitboard for a single occupancy rook bitboard.
+     * Get an attack bitboard for a rook on a given square.
      * Occupied squares are required to determine slide stop.
-     * @param rook single rook bitboard
+     * @param rook rook square
      * @param occupied occupied bitboard
      * @return rook attack map
      */
-    public static long rook(final long rook, final long occupied) {
-        return Magics.rAttack(Square.ofBitboard(rook).ordinal(), occupied);
+    public static long rook(final Square rook, final long occupied) {
+        return Magics.rAttack(rook.ordinal(), occupied);
     }
 
     /**
-     * Get an attack bitboard for a single occupancy queen bitboard.
+     * Get an attack bitboard for a queen on a given square.
      * Occupied squares are required to determine slide stop.
-     * @param queen single queen bitboard
+     * @param queen queen square
      * @param occupied occupied bitboard
      * @return queen attack map
      */
-    public static long queen(final long queen, final long occupied) {
+    public static long queen(final Square queen, final long occupied) {
         return rook(queen, occupied) | bishop(queen, occupied);
     }
 

@@ -145,7 +145,7 @@ public final class MoveGenerator {
         // TODO: Candidate optimisation: Adding a line[from][king] should remove the need to calculate pins in different directions
 
         // King attacks
-        this.attacked = Attack.king(eKing);
+        this.attacked = Attack.king(Square.ofBitboard(eKing));
         // Pawn attacks
         stepAttacks(ePawns, king, new Direction[]{
                 them.pawnAttackDirection1(), them.pawnAttackDirection2()
@@ -409,7 +409,7 @@ public final class MoveGenerator {
         final long enPassantTarget  = pos.enPassantTarget().bitboard();
         final long capturedPawn     = Bitboard.shift(enPassantTarget, backward.offset());
 
-        return Bitboard.intersects(Attack.rook(king, occupied ^ enPassantTarget ^ pawn ^ capturedPawn),
+        return Bitboard.intersects(Attack.rook(Square.ofBitboard(king), occupied ^ enPassantTarget ^ pawn ^ capturedPawn),
                 pos.board().pieces(us.flip(), PieceType.ROOK) | pos.board().pieces(us.flip(), PieceType.QUEEN));
     }
 
@@ -430,7 +430,7 @@ public final class MoveGenerator {
         final long enemies          = pos.board().pieces(us.flip());
 
         Bitboard.forEach(
-                Attack.king(king) & ~this.attacked & (unoccupied | enemies),
+                Attack.king(Square.ofBitboard(king)) & ~this.attacked & (unoccupied | enemies),
                 (final long destination) -> basicOrCapture(pos, moves, king, destination, PieceType.KING, unoccupied));
     }
 
@@ -464,7 +464,7 @@ public final class MoveGenerator {
         Bitboard.forEach(knights & ~this.pins[ALL], (final long knight) ->
                 // For each legal destination
                 Bitboard.forEach(
-                        Attack.knight(knight) & this.target,
+                        Attack.knight(Square.ofBitboard(knight)) & this.target,
                         (final long destination) -> basicOrCapture(pos, moves, knight, destination, PieceType.KNIGHT, unoccupied)));
     }
 
@@ -487,7 +487,7 @@ public final class MoveGenerator {
         Bitboard.forEach(queens, (final long queen) ->
                 // For each legal destination
                 Bitboard.forEach(
-                        Attack.queen(queen, ~unoccupied) & legalTargetsOf(queen),
+                        Attack.queen(Square.ofBitboard(queen), ~unoccupied) & legalTargetsOf(queen),
                         (final long destination) -> basicOrCapture(pos, moves, queen, destination, PieceType.QUEEN, unoccupied)));
     }
 
@@ -510,7 +510,7 @@ public final class MoveGenerator {
         Bitboard.forEach(rooks, (final long rook) ->
                 // For each legal destination
                 Bitboard.forEach(
-                        Attack.rook(rook, ~unoccupied) & legalTargetsOf(rook),
+                        Attack.rook(Square.ofBitboard(rook), ~unoccupied) & legalTargetsOf(rook),
                         (final long destination) -> basicOrCapture(pos, moves, rook, destination, PieceType.ROOK, unoccupied)));
     }
 
@@ -533,7 +533,7 @@ public final class MoveGenerator {
         Bitboard.forEach(bishops, (final long bishop) ->
                 // For each legal destination
                 Bitboard.forEach(
-                        Attack.bishop(bishop, ~unoccupied) & legalTargetsOf(bishop),
+                        Attack.bishop(Square.ofBitboard(bishop), ~unoccupied) & legalTargetsOf(bishop),
                         (final long destination) -> basicOrCapture(pos, moves, bishop, destination, PieceType.BISHOP, unoccupied)));
     }
 
