@@ -16,3 +16,4 @@ Magic bitboards,99328808,+12.4%
 IsSingle bitboard method,105508741,+6.2%
 Separate FEN from chess state classes,100523654,-4.7%
 Attack API takes square,104535513,+4.0%
+Inline move gen,101037791,-3.3%
