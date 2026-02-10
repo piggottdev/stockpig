@@ -87,7 +87,7 @@ public final class MoveGenerator {
      * @return pins bitboard
      */
     public long pins() {
-        return this.pins[MoveGenerator.ALL];
+        return this.pins[ALL];
     }
 
 
@@ -299,27 +299,33 @@ public final class MoveGenerator {
         final long enemies          = pos.board().pieces(us.flip());
         final long king             = pos.board().pieces(PieceType.KING) & team;
 
+
         // King moves - only king moves can get out of double check
-        Bitboard.forEach(
-                Attack.king(Square.ofBitboard(king)) & ~this.attacked & (unoccupied | enemies),
-                (final long destination) -> basicOrCapture(pos, moves, king, destination, PieceType.KING, unoccupied));
+
+        final Square kFrom = Square.ofBitboard(king);
+        Bitboard.forEach(Attack.king(kFrom) & ~this.attacked & (unoccupied | enemies), (final long attack) -> {
+            final Square to = Square.ofBitboard(attack);
+            final int basic = Move.basic(kFrom, to, PieceType.KING);
+            moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+        });
 
         if (this.isDoubleCheck) return;
+
 
         // All other moves (except castles)
 
         final long pawns          = pos.board().pieces(PieceType.PAWN) & team;
-        final long queens          = pos.board().pieces(PieceType.QUEEN) & team;
-        final long knights          = pos.board().pieces(PieceType.KNIGHT) & team;
+        final long queens         = pos.board().pieces(PieceType.QUEEN) & team;
+        final long knights        = pos.board().pieces(PieceType.KNIGHT) & team;
         final long rooks          = pos.board().pieces(PieceType.ROOK) & team;
-        final long bishops          = pos.board().pieces(PieceType.BISHOP) & team;
+        final long bishops        = pos.board().pieces(PieceType.BISHOP) & team;
 
-        final Direction forward = us.forward();
-        final Direction attackDir1 = us.pawnAttackDirection1();
-        final Direction attackDir2 = us.pawnAttackDirection2();
-        final long thirdRank = us.rank3().bitboard();
-        final long promotionRank = us.rank8().bitboard();
-        final long enPassantTarget = pos.enPassantTarget().bitboard();
+        final Direction forward     = us.forward();
+        final Direction attackDir1  = us.pawnAttackDirection1();
+        final Direction attackDir2  = us.pawnAttackDirection2();
+        final long thirdRank        = us.rank3().bitboard();
+        final long promotionRank    = us.rank8().bitboard();
+        final long enPassantTarget  = pos.enPassantTarget().bitboard();
 
         // Pawns that can push forward one
         final long onePushedPawns = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[VERTICAL]), forward, unoccupied);
@@ -341,33 +347,41 @@ public final class MoveGenerator {
         Bitboard.forEach(pawnAttacks2, (final long attack) ->
                 explodePawnCapture(pos, moves, attackDir2, attack, enPassantTarget, promotionRank));
 
-        // For each knight
-        Bitboard.forEach(knights, (final long knight) ->
-                // For each legal destination
-                Bitboard.forEach(
-                        Attack.knight(Square.ofBitboard(knight)) & legalTargetsOf(knight),
-                        (final long destination) -> basicOrCapture(pos, moves, knight, destination, PieceType.KNIGHT, unoccupied)));
+        Bitboard.forEach(knights, (final long knight) -> {
+            final Square from = Square.ofBitboard(knight);
+            Bitboard.forEach(Attack.knight(from) & legalTargetsOf(knight), (final long attack) -> {
+                final Square to = Square.ofBitboard(attack);
+                final int basic = Move.basic(from, to, PieceType.KNIGHT);
+                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+            });
+        });
 
-        // For each queen
-        Bitboard.forEach(queens, (final long queen) ->
-                // For each legal destination
-                Bitboard.forEach(
-                        Attack.queen(Square.ofBitboard(queen), occupied) & legalTargetsOf(queen),
-                        (final long destination) -> basicOrCapture(pos, moves, queen, destination, PieceType.QUEEN, unoccupied)));
+        Bitboard.forEach(queens, (final long queen) -> {
+            final Square from = Square.ofBitboard(queen);
+            Bitboard.forEach(Attack.queen(from, occupied) & legalTargetsOf(queen), (final long attack) -> {
+                final Square to = Square.ofBitboard(attack);
+                final int basic = Move.basic(from, to, PieceType.QUEEN);
+                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+            });
+        });
 
-        // For each rook
-        Bitboard.forEach(rooks, (final long rook) ->
-                // For each legal destination
-                Bitboard.forEach(
-                        Attack.rook(Square.ofBitboard(rook), occupied) & legalTargetsOf(rook),
-                        (final long destination) -> basicOrCapture(pos, moves, rook, destination, PieceType.ROOK, unoccupied)));
+        Bitboard.forEach(rooks, (final long rook) -> {
+            final Square from = Square.ofBitboard(rook);
+            Bitboard.forEach(Attack.rook(from, occupied) & legalTargetsOf(rook), (final long attack) -> {
+                final Square to = Square.ofBitboard(attack);
+                final int basic = Move.basic(from, to, PieceType.ROOK);
+                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+            });
+        });
 
-        // For each bishop
-        Bitboard.forEach(bishops, (final long bishop) ->
-                // For each legal destination
-                Bitboard.forEach(
-                        Attack.bishop(Square.ofBitboard(bishop), occupied) & legalTargetsOf(bishop),
-                        (final long destination) -> basicOrCapture(pos, moves, bishop, destination, PieceType.BISHOP, unoccupied)));
+        Bitboard.forEach(bishops, (final long bishop) -> {
+            final Square from = Square.ofBitboard(bishop);
+            Bitboard.forEach(Attack.bishop(from, occupied) & legalTargetsOf(bishop), (final long attack) -> {
+                final Square to = Square.ofBitboard(attack);
+                final int basic = Move.basic(from, to, PieceType.BISHOP);
+                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+            });
+        });
 
         if (this.isCheck) return;
 
@@ -401,23 +415,6 @@ public final class MoveGenerator {
     // ====================================================================================================
     //                                  Move Builders
     // ====================================================================================================
-
-    /**
-     * If the destination square of the given move is occupied, find which piece type occupies it
-     * and add it as a capture to the move, then add the move (capture or not) into the move list.
-     * @param pos current position
-     * @param moves move list
-     * @param from from bitboard
-     * @param to to bitboard
-     * @param pt moving piece type
-     * @param unoccupied unoccupied bitboard
-     */
-    private void basicOrCapture(final Position pos, final MoveList moves, final long from, final long to, final PieceType pt, final long unoccupied) {
-        final Square origin = Square.ofBitboard(from);
-        final Square destination = Square.ofBitboard(to);
-        final int basic = Move.basic(origin, destination, pt);
-        moves.add(Bitboard.intersects(unoccupied, to) ? basic : Move.addCapture(basic, pos.board().pieceType(destination)));
-    }
 
     /**
      * If the pawn move ends in the promotion rank, then generate a move per promotion piece type
