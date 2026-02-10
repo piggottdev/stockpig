@@ -17,3 +17,4 @@ IsSingle bitboard method,105508741,+6.2%
 Separate FEN from chess state classes,100523654,-4.7%
 Attack API takes square,104535513,+4.0%
 Inline move gen,101037791,-3.3%
+Fully inline move gen,104730690,+3.7%
