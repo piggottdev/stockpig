@@ -127,17 +127,17 @@ public final class MoveGenerator {
         final long unoccupied = pos.board().unoccupied();
 
         final Colour us = pos.sideToMove();
-        final long friends = pos.board().pieces(us);
-        final long king = pos.board().pieces(PieceType.KING) & friends;
+        final long team = pos.board().pieces(us);
+        final long king = pos.board().pieces(PieceType.KING) & team;
 
-        final Colour them = us.flip();
-        final long enemies = pos.board().pieces(them);
-        final long eKing = pos.board().pieces(PieceType.KING) & enemies;
-        final long ePawns = pos.board().pieces(PieceType.PAWN) & enemies;
+        final Colour them   = us.flip();
+        final long enemies  = pos.board().pieces(them);
+        final long eKing    = pos.board().pieces(PieceType.KING) & enemies;
+        final long ePawns   = pos.board().pieces(PieceType.PAWN) & enemies;
         final long eKnights = pos.board().pieces(PieceType.KNIGHT) & enemies;
         final long eBishops = pos.board().pieces(PieceType.BISHOP) & enemies;
-        final long eRooks = pos.board().pieces(PieceType.ROOK) & enemies;
-        final long eQueens = pos.board().pieces(PieceType.QUEEN) & enemies;
+        final long eRooks   = pos.board().pieces(PieceType.ROOK) & enemies;
+        final long eQueens  = pos.board().pieces(PieceType.QUEEN) & enemies;
 
         // Attacks
 
@@ -165,16 +165,16 @@ public final class MoveGenerator {
         });
 
         // Pins
-        pins(king, friends, enemies, eQueens | eRooks, VERTICAL, new Direction[]{
+        pins(king, team, enemies, eQueens | eRooks, VERTICAL, new Direction[]{
                 Direction.N, Direction.S
         });
-        pins(king, friends, enemies, eQueens | eRooks, HORIZONTAL, new Direction[]{
+        pins(king, team, enemies, eQueens | eRooks, HORIZONTAL, new Direction[]{
                 Direction.E, Direction.W
         });
-        pins(king, friends, enemies, eQueens | eBishops, DIAGONAL, new Direction[]{
+        pins(king, team, enemies, eQueens | eBishops, DIAGONAL, new Direction[]{
                 Direction.NE, Direction.SW
         });
-        pins(king, friends, enemies, eQueens | eBishops, ANTI_DIAGONAL, new Direction[]{
+        pins(king, team, enemies, eQueens | eBishops, ANTI_DIAGONAL, new Direction[]{
                 Direction.NW, Direction.SE
         });
 
@@ -187,15 +187,15 @@ public final class MoveGenerator {
     /**
      * Calculate any sliding checks or pins in given directions. This is done filling out from the king.
      * @param king king
-     * @param friends current teams pieces
+     * @param team current teams pieces
      * @param enemies other teams pieces
-     * @param eSliders other teams pieces that can slide in the direction
+     * @param eSliders other teams pieces that can slide in the directions
      * @param axis axis of the directions
      * @param ds directions
      */
-    private void pins(final long king, final long friends, final long enemies, final long eSliders, final int axis, final Direction[] ds) {
+    private void pins(final long king, final long team, final long enemies, final long eSliders, final int axis, final Direction[] ds) {
         for (final Direction d : ds) {
-            pin(king, friends, enemies, eSliders, axis, d);
+            pin(king, team, enemies, eSliders, axis, d);
         }
     }
 
@@ -226,19 +226,19 @@ public final class MoveGenerator {
     /**
      * Calculate any sliding checks or pins in given direction.
      * @param king king
-     * @param friends current teams pieces
+     * @param teams current teams pieces
      * @param enemies other teams pieces
      * @param eSliders other teams pieces that can slide in the direction
      * @param axis axis of the direction
      * @param d direction
      */
-    private void pin(final long king, final long friends, final long enemies, final long eSliders, final int axis, final Direction d) {
+    private void pin(final long king, final long teams, final long enemies, final long eSliders, final int axis, final Direction d) {
         final long line = Bitboard.slide(king, ~enemies, d);
         final long pinner = line & eSliders;
 
         if (pinner == Bitboard.EMPTY) return; // No enemies that can pin
 
-        final long pinned = line & friends;
+        final long pinned = line & teams;
         final long pinnedCount = Bitboard.count(pinned);
 
         if (pinnedCount > 1) return; // More than one blocker
@@ -384,6 +384,7 @@ public final class MoveGenerator {
         });
 
         if (this.isCheck) return;
+
 
         // Castle moves - only add if not in check
 
