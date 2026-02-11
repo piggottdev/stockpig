@@ -7,53 +7,53 @@ public final class Attack {
 
     /**
      * Get an attack bitboard for a king on a given square.
-     * @param king king square
+     * @param sq king square
      * @return king attack map
      */
-    public static long king(final Square king) {
-        return KING_ATTACKS[king.ordinal()];
+    public static long king(final int sq) {
+        return KING_ATTACKS[sq];
     }
 
     /**
      * Get an attack bitboard for a knight on a given square.
-     * @param knight knight square
+     * @param sq knight square
      * @return knight attack map
      */
-    public static long knight(final Square knight) {
-        return KNIGHT_ATTACKS[knight.ordinal()];
+    public static long knight(final int sq) {
+        return KNIGHT_ATTACKS[sq];
     }
 
     /**
      * Get an attack bitboard for a bishop on a given square.
      * Occupied squares are required to determine slide stop.
-     * @param bishop bishop square
+     * @param sq bishop square
      * @param occupied occupied bitboard
      * @return bishop attack map
      */
-    public static long bishop(final Square bishop, final long occupied) {
-        return Magics.bAttack(bishop.ordinal(), occupied);
+    public static long bishop(final int sq, final long occupied) {
+        return Magics.bAttack(sq, occupied);
     }
 
     /**
      * Get an attack bitboard for a rook on a given square.
      * Occupied squares are required to determine slide stop.
-     * @param rook rook square
+     * @param sq rook square
      * @param occupied occupied bitboard
      * @return rook attack map
      */
-    public static long rook(final Square rook, final long occupied) {
-        return Magics.rAttack(rook.ordinal(), occupied);
+    public static long rook(final int sq, final long occupied) {
+        return Magics.rAttack(sq, occupied);
     }
 
     /**
      * Get an attack bitboard for a queen on a given square.
      * Occupied squares are required to determine slide stop.
-     * @param queen queen square
+     * @param sq queen square
      * @param occupied occupied bitboard
      * @return queen attack map
      */
-    public static long queen(final Square queen, final long occupied) {
-        return rook(queen, occupied) | bishop(queen, occupied);
+    public static long queen(final int sq, final long occupied) {
+        return rook(sq, occupied) | bishop(sq, occupied);
     }
 
 
@@ -64,7 +64,7 @@ public final class Attack {
     private static final long[] KING_ATTACKS = new long[64];
     static {
         for (int i = 0; i < KING_ATTACKS.length; i++) {
-            final long king = Square.of(i).bitboard();
+            final long king = Bitboard.ofSquare(i);
             KING_ATTACKS[i] =
                     Bitboard.shift(king, Direction.N)  |
                     Bitboard.shift(king, Direction.NE) |
@@ -80,7 +80,7 @@ public final class Attack {
     private static final long[] KNIGHT_ATTACKS = new long[64];
     static {
         for (int i = 0; i < KNIGHT_ATTACKS.length; i++) {
-            final long knight = Square.of(i).bitboard();
+            final long knight = Bitboard.ofSquare(i);
             KNIGHT_ATTACKS[i] =
                     Bitboard.shift(knight, Direction.NNE) |
                     Bitboard.shift(knight, Direction.NEE) |

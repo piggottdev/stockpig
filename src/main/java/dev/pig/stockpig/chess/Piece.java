@@ -1,8 +1,7 @@
 package dev.pig.stockpig.chess;
 
 /**
- * Piece is an enum for each chess piece including colour.
- * Aggregates the colour and piece type enums allowing both to be returned with a single enum.
+ * Piece is an enum for each chess piece and colour combination.
  */
 public enum Piece {
     EMPTY       (null,  PieceType.EMPTY),
@@ -59,24 +58,23 @@ public enum Piece {
 
     /**
      * Get the piece from a piece character string.
-     * Any unknown pieces will return the empty piece.
-     * @param s single character piece string
+     * @param s piece character string
      * @return piece
      */
     public static Piece fromString(final String s) {
-        if (s.isEmpty()) return EMPTY;
-        return Piece.of(
-                Character.isUpperCase(s.charAt(0)) ? Colour.WHITE : Colour.BLACK,
-                PieceType.fromString(s)
-        );
+        final PieceType pt = PieceType.fromString(s);
+        return of(Colour.of(Character.isUpperCase(s.charAt(0))), pt);
     }
 
     /**
-     * Get the piece character as a string.
+     * Get the piece character string.
      * @return piece character string
      */
     @Override
     public String toString() {
-        return this == EMPTY ? "." : colour() == Colour.WHITE ? type().toString().toUpperCase() : type().toString();
+        return this == EMPTY ? "." :
+                colour() == Colour.WHITE ?
+                        type().toString().toUpperCase() :
+                        type().toString();
     }
 }

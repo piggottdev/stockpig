@@ -15,9 +15,9 @@ public final class ChessModel {
     private Position position = Position.starting();
 
     private final MoveList legalMoves = new MoveList();
-    private Square selected = Square.EMPTY;
-    private Square from     = Square.EMPTY;
-    private Square to       = Square.EMPTY;
+    private int selected = Square.EMPTY;
+    private int from     = Square.EMPTY;
+    private int to       = Square.EMPTY;
     private int promotionMove;
 
     /**
@@ -79,12 +79,10 @@ public final class ChessModel {
     /**
      * Attempt to select the square. If a square is already selected, attempt to make the move.
      * If a move is not made, select the square.
-     * @param si square index
+     * @param sq square index
      * @return type of game event triggered by the selection
      */
-    public GameEvent selectSquare(final int si) {
-        final Square sq = Square.of(si);
-
+    public GameEvent selectSquare(final int sq) {
         if (this.selected != Square.EMPTY) {
 
             for (int i = 0; i < this.legalMoves.size(); i++) {
@@ -153,14 +151,14 @@ public final class ChessModel {
      * @return piece
      */
     public Piece pieceAt(final int i) {
-        return this.position.board().piece(Square.of(i));
+        return this.position.board().piece(i);
     }
 
     /**
      * Get the currently selected square.
      * @return selected square
      */
-    public Square selected() {
+    public int selected() {
         return this.selected;
     }
 
@@ -168,7 +166,7 @@ public final class ChessModel {
      * Get the previous moves from square.
      * @return from square
      */
-    public Square from() {
+    public int from() {
         return this.from;
     }
 
@@ -176,7 +174,7 @@ public final class ChessModel {
      * Get the previous moves to square.
      * @return to square
      */
-    public Square to() {
+    public int to() {
         return this.to;
     }
 
@@ -186,7 +184,7 @@ public final class ChessModel {
      */
     public List<Integer> destinations() {
         final List<Integer> destinations = new ArrayList<>(this.legalMoves.size());
-        this.legalMoves.forEach(move -> destinations.add(Move.to(move).ordinal()));
+        this.legalMoves.forEach(move -> destinations.add(Move.to(move)));
         return destinations;
     }
 }

@@ -3,12 +3,11 @@ package dev.pig.stockpig.chess;
 import dev.pig.stockpig.chess.bitboard.Bitboard;
 import dev.pig.stockpig.chess.bitboard.Square;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
  * Castling rights are stored as a single byte bitmap data structure.
- * The 4 LSBs store whether each team/side castle is possible.
+ * The 4 LSBs store whether each team/side castle is allowed.
  * Provides functions and constants for encoding/decoding castling data.
  */
 public final class Castling {
@@ -28,37 +27,37 @@ public final class Castling {
     public static final int B_KING_SIDE_MOVE  = Move.castle(Square.E8, Square.G8);
 
     // Rook Move Squares
-    public static final Square W_QUEEN_SIDE_ROOK_FROM = Square.A1;
-    public static final Square W_KING_SIDE_ROOK_FROM  = Square.H1;
-    public static final Square B_QUEEN_SIDE_ROOK_FROM = Square.A8;
-    public static final Square B_KING_SIDE_ROOK_FROM  = Square.H8;
-    public static final Square W_QUEEN_SIDE_ROOK_TO   = Square.D1;
-    public static final Square W_KING_SIDE_ROOK_TO    = Square.F1;
-    public static final Square B_QUEEN_SIDE_ROOK_TO   = Square.D8;
-    public static final Square B_KING_SIDE_ROOK_TO    = Square.F8;
+    public static final int W_QUEEN_SIDE_ROOK_FROM = Square.A1;
+    public static final int W_KING_SIDE_ROOK_FROM  = Square.H1;
+    public static final int B_QUEEN_SIDE_ROOK_FROM = Square.A8;
+    public static final int B_KING_SIDE_ROOK_FROM  = Square.H8;
+    public static final int W_QUEEN_SIDE_ROOK_TO   = Square.D1;
+    public static final int W_KING_SIDE_ROOK_TO    = Square.F1;
+    public static final int B_QUEEN_SIDE_ROOK_TO   = Square.D8;
+    public static final int B_KING_SIDE_ROOK_TO    = Square.F8;
 
     // Empty Squares
-    public static final long W_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.of(Square.B1, Square.C1, Square.D1);
-    public static final long W_KING_SIDE_EMPTY_SQUARES  = Bitboard.of(Square.F1, Square.G1);
-    public static final long B_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.of(Square.B8, Square.C8, Square.D8);
-    public static final long B_KING_SIDE_EMPTY_SQUARES  = Bitboard.of(Square.F8, Square.G8);
+    public static final long W_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.ofSquares(Square.B1, Square.C1, Square.D1);
+    public static final long W_KING_SIDE_EMPTY_SQUARES  = Bitboard.ofSquares(Square.F1, Square.G1);
+    public static final long B_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.ofSquares(Square.B8, Square.C8, Square.D8);
+    public static final long B_KING_SIDE_EMPTY_SQUARES  = Bitboard.ofSquares(Square.F8, Square.G8);
 
     // Check Squares
-    public static final long W_QUEEN_CHECK_SQUARES = Bitboard.of(Square.C1, Square.D1);
-    public static final long W_KING_CHECK_SQUARES  = Bitboard.of(Square.F1, Square.G1);
-    public static final long B_QUEEN_CHECK_SQUARES = Bitboard.of(Square.C8, Square.D8);
-    public static final long B_KING_CHECK_SQUARES  = Bitboard.of(Square.F8, Square.G8);
+    public static final long W_QUEEN_CHECK_SQUARES = Bitboard.ofSquares(Square.C1, Square.D1);
+    public static final long W_KING_CHECK_SQUARES  = Bitboard.ofSquares(Square.F1, Square.G1);
+    public static final long B_QUEEN_CHECK_SQUARES = Bitboard.ofSquares(Square.C8, Square.D8);
+    public static final long B_KING_CHECK_SQUARES  = Bitboard.ofSquares(Square.F8, Square.G8);
 
     private static final byte[] SQUARE_MASKS = new byte[64];
     static {
         Arrays.fill(SQUARE_MASKS, ALL);
-        SQUARE_MASKS[Square.A1.ordinal()] = ~(W_QUEEN_SIDE);
-        SQUARE_MASKS[Square.H1.ordinal()] = ~(W_KING_SIDE);
-        SQUARE_MASKS[Square.E1.ordinal()] = ~(W_QUEEN_SIDE | W_KING_SIDE);
+        SQUARE_MASKS[Square.A1] = ~(W_QUEEN_SIDE);
+        SQUARE_MASKS[Square.H1] = ~(W_KING_SIDE);
+        SQUARE_MASKS[Square.E1] = ~(W_QUEEN_SIDE | W_KING_SIDE);
 
-        SQUARE_MASKS[Square.A8.ordinal()] = ~(B_QUEEN_SIDE);
-        SQUARE_MASKS[Square.H8.ordinal()] = ~(B_KING_SIDE);
-        SQUARE_MASKS[Square.E8.ordinal()] = ~(B_QUEEN_SIDE | B_KING_SIDE);
+        SQUARE_MASKS[Square.A8] = ~(B_QUEEN_SIDE);
+        SQUARE_MASKS[Square.H8] = ~(B_KING_SIDE);
+        SQUARE_MASKS[Square.E8] = ~(B_QUEEN_SIDE | B_KING_SIDE);
     }
 
 
@@ -69,7 +68,7 @@ public final class Castling {
     /**
      * Get the queen side castle move for the colour.
      * @param c colour
-     * @return castle move
+     * @return queen side castle move
      */
     public static int getQueenSideMove(final Colour c) {
         return c == Colour.WHITE ? W_QUEEN_SIDE_MOVE : B_QUEEN_SIDE_MOVE;
@@ -78,7 +77,7 @@ public final class Castling {
     /**
      * Get the king side castle move for the colour.
      * @param c colour
-     * @return castle move
+     * @return king side castle move
      */
     public static int getKingSideMove(final Colour c) {
         return c == Colour.WHITE ? W_KING_SIDE_MOVE : B_KING_SIDE_MOVE;
@@ -87,10 +86,10 @@ public final class Castling {
     /**
      * Get the rook from square for the given castle move.
      * @param c colour
-     * @param to to square
+     * @param to king to square
      * @return rook from square
      */
-    static Square getRookFrom(final Colour c, final Square to) {
+    static int getRookFrom(final Colour c, final int to) {
         return c == Colour.WHITE ?
                 to == Square.C1 ? W_QUEEN_SIDE_ROOK_FROM : W_KING_SIDE_ROOK_FROM :
                 to == Square.C8 ? B_QUEEN_SIDE_ROOK_FROM : B_KING_SIDE_ROOK_FROM;
@@ -99,10 +98,10 @@ public final class Castling {
     /**
      * Get the rook to square for the given castle move.
      * @param c colour
-     * @param to to square
+     * @param to king to square
      * @return rook to square
      */
-    static Square getRookTo(final Colour c, final Square to) {
+    static int getRookTo(final Colour c, final int to) {
         return c == Colour.WHITE ?
                 to == Square.C1 ? W_QUEEN_SIDE_ROOK_TO : W_KING_SIDE_ROOK_TO :
                 to == Square.C8 ? B_QUEEN_SIDE_ROOK_TO : B_KING_SIDE_ROOK_TO;
@@ -120,7 +119,7 @@ public final class Castling {
      * @return updated castling rights
      */
     static byte update(byte rights, final int move) {
-        return (byte) (rights & SQUARE_MASKS[Move.from(move).ordinal()] & SQUARE_MASKS[Move.to(move).ordinal()]);
+        return (byte) (rights & SQUARE_MASKS[Move.from(move)] & SQUARE_MASKS[Move.to(move)]);
     }
 
 
@@ -175,7 +174,7 @@ public final class Castling {
 
 
     // ====================================================================================================
-    //                                  Utils
+    //                                  String Utils
     // ====================================================================================================
 
     /**

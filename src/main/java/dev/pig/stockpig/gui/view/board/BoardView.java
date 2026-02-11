@@ -1,8 +1,6 @@
 package dev.pig.stockpig.gui.view.board;
 
 import dev.pig.stockpig.chess.bitboard.Bitboard;
-import dev.pig.stockpig.chess.bitboard.File;
-import dev.pig.stockpig.chess.bitboard.Rank;
 import dev.pig.stockpig.chess.bitboard.Square;
 import dev.pig.stockpig.gui.controller.StockpigController;
 import dev.pig.stockpig.gui.model.StockpigModel;
@@ -22,18 +20,19 @@ public final class BoardView extends JPanel {
     public BoardView() {
         super(new GridLayout(0, 9));
 
-        Rank.forEach(rank -> {
-            add(new JLabel(rank.toString(), SwingConstants.CENTER));
+        for (int rank = 7; rank >= 0; rank--) {
+            add(new JLabel(Integer.toString(rank+1), SwingConstants.CENTER));
 
-            File.forEach(file -> {
-                final Square square = Square.of(file, rank);
-                final SquareView squareView = new SquareView(square.ordinal());
-                this.squares[square.ordinal()] = squareView;
-                add(squareView);
-            });
-        });
-        add(new JLabel(""));
-        File.forEach(file -> add(new JLabel(file.toString().toUpperCase(), SwingConstants.CENTER)));
+            for (int file = 0; file < 8; file++) {
+                final int square = rank*8+file;
+                final SquareView sqview = new SquareView(square);
+                this.squares[square] = sqview;
+                add(sqview);
+            }
+        }
+        for (int file = 0; file <= 8; file++) {
+            add(new JLabel(new String[]{"", "A", "B", "C", "D", "E", "F", "G", "H"}[file], SwingConstants.CENTER));
+        }
     }
 
     /**
@@ -62,7 +61,7 @@ public final class BoardView extends JPanel {
         }
 
         if (model.isBitboardMode) {
-            Bitboard.forEachSquare(model.bitboardEditor.bitboard(), sq -> this.squares[sq.ordinal()].highlight());
+            Bitboard.forEachSquare(model.bitboardEditor.bitboard(), sq -> this.squares[sq].highlight());
             return;
         }
 
@@ -78,9 +77,9 @@ public final class BoardView extends JPanel {
      * @param sq square
      * @param c square colour method.
      */
-    private void doIfNotEmpty(final Square sq, final Consumer<SquareView> c) {
+    private void doIfNotEmpty(final int sq, final Consumer<SquareView> c) {
         if (sq == Square.EMPTY) return;
-        c.accept(this.squares[sq.ordinal()]);
+        c.accept(this.squares[sq]);
     }
 
     /**

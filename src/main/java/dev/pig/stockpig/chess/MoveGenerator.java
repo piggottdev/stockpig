@@ -302,9 +302,9 @@ public final class MoveGenerator {
 
         // King moves - only king moves can get out of double check
 
-        final Square kFrom = Square.ofBitboard(king);
+        final int kFrom = Square.ofBitboard(king);
         Bitboard.forEach(Attack.king(kFrom) & ~this.attacked & (unoccupied | enemies), (final long attack) -> {
-            final Square to = Square.ofBitboard(attack);
+            final int to = Square.ofBitboard(attack);
             final int basic = Move.basic(kFrom, to, PieceType.KING);
             moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
         });
@@ -323,9 +323,9 @@ public final class MoveGenerator {
         final Direction forward     = us.forward();
         final Direction attackDir1  = us.pawnAttackDirection1();
         final Direction attackDir2  = us.pawnAttackDirection2();
-        final long thirdRank        = us.rank3().bitboard();
-        final long promotionRank    = us.rank8().bitboard();
-        final long enPassantTarget  = pos.enPassantTarget().bitboard();
+        final long thirdRank        = us.rank3();
+        final long promotionRank    = us.rank8();
+        final long enPassantTarget  = pos.enPassantTarget() == Square.EMPTY ? Bitboard.EMPTY : Bitboard.ofSquare(pos.enPassantTarget());
 
         // Pawns that can push forward one
         final long onePushedPawns = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[VERTICAL]), forward, unoccupied);
@@ -348,36 +348,36 @@ public final class MoveGenerator {
                 explodePawnCapture(pos, moves, attackDir2, attack, enPassantTarget, promotionRank));
 
         Bitboard.forEach(knights, (final long knight) -> {
-            final Square from = Square.ofBitboard(knight);
+            final int from = Square.ofBitboard(knight);
             Bitboard.forEach(Attack.knight(from) & legalTargetsOf(knight), (final long attack) -> {
-                final Square to = Square.ofBitboard(attack);
+                final int to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.KNIGHT);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
             });
         });
 
         Bitboard.forEach(queens, (final long queen) -> {
-            final Square from = Square.ofBitboard(queen);
+            final int from = Square.ofBitboard(queen);
             Bitboard.forEach(Attack.queen(from, occupied) & legalTargetsOf(queen), (final long attack) -> {
-                final Square to = Square.ofBitboard(attack);
+                final int to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.QUEEN);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
             });
         });
 
         Bitboard.forEach(rooks, (final long rook) -> {
-            final Square from = Square.ofBitboard(rook);
+            final int from = Square.ofBitboard(rook);
             Bitboard.forEach(Attack.rook(from, occupied) & legalTargetsOf(rook), (final long attack) -> {
-                final Square to = Square.ofBitboard(attack);
+                final int to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.ROOK);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
             });
         });
 
         Bitboard.forEach(bishops, (final long bishop) -> {
-            final Square from = Square.ofBitboard(bishop);
+            final int from = Square.ofBitboard(bishop);
             Bitboard.forEach(Attack.bishop(from, occupied) & legalTargetsOf(bishop), (final long attack) -> {
-                final Square to = Square.ofBitboard(attack);
+                final int to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.BISHOP);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
             });
@@ -448,8 +448,8 @@ public final class MoveGenerator {
      */
     private void explodePawnCapture(final Position pos, final MoveList moves, final Direction attackDir, final long attack, final long enPassantTarget, final long promotionRank) {
         final long pawn = Bitboard.shiftRev(attack, attackDir);
-        final Square from = Square.ofBitboard(pawn);
-        final Square to = Square.ofBitboard(attack);
+        final int from = Square.ofBitboard(pawn);
+        final int to = Square.ofBitboard(attack);
         if (attack == enPassantTarget) {
             if (isPinnedEnPassant(pos, pawn)) return;
             moves.add(Move.enPassant(from, to));
@@ -476,7 +476,7 @@ public final class MoveGenerator {
         final long king             = pos.board().pieces(us, PieceType.KING);
         final Direction backward    = us.backward();
         final long occupied         = pos.board().occupied();
-        final long enPassantTarget  = pos.enPassantTarget().bitboard();
+        final long enPassantTarget  = Bitboard.ofSquare(pos.enPassantTarget());
         final long capturedPawn     = Bitboard.shift(enPassantTarget, backward.offset());
 
         return Bitboard.intersects(Attack.rook(Square.ofBitboard(king), occupied ^ enPassantTarget ^ pawn ^ capturedPawn),

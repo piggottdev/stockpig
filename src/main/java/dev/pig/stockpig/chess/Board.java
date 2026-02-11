@@ -1,9 +1,6 @@
 package dev.pig.stockpig.chess;
 
 import dev.pig.stockpig.chess.bitboard.Bitboard;
-import dev.pig.stockpig.chess.bitboard.File;
-import dev.pig.stockpig.chess.bitboard.Rank;
-import dev.pig.stockpig.chess.bitboard.Square;
 
 import java.util.Arrays;
 
@@ -48,9 +45,9 @@ public final class Board {
      * @param pt piece type
      * @param sq square
      */
-    public void addPiece(final Colour c, final PieceType pt, final Square sq) {
-        final long bitboard = sq.bitboard();
-        this.squares[sq.ordinal()] = pt;
+    public void addPiece(final Colour c, final PieceType pt, final int sq) {
+        final long bitboard = Bitboard.ofSquare(sq);
+        this.squares[sq] = pt;
         this.colourBBs[c.ordinal()]                 |=  bitboard;
         this.pieceBBs[pt.ordinal()]                 |=  bitboard;
         this.pieceBBs[PieceType.EMPTY.ordinal()]    &=~ bitboard;
@@ -62,9 +59,9 @@ public final class Board {
      * @param pt piece type
      * @param sq square
      */
-    public void removePiece(final Colour c, final PieceType pt, final Square sq) {
-        final long bitboard = sq.bitboard();
-        this.squares[sq.ordinal()] = PieceType.EMPTY;
+    public void removePiece(final Colour c, final PieceType pt, final int sq) {
+        final long bitboard = Bitboard.ofSquare(sq);
+        this.squares[sq] = PieceType.EMPTY;
         this.colourBBs[c.ordinal()]                 &=~ bitboard;
         this.pieceBBs[pt.ordinal()]                 &=~ bitboard;
         this.pieceBBs[PieceType.EMPTY.ordinal()]    |=  bitboard;
@@ -129,8 +126,8 @@ public final class Board {
      * @param sq square
      * @return piece type
      */
-    public PieceType pieceType(final Square sq) {
-        return this.squares[sq.ordinal()];
+    public PieceType pieceType(final int sq) {
+        return this.squares[sq];
     }
 
     /**
@@ -138,9 +135,9 @@ public final class Board {
      * @param sq square
      * @return piece
      */
-    public Piece piece(final Square sq) {
+    public Piece piece(final int sq) {
         return Piece.of(
-                Colour.of(Bitboard.intersects(sq.bitboard(), this.colourBBs[Colour.WHITE.ordinal()])),
+                Colour.of(Bitboard.intersects(Bitboard.ofSquare(sq), this.colourBBs[Colour.WHITE.ordinal()])),
                 pieceType(sq)
         );
     }
@@ -156,15 +153,15 @@ public final class Board {
      * @param move move
      */
     public void makeMove(final Colour c, final int move) {
-        final Square from = Move.from(move);
-        final Square to = Move.to(move);
+        final int from = Move.from(move);
+        final int to = Move.to(move);
         final PieceType mover = Move.mover(move);
         final PieceType capture = Move.capture(move);
         final PieceType promote = Move.promote(move);
 
         // If this was a capture remove that piece from the board
         if (capture != PieceType.EMPTY) {
-            removePiece(c.flip(), capture, Move.isEnPassant(move) ? to.shift(c.backward()) : to);
+            removePiece(c.flip(), capture, Move.isEnPassant(move) ? to + c.backward().offset() : to);
         }
 
         // Remove the moving piece from the's start location and add it to the destination
@@ -184,8 +181,8 @@ public final class Board {
      * @param move move
      */
     public void unmakeMove(final Colour c, final int move) {
-        final Square from = Move.from(move);
-        final Square to = Move.to(move);
+        final int from = Move.from(move);
+        final int to = Move.to(move);
         final PieceType mover = Move.mover(move);
         final PieceType capture = Move.capture(move);
         final PieceType promote = Move.promote(move);
@@ -202,7 +199,7 @@ public final class Board {
 
         // If this was a capture add that piece to the board
         if (capture != PieceType.EMPTY) {
-            addPiece(c.flip(), capture, Move.isEnPassant(move) ? to.shift(c.backward()) : to);
+            addPiece(c.flip(), capture, Move.isEnPassant(move) ? to + c.backward().offset() : to);
         }
     }
 
@@ -259,11 +256,13 @@ public final class Board {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        Rank.forEach(r -> {
-            File.forEach(f ->
-                    sb.append(piece(Square.of(f, r))).append(" "));
+        for (int rank = 7; rank >= 0; rank--) {
+            for (int file = 0; file < 8; file++) {
+                final int sq = rank*8+file;
+                sb.append(piece(sq)).append(" ");
+            }
             sb.append("\n");
-        });
+        }
         return sb.toString();
     }
 }

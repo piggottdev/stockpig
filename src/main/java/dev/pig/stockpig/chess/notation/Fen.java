@@ -1,8 +1,6 @@
 package dev.pig.stockpig.chess.notation;
 
 import dev.pig.stockpig.chess.*;
-import dev.pig.stockpig.chess.bitboard.File;
-import dev.pig.stockpig.chess.bitboard.Rank;
 import dev.pig.stockpig.chess.bitboard.Square;
 
 /**
@@ -23,7 +21,6 @@ public final class Fen {
     //                                  From Fen / Decode / Parse
     // ====================================================================================================
 
-
     /**
      * Parse a FEN string and return a chess position.
      * Invalid FENs do not always throw an exception.
@@ -38,7 +35,7 @@ public final class Fen {
         try {
             return new Position(
                     fromBoardFen(parts[0]),
-                    Colour.fromString(parts[1]),
+                    "w".equals(parts[1]) ? Colour.WHITE : Colour.BLACK,
                     Castling.fromString(parts[2]),
                     Square.fromString(parts[3]),
                     Integer.parseInt(parts[4]),
@@ -65,7 +62,7 @@ public final class Fen {
             else if (Character.isDigit(c))  sq += Character.digit(c, 10);
             else {
                 final Piece p = Piece.fromString(Character.toString(c));
-                board.addPiece(p.colour(), p.type(), Square.of(sq));
+                board.addPiece(p.colour(), p.type(), sq);
                 sq++;
             }
         }
@@ -85,9 +82,9 @@ public final class Fen {
     public static String format(final Position pos) {
         return String.join(" ",
                 toBoardFen(pos.board()),
-                pos.sideToMove().toString(),
+                pos.sideToMove() == Colour.WHITE ? "w" : "b",
                 Castling.toString(pos.castlingRights()),
-                pos.enPassantTarget().toString(),
+                Square.toString(pos.enPassantTarget()),
                 Integer.toString(pos.halfMoveClock()),
                 Integer.toString(pos.turn())
         );
@@ -99,32 +96,28 @@ public final class Fen {
      */
     private static String toBoardFen(final Board board) {
         final StringBuilder fen = new StringBuilder();
-        Rank.forEach(rank -> {
-            final int[] emptyRun = {0}; // Let it be final
-
-            File.forEach(file -> {
-                final Square sq = Square.of(file, rank);
+        for (int rank = 7; rank >= 0; rank--) {
+            int emptyRun = 0;
+            for (int file = 0; file < 8; file++) {
+                final int sq = rank*8+file;
                 final Piece piece = board.piece(sq);
-
                 if (piece == Piece.EMPTY) {
-                    emptyRun[0]++;
+                    emptyRun++;
                 } else {
-                    if (emptyRun[0] > 0) {
-                        fen.append(emptyRun[0]);
-                        emptyRun[0] = 0;
+                    if (emptyRun > 0) {
+                        fen.append(emptyRun);
+                        emptyRun = 0;
                     }
                     fen.append(piece.toString());
                 }
-            });
-            if (emptyRun[0] > 0) {
-                fen.append(emptyRun[0]);
-                emptyRun[0] = 0;
             }
-            if (rank != Rank.r1) {
+            if (emptyRun > 0) {
+                fen.append(emptyRun);
+            }
+            if (rank != 0) {
                 fen.append("/");
             }
-        });
-
+        }
         return fen.toString();
     }
 

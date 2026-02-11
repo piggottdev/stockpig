@@ -35,15 +35,14 @@ public final class Move {
     private static final int CAPTURE_SHIFT    = 15;
     private static final int PROMOTE_SHIFT    = 18;
 
-    // Helper Mask
+    // Helper Masks
     private static final int CAPTURE_MASK = PIECE_MASK << CAPTURE_SHIFT;
+    private static final int PROMOTE_MASK = PIECE_MASK << PROMOTE_SHIFT;
 
 
     // ====================================================================================================
     //                                  Constructors and Builders
     // ====================================================================================================
-
-    // TODO: Candidate optimisation: Test pre-computed and cached common moves
 
     /**
      * Create a basic move.
@@ -52,8 +51,8 @@ public final class Move {
      * @param mover moving piece type
      * @return move
      */
-    public static int basic(final Square from, final Square to, final PieceType mover) {
-        return from.ordinal() | (to.ordinal() << TO_SHIFT) | (mover.ordinal() << MOVER_SHIFT);
+    public static int basic(final int from, final int to, final PieceType mover) {
+        return from | (to << TO_SHIFT) | (mover.ordinal() << MOVER_SHIFT);
     }
 
     /**
@@ -82,9 +81,9 @@ public final class Move {
      * @param to to square
      * @param mover moving piece type
      * @param capture captured piece type
-     * @return move
+     * @return capture move
      */
-    public static int capture(final Square from, final Square to, final PieceType mover, final PieceType capture) {
+    public static int capture(final int from, final int to, final PieceType mover, final PieceType capture) {
         return addCapture(basic(from, to, mover), capture);
     }
 
@@ -92,9 +91,9 @@ public final class Move {
      * Create a double pawn push move.
      * @param from from square
      * @param to to square
-     * @return move
+     * @return double push move
      */
-    public static int doublePush(final Square from, final Square to) {
+    public static int doublePush(final int from, final int to) {
         return basic(from, to, PieceType.PAWN) | DOUBLE_PUSH_MASK;
     }
 
@@ -102,9 +101,9 @@ public final class Move {
      * Create a castle move.
      * @param from from square
      * @param to to square
-     * @return move
+     * @return castle move
      */
-    public static int castle(final Square from, final Square to) {
+    public static int castle(final int from, final int to) {
         return basic(from, to, PieceType.KING) | CASTLE_MASK;
     }
 
@@ -112,9 +111,9 @@ public final class Move {
      * Create an en passant move.
      * @param from from square
      * @param to to square.
-     * @return move
+     * @return en passant move
      */
-    public static int enPassant(final Square from, final Square to) {
+    public static int enPassant(final int from, final int to) {
         return capture(from, to, PieceType.PAWN, PieceType.PAWN) | EN_PASSANT_MASK;
     }
 
@@ -128,8 +127,8 @@ public final class Move {
      * @param move move
      * @return from square
      */
-    public static Square from(final int move) {
-        return Square.of(move & SQUARE_MASK);
+    public static int from(final int move) {
+        return move & SQUARE_MASK;
     }
 
     /**
@@ -137,8 +136,8 @@ public final class Move {
      * @param move move
      * @return to square
      */
-    public static Square to(final int move) {
-        return Square.of((move >>> TO_SHIFT) & SQUARE_MASK);
+    public static int to(final int move) {
+        return (move >>> TO_SHIFT) & SQUARE_MASK;
     }
 
     /**
@@ -210,7 +209,7 @@ public final class Move {
      * @return is promotion move
      */
     public static boolean isPromotion(final int move) {
-        return ((move >> PROMOTE_SHIFT) & PIECE_MASK) != 0;
+        return (move & PROMOTE_MASK) != 0;
     }
 
 
@@ -225,17 +224,17 @@ public final class Move {
      * @return promotion move
      */
     public static int overwritePromotion(final int move, final PieceType promote) {
-        return addPromotion(move & ~(PIECE_MASK << PROMOTE_SHIFT), promote);
+        return addPromotion(move & ~PROMOTE_MASK, promote);
     }
 
     /**
-     * Create a string representation of the move, this is the algebra notation of the origin
-     * square followed by the destination square, then the promoted piece type if any.
+     * Get the standard move notation string of the move. Algebra notation of from square, algebra
+     * notation of to square, promotion piece type character (if any).
      * @param move move
      * @return algebra notation move
      */
     public static String toString(final int move) {
-        return from(move).toString() + to(move).toString() + promote(move).toString();
+        return Square.toString(from(move)) + Square.toString(to(move)) + promote(move).toString();
     }
 
 

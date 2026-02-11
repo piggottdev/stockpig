@@ -2,7 +2,6 @@ package dev.pig.stockpig.gui.model;
 
 import dev.pig.stockpig.chess.Position;
 import dev.pig.stockpig.chess.bitboard.Bitboard;
-import dev.pig.stockpig.chess.bitboard.Square;
 
 /**
  * Bitboard editor model for tracking and editing selected bitboard.
@@ -46,7 +45,7 @@ public final class BitboardEditorModel {
      * @param i square index
      */
     public void toggleBit(final int i) {
-        this.bitboard ^= Square.of(i).bitboard();
+        this.bitboard ^= Bitboard.ofSquare(i);
     }
 
     /**

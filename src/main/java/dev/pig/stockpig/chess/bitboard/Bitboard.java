@@ -1,6 +1,6 @@
 package dev.pig.stockpig.chess.bitboard;
 
-import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
 /**
@@ -23,17 +23,42 @@ import java.util.function.LongConsumer;
  */
 public final class Bitboard {
 
-    // Common Constants
+
+    // ====================================================================================================
+    //                                  Common Constants
+    // ====================================================================================================
+
+    // Constants
     public static final long EMPTY          = 0L;
     public static final long ALL            = -1L;
     public static final long BLACK_SQUARES  = 0xAA55AA55AA55AA55L;
     public static final long WHITE_SQUARES  = 0x55AA55AA55AA55AAL;
 
+    // Files
+    public static final long FILE_A = 0x101010101010101L << 0;
+    public static final long FILE_B = 0x101010101010101L << 1;
+    public static final long FILE_C = 0x101010101010101L << 2;
+    public static final long FILE_D = 0x101010101010101L << 3;
+    public static final long FILE_E = 0x101010101010101L << 4;
+    public static final long FILE_F = 0x101010101010101L << 5;
+    public static final long FILE_G = 0x101010101010101L << 6;
+    public static final long FILE_H = 0x101010101010101L << 7;
+
+    // Ranks
+    public static final long RANK_1 = 0xFFL << (8 * 0);
+    public static final long RANK_2 = 0xFFL << (8 * 1);
+    public static final long RANK_3 = 0xFFL << (8 * 2);
+    public static final long RANK_4 = 0xFFL << (8 * 3);
+    public static final long RANK_5 = 0xFFL << (8 * 4);
+    public static final long RANK_6 = 0xFFL << (8 * 5);
+    public static final long RANK_7 = 0xFFL << (8 * 6);
+    public static final long RANK_8 = 0xFFL << (8 * 7);
+
     // Wrap Bounds
-    public static final long NOT_FILE_A     = ~(File.A.bitboard());
-    public static final long NOT_FILE_H     = ~(File.H.bitboard());
-    public static final long NOT_FILE_AB    = ~(File.A.bitboard() | File.B.bitboard());
-    public static final long NOT_FILE_GH    = ~(File.G.bitboard() | File.H.bitboard());
+    public static final long NOT_FILE_A     = ~(FILE_A);
+    public static final long NOT_FILE_H     = ~(FILE_H);
+    public static final long NOT_FILE_AB    = ~(FILE_A | FILE_B);
+    public static final long NOT_FILE_GH    = ~(FILE_G | FILE_H);
 
 
     // ====================================================================================================
@@ -41,14 +66,23 @@ public final class Bitboard {
     // ====================================================================================================
 
     /**
-     * Create a bitboard from a collection of squares.
-     * @param sqs squares
+     * Get a bitboard for a given square, should be a valid square.
+     * @param square square
+     * @return single occupancy bitboard
+     */
+    public static long ofSquare(final int square) {
+        return 1L << square;
+    }
+
+    /**
+     * Get a bitboard for a collection of squares, should be a valid squares.
+     * @param squares squares
      * @return bitboard
      */
-    public static long of(final Square ...sqs) {
-        long bb = EMPTY;
-        for (final Square sq : sqs) {
-            bb |= sq.bitboard();
+    public static long ofSquares(final int... squares) {
+        long bb = 0L;
+        for (final int square : squares) {
+            bb |= ofSquare(square);
         }
         return bb;
     }
@@ -74,7 +108,7 @@ public final class Bitboard {
      * @return do bitboards intersect
      */
     public static boolean intersects(final long bb1, final long bb2) {
-        return intersection(bb1, bb2) != EMPTY;
+        return (bb1 & bb2) != EMPTY;
     }
 
     /**
@@ -84,7 +118,7 @@ public final class Bitboard {
      * @return are bitboards disjoint
      */
     public static boolean disjoint(final long bb1, final long bb2) {
-        return isEmpty(intersection(bb1, bb2));
+        return isEmpty(bb1 & bb2);
     }
 
     /**
@@ -95,17 +129,7 @@ public final class Bitboard {
      * @return does area fully contain the bitboard
      */
     public static boolean contains(final long area, final long bb) {
-        return intersection(area, bb) == bb;
-    }
-
-    /**
-     * Get the intersection of two bitboards, that is bitwise AND.
-     * @param bb1 bitboard
-     * @param bb2 bitboard
-     * @return intersection bitboard
-     */
-    public static long intersection(final long bb1, final long bb2) {
-        return bb1 & bb2;
+        return (area & bb) == bb;
     }
 
 
@@ -114,21 +138,21 @@ public final class Bitboard {
     // ====================================================================================================
 
     /**
+     * Get whether the bitboard contains only a single one bit.
+     * @param bb bitboard
+     * @return is single occupancy bitboard
+     */
+    public static boolean isSingle(final long bb) {
+        return Bitboard.isEmpty(bb ^ Long.lowestOneBit(bb));
+    }
+
+    /**
      * Get the population/bit count of the bitboard, that is the number of one bits.
      * @param bb bitboard
      * @return bit count
      */
     public static int count(final long bb) {
         return Long.bitCount(bb);
-    }
-
-    /**
-     * Get whether the bitboard contains only a single one bit.
-     * @param bb bitboard
-     * @return is single
-     */
-    public static boolean isSingle(final long bb) {
-        return Bitboard.isEmpty(bb ^ Long.lowestOneBit(bb));
     }
 
 
@@ -169,7 +193,7 @@ public final class Bitboard {
     }
 
     /**
-     * Shift a bitboard in a reverse direction, does not apply a mask to prevent file wrap around(assumes this is undoing a shift).
+     * Shift a bitboard in a reverse direction, does not apply a mask to prevent file wrap around (assumes this is undoing a shift).
      * @param bb bitboard
      * @param d shift direction
      * @return reverse shifted bitboard
@@ -298,13 +322,13 @@ public final class Bitboard {
      * @param bb bitboard
      * @param c square consumer
      */
-    public static void forEachSquare(long bb, final Consumer<Square> c) {
+    public static void forEachSquare(final long bb, final IntConsumer c) {
         forEach(bb, bit -> c.accept(Square.ofBitboard(bit)));
     }
 
 
     // ====================================================================================================
-    //                                  Utils
+    //                                  String Utils
     // ====================================================================================================
 
     /**
@@ -314,11 +338,13 @@ public final class Bitboard {
      */
     public static String toString(final long bb) {
         final StringBuilder sb = new StringBuilder();
-        Rank.forEach(rank -> {
-            File.forEach(file ->
-                    sb.append((Square.of(file, rank).bitboard() & bb) == 0 ? "0 " : "1 "));
+        for (int rank = 7; rank >= 0; rank--) {
+            for (int file = 0; file < 8; file++) {
+                final long bit = ofSquare(rank*8+file);
+                sb.append(isEmpty(bit & bb) ? "0 " : "1 ");
+            }
             sb.append("\n");
-        });
+        }
         return sb.toString();
     }
 

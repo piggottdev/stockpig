@@ -18,13 +18,13 @@ public final class Position {
     private final Board board;
     private Colour sideToMove;
     private byte castlingRights;
-    private Square enPassantTarget;
+    private int enPassantTarget;
     private int halfMoveClock;
     private int turn;
 
     // History
     private final List<State> history = new ArrayList<>(100);
-    private record State(int move, byte castlingRights, Square enPassantTarget, int halfMoveClock){}
+    private record State(int move, byte castlingRights, int enPassantTarget, int halfMoveClock){}
 
     // Moves (+ check, attack and pin information)
     private final MoveGenerator moveGenerator = new MoveGenerator();
@@ -36,7 +36,7 @@ public final class Position {
     // ====================================================================================================
 
     public Position(final Board board, final Colour sideToMove, final byte castlingRights,
-                    final Square enPassantTarget, final int halfMoveClock, final int turn) {
+                    final int enPassantTarget, final int halfMoveClock, final int turn) {
         this.board = board;
         this.sideToMove = sideToMove;
         this.castlingRights = castlingRights;
@@ -101,7 +101,7 @@ public final class Position {
      * Get the en passant target, if any.
      * @return en passant target
      */
-    public Square enPassantTarget() {
+    public int enPassantTarget() {
         return this.enPassantTarget;
     }
 
@@ -186,7 +186,7 @@ public final class Position {
     public void generateMoves() {
         this.moves.clear();
         this.moveGenerator.resetCheck();
-        if (halfMoveClock >= 50 || this.board.isDeadPosition()) return;
+        if (this.halfMoveClock >= 50 || this.board.isDeadPosition()) return;
         this.moveGenerator.generate(this, this.moves);
     }
 
@@ -199,7 +199,7 @@ public final class Position {
 
         this.board.makeMove(this.sideToMove, move);
         this.castlingRights = Castling.update(this.castlingRights, move);
-        this.enPassantTarget = Move.isDoublePush(move) ? Move.from(move).shift(this.sideToMove.forward()) : Square.EMPTY;
+        this.enPassantTarget = Move.isDoublePush(move) ? Move.from(move) + this.sideToMove.forward().offset() : Square.EMPTY;
         this.halfMoveClock = Move.isCapture(move) || Move.mover(move) == PieceType.PAWN ? 0 : this.halfMoveClock + 1;
         this.sideToMove = this.sideToMove.flip();
         if (this.sideToMove == Colour.WHITE) this.turn++;
@@ -232,7 +232,7 @@ public final class Position {
 
 
     // ====================================================================================================
-    //                                  Utils
+    //                                  Fen Utils
     // ====================================================================================================
 
     /**

@@ -11,7 +11,7 @@ public enum PieceType {
 
 
     /**
-     * Get the piece type for the given index/ordinal (0...6).
+     * Get the piece type for the given piece index/ordinal (0...6).
      * @param i index
      * @return piece type
      */
@@ -19,11 +19,9 @@ public enum PieceType {
         return VALUES[i];
     }
 
-
     /**
      * Get the piece type from a piece type character string.
-     * Any unknown piece types will return the empty piece type.
-     * @param s single character piece type string
+     * @param s piece type character string
      * @return piece type
      */
     public static PieceType fromString(final String s) {
@@ -35,12 +33,12 @@ public enum PieceType {
             case "b" -> BISHOP;
             case "r" -> ROOK;
             case "q" -> QUEEN;
-            default -> EMPTY;
+            default -> throw new IllegalArgumentException("unknown piece type: " + s);
         };
     }
 
     /**
-     * Get the piece type character as a string.
+     * Get the piece type character string.
      * @return piece type character string
      */
     @Override

@@ -1,91 +1,63 @@
 package dev.pig.stockpig.chess.bitboard;
 
 /**
- * Square is an enum for all co-ordinates on an 8x8 chess board,
- * using algebraic notation, file letter, rank number.
+ * Square provides constants and functions for working with squares.
+ * The squares are indexed as described in {@link Bitboard}.
  */
-// TODO: Candidate optimisation: Test removing enum in favour of int/byte
-public enum Square {
-    // Vertically flipped, A1 (0) would appear in the bottom left visually.
-    A1, B1, C1, D1, E1, F1, G1, H1,
-    A2, B2, C2, D2, E2, F2, G2, H2,
-    A3, B3, C3, D3, E3, F3, G3, H3,
-    A4, B4, C4, D4, E4, F4, G4, H4,
-    A5, B5, C5, D5, E5, F5, G5, H5,
-    A6, B6, C6, D6, E6, F6, G6, H6,
-    A7, B7, C7, D7, E7, F7, G7, H7,
-    A8, B8, C8, D8, E8, F8, G8, H8,
-    EMPTY;
+public final class Square {
 
-    private static final Square[] VALUES = values();
-
+    public static final int
+            A8 = 56, B8 = 57, C8 = 58, D8 = 59, E8 = 60, F8 = 61, G8 = 62, H8 = 63,
+            A7 = 48, B7 = 49, C7 = 50, D7 = 51, E7 = 52, F7 = 53, G7 = 54, H7 = 55,
+            A6 = 40, B6 = 41, C6 = 42, D6 = 43, E6 = 44, F6 = 45, G6 = 46, H6 = 47,
+            A5 = 32, B5 = 33, C5 = 34, D5 = 35, E5 = 36, F5 = 37, G5 = 38, H5 = 39,
+            A4 = 24, B4 = 25, C4 = 26, D4 = 27, E4 = 28, F4 = 29, G4 = 30, H4 = 31,
+            A3 = 16, B3 = 17, C3 = 18, D3 = 19, E3 = 20, F3 = 21, G3 = 22, H3 = 23,
+            A2 = 8,  B2 = 9,  C2 = 10, D2 = 11, E2 = 12, F2 = 13, G2 = 14, H2 = 15,
+            A1 = 0,  B1 = 1,  C1 = 2,  D1 = 3,  E1 = 4,  F1 = 5,  G1 = 6,  H1 = 7,
+            EMPTY = 64;
 
     /**
-     * Get the square for the given square index/ordinal (0...63).
-     * @param i index
-     * @return square
-     */
-    public static Square of(final int i) {
-        return VALUES[i];
-    }
-
-    /**
-     * Get the square for the given file, rank.
-     * @param f file
-     * @param r rank
-     * @return square at the intersection of file and rank
-     */
-    public static Square of(final File f, final Rank r) {
-        return ofBitboard(f.bitboard() & r.bitboard());
-    }
-
-    /**
-     * Get the square for the given single occupancy bitboard.
+     * Get the square index for a given single occupancy bitboard, should not be empty.
      * @param bb bitboard
      * @return square
      */
-    public static Square ofBitboard(final long bb) {
-        return of(Long.numberOfTrailingZeros(bb));
+    public static int ofBitboard(final long bb) {
+        return Long.numberOfTrailingZeros(bb);
     }
 
     /**
-     * Get the single occupancy bitboard of the square.
-     * @return bitboard
-     */
-    public long bitboard() {
-        return this == EMPTY ? 0L : 1L << ordinal();
-    }
-
-    /**
-     * Get the square moved once in a given direction.
-     * Does not prevent file wrap around.
-     * @param d direction
-     * @return moved square
-     */
-    public Square shift(final Direction d) {
-        return of(ordinal() + d.offset());
-    }
-
-    /**
-     * Get the square from an algebraic notation string.
-     * Any unknown square notation will return the empty square.
-     * @param s algebraic notation square string
+     * Get the square from an algebra notation string. '-' is parsed as {@link Square#EMPTY}.
+     * @param s algebra notation string
      * @return square
      */
-    public static Square fromString(final String s) {
-        try {
-            return valueOf(s.toUpperCase());
-        } catch (final IllegalArgumentException iae) {
-            return EMPTY;
-        }
+    public static int fromString(final String s) {
+        if ("-".equals(s)) return EMPTY;
+
+        if (s.length() != 2) throw new IllegalArgumentException("unknown square: " + s);
+
+        final char file = s.toLowerCase().charAt(0);
+        final char rank = s.toLowerCase().charAt(1);
+
+        if (file < 'a' || file > 'h') throw new IllegalArgumentException("unknown file: " + file);
+        if (rank < '1' || rank > '8') throw new IllegalArgumentException("unknown rank: " + rank);
+
+        return (rank - 'a')*8 + (file - '1');
     }
 
     /**
-     * Get the algebraic notation string of the square.
-     * @return algebraic notation string
+     * Get the algebra notation string of the square.
+     * @param sq square
+     * @return algebra notation string
      */
-    @Override
-    public String toString() {
-        return this == EMPTY ? "-" : super.toString().toLowerCase();
+    public static String toString(final int sq) {
+        if (sq == EMPTY) return "-";
+
+        final int file = sq & 7;
+        final int rank = (sq >> 3) + 1;
+        return ('a' + file) + Integer.toString(rank);
     }
+
+
+    private Square() {}
 }

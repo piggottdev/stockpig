@@ -1,7 +1,7 @@
 package dev.pig.stockpig.chess;
 
+import dev.pig.stockpig.chess.bitboard.Bitboard;
 import dev.pig.stockpig.chess.bitboard.Direction;
-import dev.pig.stockpig.chess.bitboard.Rank;
 
 /**
  * Colour is an enum for each chess team colour.
@@ -64,35 +64,15 @@ public enum Colour {
      * starting rank.
      * @return third rank
      */
-    public Rank rank3() {
-        return this == WHITE ? Rank.r3 : Rank.r6;
+    public long rank3() {
+        return this == WHITE ? Bitboard.RANK_3 : Bitboard.RANK_6;
     }
 
     /**
      * Get the eighth forward rank of the colour, this is the pawn promotion rank.
      * @return eighth rank
      */
-    public Rank rank8() {
-        return this == WHITE ? Rank.r8 : Rank.r1;
-    }
-
-    /**
-     * Get the colour from a colour character string.
-     * @param s lowercase letter string
-     * @return colour
-     */
-    public static Colour fromString(final String s) {
-        if ("w".equalsIgnoreCase(s)) return WHITE;
-        if ("b".equalsIgnoreCase(s)) return BLACK;
-        throw new IllegalArgumentException("unknown colour " + s);
-    }
-
-    /**
-     * Get the lowercase letter string for the colour.
-     * @return lowercase letter string
-     */
-    @Override
-    public String toString() {
-        return this == WHITE ? "w" : "b";
+    public long rank8() {
+        return this == WHITE ? Bitboard.RANK_8 : Bitboard.RANK_1;
     }
 }
