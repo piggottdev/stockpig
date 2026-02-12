@@ -2,7 +2,7 @@ package dev.pig.stockpig.chess.core.bitboard;
 
 /**
  * Square provides constants and functions for working with square indexes.
- * The squares are indexed (0...63) as described in {@link Bitboard}.
+ * Squares are indexed (0...63) as described in {@link Bitboard}.
  */
 public final class Square {
 

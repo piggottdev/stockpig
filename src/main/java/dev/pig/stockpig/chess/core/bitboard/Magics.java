@@ -208,7 +208,7 @@ public final class Magics {
         }
         System.out.println();
         for (int i = 0; i < 64; i++) {
-            System.out.printf("BISHOP_MAGICS[%d] = %dL;%n", i, findMagic(i, 1, false));
+            System.out.printf("BISHOP_MAGICS[%d] = %dL;%n", i, findMagic(i, 10, false));
         }
     }
 
@@ -319,5 +319,5 @@ public final class Magics {
     }
 
 
-    private Magics() {};
+    private Magics() {}
 }
