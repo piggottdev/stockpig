@@ -1,7 +1,7 @@
 package dev.pig.stockpig.chess.perft;
 
-import dev.pig.stockpig.chess.MoveList;
-import dev.pig.stockpig.chess.Position;
+import dev.pig.stockpig.chess.core.MoveList;
+import dev.pig.stockpig.chess.core.Position;
 import dev.pig.stockpig.chess.notation.Fen;
 
 /**

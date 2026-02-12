@@ -1,11 +1,9 @@
-package dev.pig.stockpig.chess;
-
-import dev.pig.stockpig.chess.bitboard.Square;
+package dev.pig.stockpig.chess.core;
 
 /**
- * Moves are encoded as single integer bitmaps. Set bit ranges encode properties
- * of the move, including some redundant move information that could be inferred
- * from the board state.
+ * Moves are encoded as a single 32-bit integer.
+ * Specific bit ranges encode properties of the move, including some redundant
+ * information that could otherwise be inferred from the board state.
  * <p>
  * Bit ranges:
  * - Bits 0-5:      From square (0...63)
@@ -117,6 +115,16 @@ public final class Move {
         return capture(from, to, PieceType.PAWN, PieceType.PAWN) | EN_PASSANT_MASK;
     }
 
+    /**
+     * Overwrites the promotion piece type with a new piece type.
+     * @param move move
+     * @param promote promote piece type
+     * @return promotion move
+     */
+    public static int overwritePromotion(final int move, final PieceType promote) {
+        return addPromotion(move & ~PROMOTE_MASK, promote);
+    }
+
 
     // ====================================================================================================
     //                                  Accessors
@@ -210,31 +218,6 @@ public final class Move {
      */
     public static boolean isPromotion(final int move) {
         return (move & PROMOTE_MASK) != 0;
-    }
-
-
-    // ====================================================================================================
-    //                                  Utils
-    // ====================================================================================================
-
-    /**
-     * Overwrites the promotion piece type with a new piece type.
-     * @param move move
-     * @param promote promote piece type
-     * @return promotion move
-     */
-    public static int overwritePromotion(final int move, final PieceType promote) {
-        return addPromotion(move & ~PROMOTE_MASK, promote);
-    }
-
-    /**
-     * Get the standard move notation string of the move. Algebra notation of from square, algebra
-     * notation of to square, promotion piece type character (if any).
-     * @param move move
-     * @return algebra notation move
-     */
-    public static String toString(final int move) {
-        return Square.toString(from(move)) + Square.toString(to(move)) + promote(move).toString();
     }
 
 

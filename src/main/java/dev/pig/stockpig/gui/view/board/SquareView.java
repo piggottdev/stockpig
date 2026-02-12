@@ -1,6 +1,5 @@
 package dev.pig.stockpig.gui.view.board;
 
-import dev.pig.stockpig.chess.Piece;
 import dev.pig.stockpig.gui.controller.StockpigController;
 import dev.pig.stockpig.gui.style.Look;
 
@@ -37,11 +36,11 @@ public final class SquareView extends JButton {
     // ====================================================================================================
 
     /**
-     * Draw the piece icon on the square, allows {@link Piece#EMPTY}.
+     * Draw the piece icon on the square.
      * @param piece piece
      */
-    public void setPiece(final Piece piece) {
-        setIcon(Look.PIECE_ICONS[piece.ordinal()]);
+    public void setPiece(final int piece) {
+        setIcon(Look.PIECE_ICONS[piece]);
     }
 
     /**

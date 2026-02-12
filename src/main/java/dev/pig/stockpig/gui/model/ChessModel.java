@@ -1,7 +1,8 @@
 package dev.pig.stockpig.gui.model;
 
-import dev.pig.stockpig.chess.*;
-import dev.pig.stockpig.chess.bitboard.Square;
+import dev.pig.stockpig.chess.core.*;
+import dev.pig.stockpig.chess.core.bitboard.Bitboard;
+import dev.pig.stockpig.chess.core.bitboard.Square;
 import dev.pig.stockpig.chess.notation.Fen;
 
 import java.util.ArrayList;
@@ -150,8 +151,9 @@ public final class ChessModel {
      * @param i square index
      * @return piece
      */
-    public Piece pieceAt(final int i) {
-        return this.position.board().piece(i);
+    public int pieceAt(final int i) {
+        return this.position.board().pieceAt(i).ordinal() +
+                (Bitboard.intersects(Bitboard.ofSquare(i), this.position.board().pieces(Colour.BLACK)) ? 6 : 0);
     }
 
     /**

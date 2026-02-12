@@ -1,6 +1,6 @@
 package dev.pig.stockpig.gui.view.popup;
 
-import dev.pig.stockpig.chess.PieceType;
+import dev.pig.stockpig.chess.core.PieceType;
 import dev.pig.stockpig.gui.view.root.StockpigView;
 
 import javax.swing.*;

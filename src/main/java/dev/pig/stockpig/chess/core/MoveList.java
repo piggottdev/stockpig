@@ -1,10 +1,11 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.core;
 
 import java.util.function.IntConsumer;
 
 /**
- * Move list is a wrapper around an integer array providing list like
- * functionality without boxing the int. Can be cloned and re-used with clear.
+ * A MoveList is a lightweight wrapper around an integer array that provides
+ * list-like functionality without boxing. Instances can be reused via {@link #clear()}
+ * and cloned when necessary.
  */
 public final class MoveList {
 
@@ -15,7 +16,7 @@ public final class MoveList {
     private int size = 0;
 
     /**
-     * Add a move to the list.
+     * Adds a move to the list.
      * @param move move
      */
     public void add(final int move) {
@@ -23,7 +24,7 @@ public final class MoveList {
     }
 
     /**
-     * Get move at index.
+     * Returns the move at the given index.
      * @param i index
      * @return move
      */
@@ -32,7 +33,7 @@ public final class MoveList {
     }
 
     /**
-     * Get the size of the move list.
+     * Returns the number of moves in the list.
      * @return size
      */
     public int size() {
@@ -40,7 +41,7 @@ public final class MoveList {
     }
 
     /**
-     * Get whether the list is empty.
+     * Returns whether the list is empty.
      * @return is empty
      */
     public boolean isEmpty() {
@@ -64,7 +65,7 @@ public final class MoveList {
     }
 
     /**
-     * Clone/copy this move list.
+     * Creates a copy of this move list.
      * @return clone
      */
     @Override
@@ -75,7 +76,7 @@ public final class MoveList {
     }
 
     /**
-     * Clone/copy this move list into another move list.
+     * Copies the contents of this move list into the provided list.
      * @param clone move list to clone into
      */
     public void cloneInto(final MoveList clone) {

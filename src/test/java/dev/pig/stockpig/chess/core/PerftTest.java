@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.core;
 
 import dev.pig.stockpig.chess.notation.Fen;
 import dev.pig.stockpig.chess.perft.Suite;

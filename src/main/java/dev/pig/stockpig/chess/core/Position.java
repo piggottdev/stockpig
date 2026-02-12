@@ -1,6 +1,6 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.core;
 
-import dev.pig.stockpig.chess.bitboard.Square;
+import dev.pig.stockpig.chess.core.bitboard.Square;
 import dev.pig.stockpig.chess.notation.Fen;
 
 import java.util.ArrayList;
@@ -51,21 +51,7 @@ public final class Position {
      * @return starting position
      */
     public static Position starting() {
-        try {
-            return Fen.parse(Fen.STARTING);
-        } catch (final Fen.ParseException fpe) {
-            throw new RuntimeException(fpe);
-        }
-    }
-
-    /**
-     * Build a position from a FEN string.
-     * @param fen FEN string
-     * @return position
-     * @throws Fen.ParseException invalid FEN exception
-     */
-    public static Position fromFen(final String fen) throws Fen.ParseException {
-        return Fen.parse(fen);
+        return Fen.startingPosition();
     }
 
 
@@ -106,7 +92,7 @@ public final class Position {
     }
 
     /**
-     * Get the half move clock, amount of moves without a capture or pawn push.
+     * Get the half move clock, number of half-moves (plies) since last capture or pawn advance.
      * @return half move clock
      */
     public int halfMoveClock() {
@@ -143,8 +129,7 @@ public final class Position {
     // ====================================================================================================
 
     /**
-     * Get whether the position is terminal, whether from checkmate, stalemate or other
-     * draw states.
+     * Returns true if the position is terminal (checkmate, stalemate, or other draw conditions).
      * @return is game over
      */
     public boolean isGameOver() {
@@ -207,7 +192,7 @@ public final class Position {
     }
 
     /**
-     * Unmake the last move to the position and regenerate legal move list.
+     * Undoes the last move and regenerates the legal move list.
      */
     public void undo() {
         unmakeMove();
@@ -234,6 +219,16 @@ public final class Position {
     // ====================================================================================================
     //                                  Fen Utils
     // ====================================================================================================
+
+    /**
+     * Build a position from a FEN string.
+     * @param fen FEN string
+     * @return position
+     * @throws Fen.ParseException invalid FEN exception
+     */
+    public static Position fromFen(final String fen) throws Fen.ParseException {
+        return Fen.parse(fen);
+    }
 
     /**
      * Get a FEN string for the current position.

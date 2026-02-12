@@ -1,9 +1,9 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.core;
 
-import dev.pig.stockpig.chess.bitboard.Attack;
-import dev.pig.stockpig.chess.bitboard.Bitboard;
-import dev.pig.stockpig.chess.bitboard.Direction;
-import dev.pig.stockpig.chess.bitboard.Square;
+import dev.pig.stockpig.chess.core.bitboard.Attack;
+import dev.pig.stockpig.chess.core.bitboard.Bitboard;
+import dev.pig.stockpig.chess.core.bitboard.Direction;
+import dev.pig.stockpig.chess.core.bitboard.Square;
 
 /**
  * Move Generator generates legal moves for a given chess position into a
@@ -186,7 +186,7 @@ public final class MoveGenerator {
 
     /**
      * Calculate any sliding checks or pins in given directions. This is done filling out from the king.
-     * @param king king
+     * @param king single occupancy king bitboard
      * @param team current teams pieces
      * @param enemies other teams pieces
      * @param eSliders other teams pieces that can slide in the directions
@@ -214,7 +214,7 @@ public final class MoveGenerator {
     /**
      * Calculate any step attacks (single moves) in given directions.
      * @param pieces enemy step attackers
-     * @param king king
+     * @param king single occupancy king bitboard
      * @param ds directions
      */
     private void stepAttacks(final long pieces, final long king, final Direction[] ds) {
@@ -225,20 +225,20 @@ public final class MoveGenerator {
 
     /**
      * Calculate any sliding checks or pins in given direction.
-     * @param king king
-     * @param teams current teams pieces
+     * @param king single occupancy king bitboard
+     * @param team current teams pieces
      * @param enemies other teams pieces
      * @param eSliders other teams pieces that can slide in the direction
      * @param axis axis of the direction
      * @param d direction
      */
-    private void pin(final long king, final long teams, final long enemies, final long eSliders, final int axis, final Direction d) {
+    private void pin(final long king, final long team, final long enemies, final long eSliders, final int axis, final Direction d) {
         final long line = Bitboard.slide(king, ~enemies, d);
         final long pinner = line & eSliders;
 
         if (pinner == Bitboard.EMPTY) return; // No enemies that can pin
 
-        final long pinned = line & teams;
+        final long pinned = line & team;
         final long pinnedCount = Bitboard.count(pinned);
 
         if (pinnedCount > 1) return; // More than one blocker
@@ -268,7 +268,7 @@ public final class MoveGenerator {
     /**
      * Calculate any step attacks (single moves) in given direction.
      * @param pieces enemy step attackers
-     * @param king king
+     * @param king single occupancy king bitboard
      * @param d direction
      */
     private void stepAttack(final long pieces, final long king, final Direction d) {
@@ -306,7 +306,7 @@ public final class MoveGenerator {
         Bitboard.forEach(Attack.king(kFrom) & ~this.attacked & (unoccupied | enemies), (final long attack) -> {
             final int to = Square.ofBitboard(attack);
             final int basic = Move.basic(kFrom, to, PieceType.KING);
-            moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+            moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
         });
 
         if (this.isDoubleCheck) return;
@@ -352,7 +352,7 @@ public final class MoveGenerator {
             Bitboard.forEach(Attack.knight(from) & legalTargetsOf(knight), (final long attack) -> {
                 final int to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.KNIGHT);
-                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
             });
         });
 
@@ -361,7 +361,7 @@ public final class MoveGenerator {
             Bitboard.forEach(Attack.queen(from, occupied) & legalTargetsOf(queen), (final long attack) -> {
                 final int to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.QUEEN);
-                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
             });
         });
 
@@ -370,7 +370,7 @@ public final class MoveGenerator {
             Bitboard.forEach(Attack.rook(from, occupied) & legalTargetsOf(rook), (final long attack) -> {
                 final int to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.ROOK);
-                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
             });
         });
 
@@ -379,7 +379,7 @@ public final class MoveGenerator {
             Bitboard.forEach(Attack.bishop(from, occupied) & legalTargetsOf(bishop), (final long attack) -> {
                 final int to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.BISHOP);
-                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceType(to)));
+                moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
             });
         });
 
@@ -455,7 +455,7 @@ public final class MoveGenerator {
             moves.add(Move.enPassant(from, to));
             return;
         }
-        explodePawnPromotions(moves, Move.capture(from, to, PieceType.PAWN, pos.board().pieceType(to)), attack, promotionRank);
+        explodePawnPromotions(moves, Move.capture(from, to, PieceType.PAWN, pos.board().pieceAt(to)), attack, promotionRank);
     }
 
 

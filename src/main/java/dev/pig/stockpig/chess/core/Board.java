@@ -1,13 +1,12 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.core;
 
-import dev.pig.stockpig.chess.bitboard.Bitboard;
+import dev.pig.stockpig.chess.core.bitboard.Bitboard;
 
 import java.util.Arrays;
 
 /**
  * Board stores all piece/material state for a chess position.
- * Arrays of occupancy bitboards store all piece information, the index within the array encodes the
- * piece type.
+ * Arrays of occupancy bitboards store all piece information; the index within the array encodes the piece type.
  */
 public final class Board {
 
@@ -22,7 +21,7 @@ public final class Board {
     // ====================================================================================================
 
     private Board() {
-        this.pieceBBs[PieceType.EMPTY.ordinal()] |= Bitboard.ALL;
+        this.pieceBBs[PieceType.EMPTY.ordinal()] = Bitboard.ALL;
         Arrays.fill(this.squares, PieceType.EMPTY);
     }
 
@@ -47,21 +46,21 @@ public final class Board {
      */
     public void addPiece(final Colour c, final PieceType pt, final int sq) {
         final long bitboard = Bitboard.ofSquare(sq);
-        this.squares[sq] = pt;
+        this.squares[sq]                            =   pt;
         this.colourBBs[c.ordinal()]                 |=  bitboard;
         this.pieceBBs[pt.ordinal()]                 |=  bitboard;
         this.pieceBBs[PieceType.EMPTY.ordinal()]    &=~ bitboard;
     }
 
     /**
-     * Remove the piece from the square.
+     * Remove a piece from a square.
      * @param c colour
      * @param pt piece type
      * @param sq square
      */
     public void removePiece(final Colour c, final PieceType pt, final int sq) {
         final long bitboard = Bitboard.ofSquare(sq);
-        this.squares[sq] = PieceType.EMPTY;
+        this.squares[sq]                            =   PieceType.EMPTY;
         this.colourBBs[c.ordinal()]                 &=~ bitboard;
         this.pieceBBs[pt.ordinal()]                 &=~ bitboard;
         this.pieceBBs[PieceType.EMPTY.ordinal()]    |=  bitboard;
@@ -109,7 +108,7 @@ public final class Board {
     }
 
     /**
-     * Get the occupancy bitboard of all pieces.
+     * Get the occupied bitboard.
      * @return bitboard
      */
     public long occupied() {
@@ -126,22 +125,9 @@ public final class Board {
      * @param sq square
      * @return piece type
      */
-    public PieceType pieceType(final int sq) {
+    public PieceType pieceAt(final int sq) {
         return this.squares[sq];
     }
-
-    /**
-     * Get the piece at the square.
-     * @param sq square
-     * @return piece
-     */
-    public Piece piece(final int sq) {
-        return Piece.of(
-                Colour.of(Bitboard.intersects(Bitboard.ofSquare(sq), this.colourBBs[Colour.WHITE.ordinal()])),
-                pieceType(sq)
-        );
-    }
-
 
     // ====================================================================================================
     //                                  Move Make / Unmake
@@ -164,7 +150,7 @@ public final class Board {
             removePiece(c.flip(), capture, Move.isEnPassant(move) ? to + c.backward().offset() : to);
         }
 
-        // Remove the moving piece from the's start location and add it to the destination
+        // Remove the moving piece from the start location and add it to the destination
         removePiece(c, mover, from);
         addPiece(c, promote == PieceType.EMPTY ? mover : promote, to);
 
@@ -209,7 +195,7 @@ public final class Board {
     // ====================================================================================================
 
     /**
-     * Get whether the position is dead, insufficient material for a checkmate.
+     * Returns whether the position is a dead position (insufficient material for checkmate).
      * @return is dead position
      */
     public boolean isDeadPosition() {
@@ -242,28 +228,6 @@ public final class Board {
         // Dead if bishops are on same colour
         final long bishopsOnWhite = bishops & Bitboard.WHITE_SQUARES;
         return bishopsOnWhite == bishops || bishopsOnWhite == Bitboard.EMPTY;
-    }
-
-
-    // ====================================================================================================
-    //                                  Utils
-    // ====================================================================================================
-
-    /**
-     * Create a pretty printed debug string of the board.
-     * @return pretty debug string
-     */
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        for (int rank = 7; rank >= 0; rank--) {
-            for (int file = 0; file < 8; file++) {
-                final int sq = rank*8+file;
-                sb.append(piece(sq)).append(" ");
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
     }
 }
 

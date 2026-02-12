@@ -1,14 +1,14 @@
-package dev.pig.stockpig.chess;
+package dev.pig.stockpig.chess.core;
 
-import dev.pig.stockpig.chess.bitboard.Bitboard;
-import dev.pig.stockpig.chess.bitboard.Square;
+import dev.pig.stockpig.chess.core.bitboard.Bitboard;
+import dev.pig.stockpig.chess.core.bitboard.Square;
 
 import java.util.Arrays;
 
 /**
- * Castling rights are stored as a single byte bitmap data structure.
- * The 4 LSBs store whether each team/side castle is allowed.
- * Provides functions and constants for encoding/decoding castling data.
+ * Castling rights are encoded as a single 8-bit byte (using only the 4 LSBs).
+ * The 4 least-significant bits encode whether each colour/side may castle.
+ * Provides functions and constants for encoding/decoding and querying castling rights.
  */
 public final class Castling {
 
@@ -51,6 +51,7 @@ public final class Castling {
     private static final byte[] SQUARE_MASKS = new byte[64];
     static {
         Arrays.fill(SQUARE_MASKS, ALL);
+
         SQUARE_MASKS[Square.A1] = ~(W_QUEEN_SIDE);
         SQUARE_MASKS[Square.H1] = ~(W_KING_SIDE);
         SQUARE_MASKS[Square.E1] = ~(W_QUEEN_SIDE | W_KING_SIDE);
@@ -113,7 +114,7 @@ public final class Castling {
     // ====================================================================================================
 
     /**
-     * Get the castling rights after a given move.
+     * Returns updated castling rights after applying the given move.
      * @param rights current castling rights
      * @param move move
      * @return updated castling rights
@@ -128,7 +129,7 @@ public final class Castling {
     // ====================================================================================================
 
     /**
-     * Get whether a queen side castle move is allowed given some current state.
+     * Returns whether queen side castling is allowed under the given position state.
      * @param c colour
      * @param rights castling rights
      * @param unoccupied unoccupied bitboard
@@ -142,7 +143,7 @@ public final class Castling {
     }
 
     /**
-     * Get whether a king side castle move is allowed given some current state.
+     * Returns whether king side castling is allowed under the given position state.
      * @param c colour
      * @param rights castling rights
      * @param unoccupied unoccupied bitboard
@@ -170,37 +171,6 @@ public final class Castling {
         return ((rights & flag) != 0) &&
                 (Bitboard.contains(unoccupied, emptySquares)) &&
                 (Bitboard.disjoint(attacked, checkSquares));
-    }
-
-
-    // ====================================================================================================
-    //                                  String Utils
-    // ====================================================================================================
-
-    /**
-     * Get the castling rights from a string.
-     * @param s castling rights string
-     * @return castling rights
-     */
-    public static byte fromString(final String s) {
-        return (byte) (
-                        (s.contains("K") ? W_KING_SIDE  : 0) |
-                        (s.contains("Q") ? W_QUEEN_SIDE : 0) |
-                        (s.contains("k") ? B_KING_SIDE  : 0) |
-                        (s.contains("q") ? B_QUEEN_SIDE : 0));
-    }
-
-    /**
-     * Get a castling rights string from castling rights.
-     * @param rights castling rights
-     * @return castling rights string
-     */
-    public static String toString(final byte rights) {
-        return  rights == NONE ? "-" :
-                ((rights & W_KING_SIDE)     == 0 ? "" : "K") +
-                ((rights & W_QUEEN_SIDE)    == 0 ? "" : "Q") +
-                ((rights & B_KING_SIDE)     == 0 ? "" : "k") +
-                ((rights & B_QUEEN_SIDE)    == 0 ? "" : "q");
     }
 
 

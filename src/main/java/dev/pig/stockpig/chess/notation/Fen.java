@@ -1,7 +1,8 @@
 package dev.pig.stockpig.chess.notation;
 
-import dev.pig.stockpig.chess.*;
-import dev.pig.stockpig.chess.bitboard.Square;
+import dev.pig.stockpig.chess.core.*;
+import dev.pig.stockpig.chess.core.bitboard.Bitboard;
+import dev.pig.stockpig.chess.core.bitboard.Square;
 
 /**
  * Fen (Forsyth-Edwards Notation) provides functions for encoding and decoding FEN strings.
@@ -13,6 +14,19 @@ public final class Fen {
     public final static class ParseException extends Exception {
         private ParseException(final String message) {
             super(message);
+        }
+    }
+
+
+    /**
+     * Get a starting position by parsing the starting FEN.
+     * @return starting position
+     */
+    public static Position startingPosition() {
+        try {
+            return parse(STARTING);
+        } catch (final ParseException pe) {
+            throw new RuntimeException(pe);
         }
     }
 
@@ -34,10 +48,10 @@ public final class Fen {
 
         try {
             return new Position(
-                    fromBoardFen(parts[0]),
+                    parseBoard(parts[0]),
                     "w".equals(parts[1]) ? Colour.WHITE : Colour.BLACK,
-                    Castling.fromString(parts[2]),
-                    Square.fromString(parts[3]),
+                    parseCastling(parts[2]),
+                    parseEnPassantTarget(parts[3]),
                     Integer.parseInt(parts[4]),
                     Integer.parseInt(parts[5])
             );
@@ -47,11 +61,11 @@ public final class Fen {
     }
 
     /**
-     * Create a chess board from the material part of a FEN string.
-     * @param fen board part FEN string
+     *  Parse the board part of a FEN string and return a board.
+     * @param fen board part of FEN string
      * @return board
      */
-    private static Board fromBoardFen(final String fen) {
+    private static Board parseBoard(final String fen) {
         final Board board = Board.empty();
 
         int sq = 56;
@@ -61,12 +75,61 @@ public final class Fen {
             if      (c == '/')              sq -= 16;
             else if (Character.isDigit(c))  sq += Character.digit(c, 10);
             else {
-                final Piece p = Piece.fromString(Character.toString(c));
-                board.addPiece(p.colour(), p.type(), sq);
+                final PieceType pt = parsePieceType(Character.toString(c));
+                board.addPiece(Colour.of(Character.isUpperCase(c)), pt, sq);
                 sq++;
             }
         }
         return board;
+    }
+
+    /**
+     * Parse the castling rights part of a FEN string and return castling rights.
+     * @param s castling rights part of FEN string
+     * @return castling rights
+     */
+    private static byte parseCastling(final String s) {
+        return (byte) (
+                        (s.contains("K") ? Castling.W_KING_SIDE  : 0) |
+                        (s.contains("Q") ? Castling.W_QUEEN_SIDE : 0) |
+                        (s.contains("k") ? Castling.B_KING_SIDE  : 0) |
+                        (s.contains("q") ? Castling.B_QUEEN_SIDE : 0));
+    }
+
+    /**
+     * Parse the en passant target square part of a FEN string and return en passant target square.
+     * @param s en passant target part of FEN string
+     * @return en passant target
+     */
+    private static int parseEnPassantTarget(final String s) {
+        if ("-".equals(s)) return Square.EMPTY;
+
+        if (s.length() != 2) throw new IllegalArgumentException("unknown square: " + s);
+
+        final char file = s.toLowerCase().charAt(0);
+        final char rank = s.toLowerCase().charAt(1);
+
+        if (file < 'a' || file > 'h') throw new IllegalArgumentException("unknown file: " + file);
+        if (rank < '1' || rank > '8') throw new IllegalArgumentException("unknown rank: " + rank);
+
+        return (rank - '1')*8 + (file - 'a');
+    }
+
+    /**
+     * Parse a piece type from a piece character string.
+     * @param s piece type character string
+     * @return piece type
+     */
+    private static PieceType parsePieceType(final String s) {
+        return switch (s.toLowerCase()) {
+            case "k" -> PieceType.KING;
+            case "p" -> PieceType.PAWN;
+            case "n" -> PieceType.KNIGHT;
+            case "b" -> PieceType.BISHOP;
+            case "r" -> PieceType.ROOK;
+            case "q" -> PieceType.QUEEN;
+            default -> throw new IllegalArgumentException("unknown piece type: " + s);
+        };
     }
 
 
@@ -75,40 +138,45 @@ public final class Fen {
     // ====================================================================================================
 
     /**
-     * Get a FEN string for a chess position.
+     * Format a chess position into a FEN string
      * @param pos position
      * @return FEN string
      */
     public static String format(final Position pos) {
         return String.join(" ",
-                toBoardFen(pos.board()),
+                formatBoard(pos.board()),
                 pos.sideToMove() == Colour.WHITE ? "w" : "b",
-                Castling.toString(pos.castlingRights()),
-                Square.toString(pos.enPassantTarget()),
+                formatCastling(pos.castlingRights()),
+                formatEnPassantTarget(pos.enPassantTarget()),
                 Integer.toString(pos.halfMoveClock()),
                 Integer.toString(pos.turn())
         );
     }
 
     /**
-     * Create the board part of FEN string from the board.
+     * Format a board into a board FEN string.
+     * @param board board
      * @return board part FEN string
      */
-    private static String toBoardFen(final Board board) {
+    private static String formatBoard(final Board board) {
         final StringBuilder fen = new StringBuilder();
         for (int rank = 7; rank >= 0; rank--) {
             int emptyRun = 0;
             for (int file = 0; file < 8; file++) {
                 final int sq = rank*8+file;
-                final Piece piece = board.piece(sq);
-                if (piece == Piece.EMPTY) {
+                final PieceType piece = board.pieceAt(sq);
+                if (piece == PieceType.EMPTY) {
                     emptyRun++;
                 } else {
                     if (emptyRun > 0) {
                         fen.append(emptyRun);
                         emptyRun = 0;
                     }
-                    fen.append(piece.toString());
+                    fen.append(
+                            Bitboard.intersects(Bitboard.ofSquare(sq), board.pieces(Colour.WHITE)) ?
+                                    formatPieceType(piece).toUpperCase() :
+                                    formatPieceType(piece)
+                    );
                 }
             }
             if (emptyRun > 0) {
@@ -119,6 +187,49 @@ public final class Fen {
             }
         }
         return fen.toString();
+    }
+
+    /**
+     * Format a square into an en passant target square FEN string.
+     * @param sq square
+     * @return en passant target FEN string
+     */
+    private static String formatEnPassantTarget(final int sq) {
+        if (sq == Square.EMPTY) return "-";
+
+        final int file = sq & 7;
+        final int rank = (sq >> 3) + 1;
+        return (char) ('a' + file) + Integer.toString(rank);
+    }
+
+    /**
+     * Format castling rights into a castling rights FEN string
+     * @param rights castling rights
+     * @return castling rights FEN string
+     */
+    public static String formatCastling(final byte rights) {
+        return rights == Castling.NONE ? "-" :
+                ((rights & Castling.W_KING_SIDE)     == 0 ? "" : "K") +
+                ((rights & Castling.W_QUEEN_SIDE)    == 0 ? "" : "Q") +
+                ((rights & Castling.B_KING_SIDE)     == 0 ? "" : "k") +
+                ((rights & Castling.B_QUEEN_SIDE)    == 0 ? "" : "q");
+    }
+
+    /**
+     * Format a piece type to a piece type character string
+     * @param pt piece type
+     * @return piece type character string
+     */
+    private static String formatPieceType(final PieceType pt) {
+        return switch (pt) {
+            case EMPTY  -> "";
+            case KING   -> "k";
+            case PAWN   -> "p";
+            case KNIGHT -> "n";
+            case BISHOP -> "b";
+            case ROOK   -> "r";
+            case QUEEN  -> "q";
+        };
     }
 
 
