@@ -75,7 +75,7 @@ public final class Fen {
             if      (c == '/')              sq -= 16;
             else if (Character.isDigit(c))  sq += Character.digit(c, 10);
             else {
-                final PieceType pt = parsePieceType(Character.toString(c));
+                final byte pt = parsePieceType(Character.toString(c));
                 board.addPiece(Colour.of(Character.isUpperCase(c)), pt, sq);
                 sq++;
             }
@@ -120,7 +120,7 @@ public final class Fen {
      * @param s piece type character string
      * @return piece type
      */
-    private static PieceType parsePieceType(final String s) {
+    private static byte parsePieceType(final String s) {
         return switch (s.toLowerCase()) {
             case "k" -> PieceType.KING;
             case "p" -> PieceType.PAWN;
@@ -164,7 +164,7 @@ public final class Fen {
             int emptyRun = 0;
             for (int file = 0; file < 8; file++) {
                 final int sq = rank*8+file;
-                final PieceType piece = board.pieceAt(sq);
+                final byte piece = board.pieceAt(sq);
                 if (piece == PieceType.EMPTY) {
                     emptyRun++;
                 } else {
@@ -220,15 +220,15 @@ public final class Fen {
      * @param pt piece type
      * @return piece type character string
      */
-    private static String formatPieceType(final PieceType pt) {
+    private static String formatPieceType(final byte pt) {
         return switch (pt) {
-            case EMPTY  -> "";
-            case KING   -> "k";
-            case PAWN   -> "p";
-            case KNIGHT -> "n";
-            case BISHOP -> "b";
-            case ROOK   -> "r";
-            case QUEEN  -> "q";
+            case PieceType.KING   -> "k";
+            case PieceType.PAWN   -> "p";
+            case PieceType.KNIGHT -> "n";
+            case PieceType.BISHOP -> "b";
+            case PieceType.ROOK   -> "r";
+            case PieceType.QUEEN  -> "q";
+            default -> "";
         };
     }
 

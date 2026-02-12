@@ -17,7 +17,7 @@ public final class PromotionPopup {
      * @param view view
      * @return piece to promote
      */
-    public static PieceType getPromoteToPiece(final StockpigView view) {
+    public static byte getPromoteToPiece(final StockpigView view) {
         final int option = JOptionPane.showOptionDialog(view,
                 "Promote to:", "Promotion",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,

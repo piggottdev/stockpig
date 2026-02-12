@@ -79,7 +79,7 @@ public final class StockpigController {
         switch (event) {
             case MOVE ->  MoveSoundPlayer.play();
             case PROMOTION -> {
-                final PieceType pt = PromotionPopup.getPromoteToPiece(this.view);
+                final byte pt = PromotionPopup.getPromoteToPiece(this.view);
                 if (pt != PieceType.EMPTY) {
                     this.model.chess.finishPromotion(pt);
                     MoveSoundPlayer.play();

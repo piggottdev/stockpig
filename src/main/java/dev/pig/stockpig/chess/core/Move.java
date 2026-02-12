@@ -49,8 +49,8 @@ public final class Move {
      * @param mover moving piece type
      * @return move
      */
-    public static int basic(final int from, final int to, final PieceType mover) {
-        return from | (to << TO_SHIFT) | (mover.ordinal() << MOVER_SHIFT);
+    public static int basic(final int from, final int to, final byte mover) {
+        return from | (to << TO_SHIFT) | (mover << MOVER_SHIFT);
     }
 
     /**
@@ -59,8 +59,8 @@ public final class Move {
      * @param capture captured piece type
      * @return capture move
      */
-    public static int addCapture(final int move, final PieceType capture) {
-        return move | (capture.ordinal() << CAPTURE_SHIFT);
+    public static int addCapture(final int move, final byte capture) {
+        return move | (capture << CAPTURE_SHIFT);
     }
 
     /**
@@ -69,8 +69,8 @@ public final class Move {
      * @param promote promoted piece type
      * @return promotion move
      */
-    public static int addPromotion(final int move, final PieceType promote) {
-        return move | (promote.ordinal() << PROMOTE_SHIFT);
+    public static int addPromotion(final int move, final byte promote) {
+        return move | (promote << PROMOTE_SHIFT);
     }
 
     /**
@@ -81,7 +81,7 @@ public final class Move {
      * @param capture captured piece type
      * @return capture move
      */
-    public static int capture(final int from, final int to, final PieceType mover, final PieceType capture) {
+    public static int capture(final int from, final int to, final byte mover, final byte capture) {
         return addCapture(basic(from, to, mover), capture);
     }
 
@@ -121,7 +121,7 @@ public final class Move {
      * @param promote promote piece type
      * @return promotion move
      */
-    public static int overwritePromotion(final int move, final PieceType promote) {
+    public static int overwritePromotion(final int move, final byte promote) {
         return addPromotion(move & ~PROMOTE_MASK, promote);
     }
 
@@ -153,8 +153,8 @@ public final class Move {
      * @param move move
      * @return moving piece type
      */
-    public static PieceType mover(final int move) {
-        return PieceType.of((move >>> MOVER_SHIFT) & PIECE_MASK);
+    public static byte mover(final int move) {
+        return (byte) ((move >>> MOVER_SHIFT) & PIECE_MASK);
     }
 
     /**
@@ -162,8 +162,8 @@ public final class Move {
      * @param move move
      * @return captured piece type
      */
-    public static PieceType capture(final int move) {
-        return PieceType.of((move >>> CAPTURE_SHIFT) & PIECE_MASK);
+    public static byte capture(final int move) {
+        return (byte) ((move >>> CAPTURE_SHIFT) & PIECE_MASK);
     }
 
     /**
@@ -171,8 +171,8 @@ public final class Move {
      * @param move move
      * @return promoted piece type
      */
-    public static PieceType promote(final int move) {
-        return PieceType.of((move >>> PROMOTE_SHIFT) & PIECE_MASK);
+    public static byte promote(final int move) {
+        return (byte) ((move >>> PROMOTE_SHIFT) & PIECE_MASK);
     }
 
     /**

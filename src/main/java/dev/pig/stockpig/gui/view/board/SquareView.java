@@ -39,7 +39,7 @@ public final class SquareView extends JButton {
      * Draw the piece icon on the square.
      * @param piece piece
      */
-    public void setPiece(final int piece) {
+    public void setPiece(final byte piece) {
         setIcon(Look.PIECE_ICONS[piece]);
     }
 

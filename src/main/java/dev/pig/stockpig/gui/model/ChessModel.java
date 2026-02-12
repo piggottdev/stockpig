@@ -132,7 +132,7 @@ public final class ChessModel {
      * Finish the promotion move once a piece type has been selected.
      * @param pt promotion piece type
      */
-    public void finishPromotion(final PieceType pt) {
+    public void finishPromotion(final byte pt) {
         final int move = Move.overwritePromotion(this.promotionMove, pt);
         this.position.makeMove(move);
         this.legalMoves.clear();
@@ -151,9 +151,9 @@ public final class ChessModel {
      * @param i square index
      * @return piece
      */
-    public int pieceAt(final int i) {
-        return this.position.board().pieceAt(i).ordinal() +
-                (Bitboard.intersects(Bitboard.ofSquare(i), this.position.board().pieces(Colour.BLACK)) ? 6 : 0);
+    public byte pieceAt(final int i) {
+        return (byte) (this.position.board().pieceAt(i) +
+                        (Bitboard.intersects(Bitboard.ofSquare(i), this.position.board().pieces(Colour.BLACK)) ? 6 : 0));
     }
 
     /**

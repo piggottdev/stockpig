@@ -10,10 +10,10 @@ import java.util.Arrays;
  */
 public final class Board {
 
-    private final long[] pieceBBs   = new long[PieceType.values().length];
+    private final long[] pieceBBs   = new long[7];
     private final long[] colourBBs  = new long[Colour.values().length];
 
-    private final PieceType[] squares = new PieceType[64];
+    private final byte[] squares = new byte[64];
 
 
     // ====================================================================================================
@@ -21,7 +21,7 @@ public final class Board {
     // ====================================================================================================
 
     private Board() {
-        this.pieceBBs[PieceType.EMPTY.ordinal()] = Bitboard.ALL;
+        this.pieceBBs[PieceType.EMPTY] = Bitboard.ALL;
         Arrays.fill(this.squares, PieceType.EMPTY);
     }
 
@@ -44,12 +44,12 @@ public final class Board {
      * @param pt piece type
      * @param sq square
      */
-    public void addPiece(final Colour c, final PieceType pt, final int sq) {
+    public void addPiece(final Colour c, final byte pt, final int sq) {
         final long bitboard = Bitboard.ofSquare(sq);
-        this.squares[sq]                            =   pt;
-        this.colourBBs[c.ordinal()]                 |=  bitboard;
-        this.pieceBBs[pt.ordinal()]                 |=  bitboard;
-        this.pieceBBs[PieceType.EMPTY.ordinal()]    &=~ bitboard;
+        this.squares[sq]                =   pt;
+        this.colourBBs[c.ordinal()]     |=  bitboard;
+        this.pieceBBs[pt]               |=  bitboard;
+        this.pieceBBs[PieceType.EMPTY]  &=~ bitboard;
     }
 
     /**
@@ -58,12 +58,12 @@ public final class Board {
      * @param pt piece type
      * @param sq square
      */
-    public void removePiece(final Colour c, final PieceType pt, final int sq) {
+    public void removePiece(final Colour c, final byte pt, final int sq) {
         final long bitboard = Bitboard.ofSquare(sq);
-        this.squares[sq]                            =   PieceType.EMPTY;
-        this.colourBBs[c.ordinal()]                 &=~ bitboard;
-        this.pieceBBs[pt.ordinal()]                 &=~ bitboard;
-        this.pieceBBs[PieceType.EMPTY.ordinal()]    |=  bitboard;
+        this.squares[sq]                  =   PieceType.EMPTY;
+        this.colourBBs[c.ordinal()]       &=~ bitboard;
+        this.pieceBBs[pt]                 &=~ bitboard;
+        this.pieceBBs[PieceType.EMPTY]    |=  bitboard;
     }
 
 
@@ -85,8 +85,8 @@ public final class Board {
      * @param pt piece type
      * @return bitboard
      */
-    public long pieces(final PieceType pt) {
-        return this.pieceBBs[pt.ordinal()];
+    public long pieces(final byte pt) {
+        return this.pieceBBs[pt];
     }
 
     /**
@@ -95,7 +95,7 @@ public final class Board {
      * @param pt piece type
      * @return bitboard
      */
-    public long pieces(final Colour c, final PieceType pt) {
+    public long pieces(final Colour c, final byte pt) {
         return pieces(c) & pieces(pt);
     }
 
@@ -125,7 +125,7 @@ public final class Board {
      * @param sq square
      * @return piece type
      */
-    public PieceType pieceAt(final int sq) {
+    public byte pieceAt(final int sq) {
         return this.squares[sq];
     }
 
@@ -141,9 +141,9 @@ public final class Board {
     public void makeMove(final Colour c, final int move) {
         final int from = Move.from(move);
         final int to = Move.to(move);
-        final PieceType mover = Move.mover(move);
-        final PieceType capture = Move.capture(move);
-        final PieceType promote = Move.promote(move);
+        final byte mover = Move.mover(move);
+        final byte capture = Move.capture(move);
+        final byte promote = Move.promote(move);
 
         // If this was a capture remove that piece from the board
         if (capture != PieceType.EMPTY) {
@@ -169,9 +169,9 @@ public final class Board {
     public void unmakeMove(final Colour c, final int move) {
         final int from = Move.from(move);
         final int to = Move.to(move);
-        final PieceType mover = Move.mover(move);
-        final PieceType capture = Move.capture(move);
-        final PieceType promote = Move.promote(move);
+        final byte mover = Move.mover(move);
+        final byte capture = Move.capture(move);
+        final byte promote = Move.promote(move);
 
         // If it's a castle move then move the rook
         if (Move.isCastle(move)) {
