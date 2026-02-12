@@ -128,16 +128,18 @@ public final class MoveGenerator {
         final long team = pos.board().pieces(us);
         final long king = pos.board().pieces(PieceType.KING) & team;
 
-        final Colour them       = us.flip();
-        final long enemies      = pos.board().pieces(them);
-        final long eKing        = pos.board().pieces(PieceType.KING) & enemies;
-        final long ePawns       = pos.board().pieces(PieceType.PAWN) & enemies;
-        final long eKnights     = pos.board().pieces(PieceType.KNIGHT) & enemies;
-        final long eBishops     = pos.board().pieces(PieceType.BISHOP) & enemies;
-        final long eRooks       = pos.board().pieces(PieceType.ROOK) & enemies;
-        final long eQueens      = pos.board().pieces(PieceType.QUEEN) & enemies;
-        final long eDiagonals   = eQueens | eBishops;
-        final long eOrthogonals = eQueens | eRooks;
+        final Colour them               = us.flip();
+        final long enemies              = pos.board().pieces(them);
+        final long eKing                = pos.board().pieces(PieceType.KING) & enemies;
+        final long ePawns               = pos.board().pieces(PieceType.PAWN) & enemies;
+        final long eKnights             = pos.board().pieces(PieceType.KNIGHT) & enemies;
+        final long eBishops             = pos.board().pieces(PieceType.BISHOP) & enemies;
+        final long eRooks               = pos.board().pieces(PieceType.ROOK) & enemies;
+        final long eQueens              = pos.board().pieces(PieceType.QUEEN) & enemies;
+        final long eDiagonals           = eQueens | eBishops;
+        final long eOrthogonals         = eQueens | eRooks;
+        final Direction pawnAttackDir1  = them.pawnAttackDirection1();
+        final Direction pawnAttackDir2  = them.pawnAttackDirection2();
 
         final long unoccupied    = pos.board().unoccupied();
         final long occupied      = ~unoccupied;
@@ -146,22 +148,26 @@ public final class MoveGenerator {
 
         // Attacks
 
-        // TODO: Candidate optimisation: Move towards attack maps to calculate checks threats and pins
-        // TODO: Candidate optimisation: Adding a line[from][king] should remove the need to calculate pins in different directions
-
         // King attacks
         this.attacked = Attack.king(Square.ofBitboard(eKing));
 
         // Pawn attacks
-        stepAttacks(ePawns, king, new Direction[]{
-                them.pawnAttackDirection1(), them.pawnAttackDirection2()
-        });
+        final long p1Attacks = Bitboard.shift(ePawns, pawnAttackDir1);
+        final long p2Attacks = Bitboard.shift(ePawns, pawnAttackDir2);
+        this.attacked |= p1Attacks;
+        this.attacked |= p2Attacks;
+        if (Bitboard.intersects(p1Attacks, king)) this.checkers |= Bitboard.shiftRev(king, pawnAttackDir1);
+        if (Bitboard.intersects(p2Attacks, king)) this.checkers |= Bitboard.shiftRev(king, pawnAttackDir2);
 
         // Knight attacks
-        stepAttacks(eKnights, king, new Direction[]{
-                Direction.NNE, Direction.NEE, Direction.SEE, Direction.SSE,
-                Direction.SSW, Direction.SWW, Direction.NWW, Direction.NNW
-        });
+        long knights = eKnights;
+        while (knights != 0L) {
+            final long knight = Bitboard.pop(knights);
+            final long attacks = Attack.knight(Square.ofBitboard(knight));
+            this.attacked |= attacks;
+            if (Bitboard.intersects(attacks, king)) this.checkers |= knight;
+            knights ^= knight;
+        }
 
         // Sliding Attacks
 
@@ -178,6 +184,9 @@ public final class MoveGenerator {
             this.attacked |= Attack.rook(Square.ofBitboard(slider), occupiedWKing);
             sliders ^= slider;
         }
+
+        // TODO: Candidate optimisation: Move towards attack maps to calculate checks threats and pins
+        // TODO: Candidate optimisation: Adding a line[from][king] should remove the need to calculate pins in different directions
 
         // Pins
         pins(king, team, enemies, eDiagonals, DIAGONAL, new Direction[]{
@@ -215,18 +224,6 @@ public final class MoveGenerator {
     }
 
     /**
-     * Calculate any step attacks (single moves) in given directions.
-     * @param pieces enemy step attackers
-     * @param king single occupancy king bitboard
-     * @param ds directions
-     */
-    private void stepAttacks(final long pieces, final long king, final Direction[] ds) {
-        for (final Direction d : ds) {
-            stepAttack(pieces, king, d);
-        }
-    }
-
-    /**
      * Calculate any sliding checks or pins in given direction.
      * @param king single occupancy king bitboard
      * @param team current teams pieces
@@ -256,20 +253,6 @@ public final class MoveGenerator {
         this.pins[ALL]  |= line;
         this.pins[axis] |= line;
         this.pinned     |= pinned;
-    }
-
-    /**
-     * Calculate any step attacks (single moves) in given direction.
-     * @param pieces enemy step attackers
-     * @param king single occupancy king bitboard
-     * @param d direction
-     */
-    private void stepAttack(final long pieces, final long king, final Direction d) {
-        final long attacks = Bitboard.shift(pieces, d);
-        if (Bitboard.intersects(king, attacks)) {
-            this.checkers |= Bitboard.shiftRev(king, d);
-        }
-        this.attacked |= attacks;
     }
 
 

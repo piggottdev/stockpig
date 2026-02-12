@@ -18,7 +18,7 @@ import java.util.function.LongConsumer;
  *                  . . . . . . .
  *          1       0 . . . . . 7
  * <p>
- *                  A    Files   H
+ *                  A   Files   H
  *
  */
 public final class Bitboard {

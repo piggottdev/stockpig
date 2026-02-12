@@ -221,6 +221,14 @@ public final class Position {
     // ====================================================================================================
 
     /**
+     * Get a FEN string for the current position.
+     * @return FEN string.
+     */
+    public String toFen() {
+        return Fen.format(this);
+    }
+
+    /**
      * Build a position from a FEN string.
      * @param fen FEN string
      * @return position
@@ -228,13 +236,5 @@ public final class Position {
      */
     public static Position fromFen(final String fen) throws Fen.ParseException {
         return Fen.parse(fen);
-    }
-
-    /**
-     * Get a FEN string for the current position.
-     * @return FEN string.
-     */
-    public String toFen() {
-        return Fen.format(this);
     }
 }

@@ -10,7 +10,7 @@ import dev.pig.stockpig.chess.notation.Fen;
  * is then compared against the known correct value to validate move generation. Monitoring
  * time elapsed for tests is a good way of benchmarking move generation.
  * @param name test name
- * @param fen fen string of starting pos
+ * @param fen FEN string of starting pos
  * @param depth depth ply
  * @param expectedNodes expected node count
  */

@@ -61,7 +61,7 @@ public final class Fen {
     }
 
     /**
-     *  Parse the board part of a FEN string and return a board.
+     * Parse the board part of a FEN string and return a board.
      * @param fen board part of FEN string
      * @return board
      */
@@ -138,7 +138,7 @@ public final class Fen {
     // ====================================================================================================
 
     /**
-     * Format a chess position into a FEN string
+     * Format a chess position into a FEN string.
      * @param pos position
      * @return FEN string
      */
@@ -203,11 +203,11 @@ public final class Fen {
     }
 
     /**
-     * Format castling rights into a castling rights FEN string
+     * Format castling rights into a castling rights FEN string.
      * @param rights castling rights
      * @return castling rights FEN string
      */
-    public static String formatCastling(final byte rights) {
+    private static String formatCastling(final byte rights) {
         return rights == Castling.NONE ? "-" :
                 ((rights & Castling.W_KING_SIDE)     == 0 ? "" : "K") +
                 ((rights & Castling.W_QUEEN_SIDE)    == 0 ? "" : "Q") +
@@ -216,7 +216,7 @@ public final class Fen {
     }
 
     /**
-     * Format a piece type to a piece type character string
+     * Format a piece type to a piece type character string.
      * @param pt piece type
      * @return piece type character string
      */
