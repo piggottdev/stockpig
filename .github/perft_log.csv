@@ -21,3 +21,4 @@ Fully inline move gen,104730690,+3.7%
 Remove Square enum,116556411,+11.3%
 Refactor,113845145,-2.3%
 Slide attack analysis uses attack lookups,124499813,+9.4%
+Knights use lookups for attacks,132736053,+6.6%
