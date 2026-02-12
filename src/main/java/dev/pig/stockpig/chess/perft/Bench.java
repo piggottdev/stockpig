@@ -48,7 +48,7 @@ public final class Bench {
         }
 
         System.out.println("-------------------- Finished ME-PERFTs --------------------");
-        System.out.printf("ME-PERFT Suite completed: %d nodes in %dms%n", totalNodes, totalRuntime/1000000);
+        System.out.printf("ME-PERFT Suite completed: %d nodes in %dms (%dnps)%n", totalNodes, totalRuntime/1000000, Math.round(totalNodes / (totalRuntime/1000000000d)));
 
         // If a test failed then exit now
         if (!pass) System.exit(1);
