@@ -124,20 +124,25 @@ public final class MoveGenerator {
     public void attackAnalysis(final Position pos) {
         reset();
 
-        final long unoccupied = pos.board().unoccupied();
-
         final Colour us = pos.sideToMove();
         final long team = pos.board().pieces(us);
         final long king = pos.board().pieces(PieceType.KING) & team;
 
-        final Colour them   = us.flip();
-        final long enemies  = pos.board().pieces(them);
-        final long eKing    = pos.board().pieces(PieceType.KING) & enemies;
-        final long ePawns   = pos.board().pieces(PieceType.PAWN) & enemies;
-        final long eKnights = pos.board().pieces(PieceType.KNIGHT) & enemies;
-        final long eBishops = pos.board().pieces(PieceType.BISHOP) & enemies;
-        final long eRooks   = pos.board().pieces(PieceType.ROOK) & enemies;
-        final long eQueens  = pos.board().pieces(PieceType.QUEEN) & enemies;
+        final Colour them       = us.flip();
+        final long enemies      = pos.board().pieces(them);
+        final long eKing        = pos.board().pieces(PieceType.KING) & enemies;
+        final long ePawns       = pos.board().pieces(PieceType.PAWN) & enemies;
+        final long eKnights     = pos.board().pieces(PieceType.KNIGHT) & enemies;
+        final long eBishops     = pos.board().pieces(PieceType.BISHOP) & enemies;
+        final long eRooks       = pos.board().pieces(PieceType.ROOK) & enemies;
+        final long eQueens      = pos.board().pieces(PieceType.QUEEN) & enemies;
+        final long eDiagonals   = eQueens | eBishops;
+        final long eOrthogonals = eQueens | eRooks;
+
+        final long unoccupied    = pos.board().unoccupied();
+        final long occupied      = ~unoccupied;
+        final long occupiedWKing = occupied ^ king;
+
 
         // Attacks
 
@@ -146,36 +151,46 @@ public final class MoveGenerator {
 
         // King attacks
         this.attacked = Attack.king(Square.ofBitboard(eKing));
+
         // Pawn attacks
         stepAttacks(ePawns, king, new Direction[]{
                 them.pawnAttackDirection1(), them.pawnAttackDirection2()
         });
+
         // Knight attacks
         stepAttacks(eKnights, king, new Direction[]{
                 Direction.NNE, Direction.NEE, Direction.SEE, Direction.SSE,
                 Direction.SSW, Direction.SWW, Direction.NWW, Direction.NNW
         });
-        // Diagonal attacks
-        slidingAttacks(eQueens | eBishops, unoccupied | king,  new Direction[]{
-                Direction.NE, Direction.SE, Direction.SW, Direction.NW
-        });
-        // Orthogonal attacks
-        slidingAttacks(eQueens | eRooks, unoccupied | king,  new Direction[]{
-                Direction.N, Direction.E, Direction.S, Direction.W
-        });
+
+        // Sliding Attacks
+
+        long sliders = eDiagonals;
+        while (sliders != 0L) {
+            final long slider = Bitboard.pop(sliders);
+            this.attacked |= Attack.bishop(Square.ofBitboard(slider), occupiedWKing);
+            sliders ^= slider;
+        }
+
+        sliders = eOrthogonals;
+        while (sliders != 0L) {
+            final long slider = Bitboard.pop(sliders);
+            this.attacked |= Attack.rook(Square.ofBitboard(slider), occupiedWKing);
+            sliders ^= slider;
+        }
 
         // Pins
-        pins(king, team, enemies, eQueens | eRooks, VERTICAL, new Direction[]{
-                Direction.N, Direction.S
-        });
-        pins(king, team, enemies, eQueens | eRooks, HORIZONTAL, new Direction[]{
-                Direction.E, Direction.W
-        });
-        pins(king, team, enemies, eQueens | eBishops, DIAGONAL, new Direction[]{
+        pins(king, team, enemies, eDiagonals, DIAGONAL, new Direction[]{
                 Direction.NE, Direction.SW
         });
-        pins(king, team, enemies, eQueens | eBishops, ANTI_DIAGONAL, new Direction[]{
+        pins(king, team, enemies, eDiagonals, ANTI_DIAGONAL, new Direction[]{
                 Direction.NW, Direction.SE
+        });
+        pins(king, team, enemies, eOrthogonals, VERTICAL, new Direction[]{
+                Direction.N, Direction.S
+        });
+        pins(king, team, enemies, eOrthogonals, HORIZONTAL, new Direction[]{
+                Direction.E, Direction.W
         });
 
         this.isCheck = !Bitboard.isEmpty(this.checkers);
@@ -196,18 +211,6 @@ public final class MoveGenerator {
     private void pins(final long king, final long team, final long enemies, final long eSliders, final int axis, final Direction[] ds) {
         for (final Direction d : ds) {
             pin(king, team, enemies, eSliders, axis, d);
-        }
-    }
-
-    /**
-     * Calculate any sliding attacks in given directions.
-     * @param pieces enemy sliders
-     * @param unoccupied unoccupied bitboard
-     * @param ds directions
-     */
-    private void slidingAttacks(final long pieces, final long unoccupied, final Direction[] ds) {
-        for (final Direction d : ds) {
-            slidingAttack(pieces, unoccupied, d);
         }
     }
 
@@ -253,16 +256,6 @@ public final class MoveGenerator {
         this.pins[ALL]  |= line;
         this.pins[axis] |= line;
         this.pinned     |= pinned;
-    }
-
-    /**
-     * Calculate any sliding attacks in given direction.
-     * @param pieces enemy sliders
-     * @param unoccupied unoccupied bitboard
-     * @param d direction
-     */
-    private void slidingAttack(final long pieces, final long unoccupied, final Direction d) {
-        this.attacked |= Bitboard.slide(pieces, unoccupied, d);
     }
 
     /**

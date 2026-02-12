@@ -143,7 +143,7 @@ public final class Bitboard {
      * @return is single occupancy bitboard
      */
     public static boolean isSingle(final long bb) {
-        return Bitboard.isEmpty(bb ^ Long.lowestOneBit(bb));
+        return Bitboard.isEmpty(bb ^ pop(bb));
     }
 
     /**
@@ -305,13 +305,23 @@ public final class Bitboard {
     // ====================================================================================================
 
     /**
+     * Return the lowest bit of a bitboard as a single occupancy bitboard.
+     * Can be used to iterate through individual bits of a bitboard.
+     * @param bb bitboard
+     * @return single occupancy bitboard
+     */
+    public static long pop(final long bb) {
+        return Long.lowestOneBit(bb);
+    }
+
+    /**
      * Call the consumer with each single bit within a bitboard (LSB...MSB).
      * @param bb bitboard
      * @param c single occupancy bitboard consumer
      */
     public static void forEach(long bb, final LongConsumer c) {
         while (bb != 0L) {
-            final long lsb = Long.lowestOneBit(bb);
+            final long lsb = pop(bb);
             c.accept(lsb);
             bb ^= lsb;
         }
