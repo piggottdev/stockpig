@@ -16,7 +16,7 @@ public final class Position {
 
     // State
     private final Board board;
-    private Colour sideToMove;
+    private boolean sideToMove;
     private byte castlingRights;
     private byte enPassantTarget;
     private int halfMoveClock;
@@ -35,7 +35,7 @@ public final class Position {
     //                                  Constructors and Builders
     // ====================================================================================================
 
-    public Position(final Board board, final Colour sideToMove, final byte castlingRights,
+    public Position(final Board board, final boolean sideToMove, final byte castlingRights,
                     final byte enPassantTarget, final int halfMoveClock, final int turn) {
         this.board = board;
         this.sideToMove = sideToMove;
@@ -71,7 +71,7 @@ public final class Position {
      * Get the current team, the side to move.
      * @return side to move
      */
-    public Colour sideToMove() {
+    public boolean sideToMove() {
         return this.sideToMove;
     }
 
@@ -184,9 +184,9 @@ public final class Position {
 
         this.board.makeMove(this.sideToMove, move);
         this.castlingRights = Castling.update(this.castlingRights, move);
-        this.enPassantTarget = Move.isDoublePush(move) ? (byte) (Move.from(move) + this.sideToMove.forward().offset()) : Square.EMPTY;
+        this.enPassantTarget = Move.isDoublePush(move) ? (byte) (Move.from(move) + Colour.forward(this.sideToMove).offset()) : Square.EMPTY;
         this.halfMoveClock = Move.isCapture(move) || Move.mover(move) == PieceType.PAWN ? 0 : this.halfMoveClock + 1;
-        this.sideToMove = this.sideToMove.flip();
+        this.sideToMove = Colour.flip(this.sideToMove);
         if (this.sideToMove == Colour.WHITE) this.turn++;
         generateMoves();
     }
@@ -207,7 +207,7 @@ public final class Position {
         if (this.history.isEmpty()) return;
         final State prev = this.history.removeLast();
 
-        this.sideToMove = this.sideToMove.flip();
+        this.sideToMove = Colour.flip(this.sideToMove);
         this.board.unmakeMove(this.sideToMove, prev.move);
         this.castlingRights = prev.castlingRights;
         this.enPassantTarget = prev.enPassantTarget;

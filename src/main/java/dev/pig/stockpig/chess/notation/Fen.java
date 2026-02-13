@@ -76,7 +76,7 @@ public final class Fen {
             else if (Character.isDigit(c))  sq += (byte) Character.digit(c, 10);
             else {
                 final byte pt = parsePieceType(Character.toString(c));
-                board.addPiece(Colour.of(Character.isUpperCase(c)), pt, sq);
+                board.addPiece(Character.isUpperCase(c), pt, sq);
                 sq++;
             }
         }

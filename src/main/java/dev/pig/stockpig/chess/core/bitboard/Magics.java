@@ -10,7 +10,7 @@ public final class Magics {
 
     /**
      * Get a rook attack map for a square given an occupancy bitboard.
-     * @param sq square index
+     * @param sq square
      * @param occupied occupied bitboard
      * @return rook attack map
      */
@@ -22,7 +22,7 @@ public final class Magics {
 
     /**
      * Get a bishop attack map for a square given an occupancy bitboard.
-     * @param sq square index
+     * @param sq square
      * @param occupied occupied bitboard
      * @return bishop attack map
      */
@@ -214,7 +214,7 @@ public final class Magics {
 
     /**
      * Find a magic number for the given square with a given attack index bit size.
-     * @param sq square index
+     * @param sq square
      * @param bits attack index bit size
      * @param isRook find rook magic, else bishop magic
      * @return magic number
@@ -229,7 +229,7 @@ public final class Magics {
     /**
      * Get whether a given number is a magic with given attack index bit size.
      * @param magic candidate magic number
-     * @param sq square index
+     * @param sq square
      * @param bits attack index bit size
      * @param isRook is rook magic, else bishop magic
      * @return is magic
@@ -281,7 +281,8 @@ public final class Magics {
 
     /**
      * Build the occupancy mask for a given square.
-     * @param sq square index
+     * @param sq square
+     * @param isRook is rook occupancy mask, else bishop occupancy mask
      * @return occupancy mask
      */
     private static long occupancyMask(final byte sq, final boolean isRook) {
@@ -299,7 +300,7 @@ public final class Magics {
     /**
      * Build the attack array for a given magic number and square.
      * @param magic magic number
-     * @param sq square index
+     * @param sq square
      * @param bits attack index bit size
      * @param isRook is rook magic, else bishop magic
      * @return attacks

@@ -11,7 +11,7 @@ import java.util.Arrays;
 public final class Board {
 
     private final long[] pieceBBs   = new long[7];
-    private final long[] colourBBs  = new long[Colour.values().length];
+    private final long[] colourBBs  = new long[2];
 
     private final byte[] squares = new byte[64];
 
@@ -44,10 +44,10 @@ public final class Board {
      * @param pt piece type
      * @param sq square
      */
-    public void addPiece(final Colour c, final byte pt, final byte sq) {
+    public void addPiece(final boolean c, final byte pt, final byte sq) {
         final long bitboard = Bitboard.ofSquare(sq);
         this.squares[sq]                =   pt;
-        this.colourBBs[c.ordinal()]     |=  bitboard;
+        this.colourBBs[c ? 1 : 0]       |=  bitboard;
         this.pieceBBs[pt]               |=  bitboard;
         this.pieceBBs[PieceType.EMPTY]  &=~ bitboard;
     }
@@ -58,10 +58,10 @@ public final class Board {
      * @param pt piece type
      * @param sq square
      */
-    public void removePiece(final Colour c, final byte pt, final byte sq) {
+    public void removePiece(final boolean c, final byte pt, final byte sq) {
         final long bitboard = Bitboard.ofSquare(sq);
         this.squares[sq]                  =   PieceType.EMPTY;
-        this.colourBBs[c.ordinal()]       &=~ bitboard;
+        this.colourBBs[c ? 1 : 0]         &=~ bitboard;
         this.pieceBBs[pt]                 &=~ bitboard;
         this.pieceBBs[PieceType.EMPTY]    |=  bitboard;
     }
@@ -76,8 +76,8 @@ public final class Board {
      * @param c colour
      * @return bitboard
      */
-    public long pieces(final Colour c) {
-        return this.colourBBs[c.ordinal()];
+    public long pieces(final boolean c) {
+        return this.colourBBs[c ? 1 : 0];
     }
 
     /**
@@ -95,7 +95,7 @@ public final class Board {
      * @param pt piece type
      * @return bitboard
      */
-    public long pieces(final Colour c, final byte pt) {
+    public long pieces(final boolean c, final byte pt) {
         return pieces(c) & pieces(pt);
     }
 
@@ -138,7 +138,7 @@ public final class Board {
      * @param c colour
      * @param move move
      */
-    public void makeMove(final Colour c, final int move) {
+    public void makeMove(final boolean c, final int move) {
         final byte from    = Move.from(move);
         final byte to      = Move.to(move);
         final byte mover   = Move.mover(move);
@@ -147,7 +147,7 @@ public final class Board {
 
         // If this was a capture remove that piece from the board
         if (capture != PieceType.EMPTY) {
-            removePiece(c.flip(), capture, Move.isEnPassant(move) ? (byte) (to + c.backward().offset()) : to);
+            removePiece(Colour.flip(c), capture, Move.isEnPassant(move) ? (byte) (to + Colour.backward(c).offset()) : to);
         }
 
         // Remove the moving piece from the start location and add it to the destination
@@ -166,7 +166,7 @@ public final class Board {
      * @param c colour
      * @param move move
      */
-    public void unmakeMove(final Colour c, final int move) {
+    public void unmakeMove(final boolean c, final int move) {
         final byte from     = Move.from(move);
         final byte to       = Move.to(move);
         final byte mover    = Move.mover(move);
@@ -185,7 +185,7 @@ public final class Board {
 
         // If this was a capture add that piece to the board
         if (capture != PieceType.EMPTY) {
-            addPiece(c.flip(), capture, Move.isEnPassant(move) ? (byte) (to + c.backward().offset()) : to);
+            addPiece(Colour.flip(c), capture, Move.isEnPassant(move) ? (byte) (to + Colour.backward(c).offset()) : to);
         }
     }
 

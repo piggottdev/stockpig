@@ -4,75 +4,77 @@ import dev.pig.stockpig.chess.core.bitboard.Bitboard;
 import dev.pig.stockpig.chess.core.bitboard.Direction;
 
 /**
- * Colour is an enum for each chess team colour.
+ * Colour provides constants and functions for working with team colour booleans.
  */
-public enum Colour {
-    WHITE, BLACK;
+public final class Colour {
 
+    public static final boolean
+            WHITE = true, BLACK = false;
 
-    /**
-     * Get the colour for the boolean (true is WHITE, false is BLACK).
-     * @param isWhite is white
-     * @return colour
-     */
-    public static Colour of(final boolean isWhite) {
-        return isWhite ? WHITE : BLACK;
-    }
 
     /**
      * Get the other colour.
+     * @param c colour
      * @return other colour
      */
-    public Colour flip() {
-        return this == WHITE ? BLACK : WHITE;
+    public static boolean flip(final boolean c) {
+        return !c;
     }
 
     /**
      * Get the forward direction of the colour.
+     * @param c colour
      * @return forward direction
      */
-    public Direction forward() {
-        return this == WHITE ? Direction.N : Direction.S;
+    public static Direction forward(final boolean c) {
+        return c ? Direction.N : Direction.S;
     }
 
     /**
      * Get the backward direction of the colour.
+     * @param c colour
      * @return backward direction
      */
-    public Direction backward() {
-        return this == WHITE ? Direction.S : Direction.N;
+    public static Direction backward(final boolean c) {
+        return c ? Direction.S : Direction.N;
     }
 
     /**
-     * Get the first pawn attack direction of the colour, in the diagonal axis.
-     * @return diagonal pawn attack direction
+     * Get the diagonal pawn attacking direction of the colour.
+     * @param c colour
+     * @return diagonal attack direction
      */
-    public Direction pawnAttackDirection1() {
-        return this == WHITE ? Direction.NE : Direction.SW;
+    public static Direction pawnAttackDirection1(final boolean c) {
+        return c ? Direction.NE : Direction.SW;
     }
 
     /**
-     * Get the second pawn attack direction of the colour, in the anti-diagonal axis.
-     * @return anti-diagonal pawn attack direction
+     * Get the anti-diagonal pawn attacking direction of the colour.
+     * @param c colour
+     * @return anti-diagonal attack direction
      */
-    public Direction pawnAttackDirection2() {
-        return this == WHITE ? Direction.NW : Direction.SE;
+    public static Direction pawnAttackDirection2(final boolean c) {
+        return c ? Direction.NW : Direction.SE;
     }
 
     /**
-     * Get the third forward rank of the colour, this is the rank one forward from the pawn
-     * starting rank.
-     * @return third rank
+     * Get the third rank forward bitboard for the colour.
+     * @param c colour
+     * @return rank 3 bitboard
      */
-    public long rank3() {
-        return this == WHITE ? Bitboard.RANK_3 : Bitboard.RANK_6;
+    public static long rank3(final boolean c) {
+        return c ? Bitboard.RANK_3 : Bitboard.RANK_6;
     }
 
     /**
-     * Get the eighth forward rank of the colour, this is the pawn promotion rank.
-     * @return eighth rank
+     * Get the eighth rank forward bitboard for the colour.
+     * @param c colour
+     * @return rank 8 bitboard
      */
-    public long rank8() {
-        return this == WHITE ? Bitboard.RANK_8 : Bitboard.RANK_1;
+    public static long rank8(final boolean c) {
+        return c ? Bitboard.RANK_8 : Bitboard.RANK_1;
     }
+
+
+    private Colour() {}
 }

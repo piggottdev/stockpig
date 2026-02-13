@@ -124,11 +124,11 @@ public final class MoveGenerator {
     public void attackAnalysis(final Position pos) {
         reset();
 
-        final Colour us = pos.sideToMove();
-        final long team = pos.board().pieces(us);
-        final long king = pos.board().pieces(PieceType.KING) & team;
+        final boolean us = pos.sideToMove();
+        final long team  = pos.board().pieces(us);
+        final long king  = pos.board().pieces(PieceType.KING) & team;
 
-        final Colour them               = us.flip();
+        final boolean them              = Colour.flip(us);
         final long enemies              = pos.board().pieces(them);
         final long eKing                = pos.board().pieces(PieceType.KING) & enemies;
         final long ePawns               = pos.board().pieces(PieceType.PAWN) & enemies;
@@ -138,8 +138,8 @@ public final class MoveGenerator {
         final long eQueens              = pos.board().pieces(PieceType.QUEEN) & enemies;
         final long eDiagonals           = eQueens | eBishops;
         final long eOrthogonals         = eQueens | eRooks;
-        final Direction pawnAttackDir1  = them.pawnAttackDirection1();
-        final Direction pawnAttackDir2  = them.pawnAttackDirection2();
+        final Direction pawnAttackDir1  = Colour.pawnAttackDirection1(them);
+        final Direction pawnAttackDir2  = Colour.pawnAttackDirection2(them);
 
         final long unoccupied    = pos.board().unoccupied();
         final long occupied      = ~unoccupied;
@@ -268,11 +268,11 @@ public final class MoveGenerator {
     public void generate(final Position pos, final MoveList moves) {
         attackAnalysis(pos);
 
-        final Colour us             = pos.sideToMove();
+        final boolean us            = pos.sideToMove();
         final long unoccupied       = pos.board().unoccupied();
         final long occupied         = ~unoccupied;
         final long team             = pos.board().pieces(us);
-        final long enemies          = pos.board().pieces(us.flip());
+        final long enemies          = pos.board().pieces(Colour.flip(us));
         final long king             = pos.board().pieces(PieceType.KING) & team;
 
 
@@ -296,11 +296,11 @@ public final class MoveGenerator {
         final long rooks          = pos.board().pieces(PieceType.ROOK) & team;
         final long bishops        = pos.board().pieces(PieceType.BISHOP) & team;
 
-        final Direction forward     = us.forward();
-        final Direction attackDir1  = us.pawnAttackDirection1();
-        final Direction attackDir2  = us.pawnAttackDirection2();
-        final long thirdRank        = us.rank3();
-        final long promotionRank    = us.rank8();
+        final Direction forward     = Colour.forward(us);
+        final Direction attackDir1  = Colour.pawnAttackDirection1(us);
+        final Direction attackDir2  = Colour.pawnAttackDirection2(us);
+        final long thirdRank        = Colour.rank3(us);
+        final long promotionRank    = Colour.rank8(us);
         final long enPassantTarget  = pos.enPassantTarget() == Square.EMPTY ? Bitboard.EMPTY : Bitboard.ofSquare(pos.enPassantTarget());
 
         // Pawns that can push forward one
@@ -448,14 +448,14 @@ public final class MoveGenerator {
      * @return is en passant illegal/pinned
      */
     private boolean isPinnedEnPassant(final Position pos, final long pawn) {
-        final Colour us             = pos.sideToMove();
+        final boolean us            = pos.sideToMove();
         final long king             = pos.board().pieces(us, PieceType.KING);
-        final Direction backward    = us.backward();
+        final Direction backward    = Colour.backward(us);
         final long occupied         = pos.board().occupied();
         final long enPassantTarget  = Bitboard.ofSquare(pos.enPassantTarget());
         final long capturedPawn     = Bitboard.shift(enPassantTarget, backward.offset());
 
         return Bitboard.intersects(Attack.rook(Square.ofBitboard(king), occupied ^ enPassantTarget ^ pawn ^ capturedPawn),
-                pos.board().pieces(us.flip(), PieceType.ROOK) | pos.board().pieces(us.flip(), PieceType.QUEEN));
+                pos.board().pieces(Colour.flip(us), PieceType.ROOK) | pos.board().pieces(Colour.flip(us), PieceType.QUEEN));
     }
 }

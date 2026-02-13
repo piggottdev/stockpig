@@ -1,7 +1,8 @@
 package dev.pig.stockpig.chess.core.bitboard;
 
 /**
- * Attacks provides static functions for obtaining attack map bitboards.
+ * Attacks provides static functions for obtaining attack map
+ * bitboards for single pieces.
  */
 public final class Attack {
 

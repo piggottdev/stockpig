@@ -1,7 +1,7 @@
 package dev.pig.stockpig.chess.core.bitboard;
 
 /**
- * Direction is an enum for all possible directions a piece can move on a chess board,
+ * Direction is an enum of all possible directions a piece can move on a chess board,
  * including knight L-shapes. The enum uses compass directions as looking at the board with
  * A1 in the bottom left.
  */
