@@ -27,14 +27,14 @@ public final class Castling {
     public static final int B_KING_SIDE_MOVE  = Move.castle(Square.E8, Square.G8);
 
     // Rook Move Squares
-    public static final int W_QUEEN_SIDE_ROOK_FROM = Square.A1;
-    public static final int W_KING_SIDE_ROOK_FROM  = Square.H1;
-    public static final int B_QUEEN_SIDE_ROOK_FROM = Square.A8;
-    public static final int B_KING_SIDE_ROOK_FROM  = Square.H8;
-    public static final int W_QUEEN_SIDE_ROOK_TO   = Square.D1;
-    public static final int W_KING_SIDE_ROOK_TO    = Square.F1;
-    public static final int B_QUEEN_SIDE_ROOK_TO   = Square.D8;
-    public static final int B_KING_SIDE_ROOK_TO    = Square.F8;
+    public static final byte W_QUEEN_SIDE_ROOK_FROM = Square.A1;
+    public static final byte W_KING_SIDE_ROOK_FROM  = Square.H1;
+    public static final byte B_QUEEN_SIDE_ROOK_FROM = Square.A8;
+    public static final byte B_KING_SIDE_ROOK_FROM  = Square.H8;
+    public static final byte W_QUEEN_SIDE_ROOK_TO   = Square.D1;
+    public static final byte W_KING_SIDE_ROOK_TO    = Square.F1;
+    public static final byte B_QUEEN_SIDE_ROOK_TO   = Square.D8;
+    public static final byte B_KING_SIDE_ROOK_TO    = Square.F8;
 
     // Empty Squares
     public static final long W_QUEEN_SIDE_EMPTY_SQUARES = Bitboard.ofSquares(Square.B1, Square.C1, Square.D1);
@@ -90,7 +90,7 @@ public final class Castling {
      * @param to king to square
      * @return rook from square
      */
-    static int getRookFrom(final Colour c, final int to) {
+    static byte getRookFrom(final Colour c, final byte to) {
         return c == Colour.WHITE ?
                 to == Square.C1 ? W_QUEEN_SIDE_ROOK_FROM : W_KING_SIDE_ROOK_FROM :
                 to == Square.C8 ? B_QUEEN_SIDE_ROOK_FROM : B_KING_SIDE_ROOK_FROM;
@@ -102,7 +102,7 @@ public final class Castling {
      * @param to king to square
      * @return rook to square
      */
-    static int getRookTo(final Colour c, final int to) {
+    static byte getRookTo(final Colour c, final byte to) {
         return c == Colour.WHITE ?
                 to == Square.C1 ? W_QUEEN_SIDE_ROOK_TO : W_KING_SIDE_ROOK_TO :
                 to == Square.C8 ? B_QUEEN_SIDE_ROOK_TO : B_KING_SIDE_ROOK_TO;

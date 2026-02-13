@@ -14,7 +14,7 @@ public final class Magics {
      * @param occupied occupied bitboard
      * @return rook attack map
      */
-    public static long rAttack(final int sq, final long occupied) {
+    public static long rAttack(final byte sq, final long occupied) {
         final long occ = occupied & ROOK_MASKS[sq];
         final int idx = (int) ((occ * ROOK_MAGICS[sq]) >>> (64 - ROOK_BITS));
         return ROOK_ATTACKS[sq][idx];
@@ -26,7 +26,7 @@ public final class Magics {
      * @param occupied occupied bitboard
      * @return bishop attack map
      */
-    public static long bAttack(final int sq, final long occupied) {
+    public static long bAttack(final byte sq, final long occupied) {
         final long occ = occupied & BISHOP_MASKS[sq];
         final int idx = (int) ((occ * BISHOP_MAGICS[sq]) >>> (64 - BISHOP_BITS));
         return BISHOP_ATTACKS[sq][idx];
@@ -109,7 +109,7 @@ public final class Magics {
         ROOK_MAGICS[63] = 4645483376557517874L;
 
         // Init rook masks and attacks
-        for (int i = 0; i < ROOK_MASKS.length; i++) {
+        for (byte i = 0; i < ROOK_MASKS.length; i++) {
             ROOK_MASKS[i] = occupancyMask(i, true);
             ROOK_ATTACKS[i] = attacks(ROOK_MAGICS[i], i, ROOK_BITS, true);
         }
@@ -187,7 +187,7 @@ public final class Magics {
         BISHOP_MAGICS[63] = 3176925572122216991L;
 
         // Init bishop masks and attacks
-        for (int i = 0; i < BISHOP_MASKS.length; i++) {
+        for (byte i = 0; i < BISHOP_MASKS.length; i++) {
             BISHOP_MASKS[i] = occupancyMask(i, false);
             BISHOP_ATTACKS[i] = attacks(BISHOP_MAGICS[i], i, BISHOP_BITS, false);
         }
@@ -203,11 +203,11 @@ public final class Magics {
      * @param args empty
      */
     public static void main(final String[] args) {
-        for (int i = 0; i < 64; i++) {
+        for (byte i = 0; i < 64; i++) {
             System.out.printf("ROOK_MAGICS[%d] = %dL;%n", i, findMagic(i, 12, true));
         }
         System.out.println();
-        for (int i = 0; i < 64; i++) {
+        for (byte i = 0; i < 64; i++) {
             System.out.printf("BISHOP_MAGICS[%d] = %dL;%n", i, findMagic(i, 10, false));
         }
     }
@@ -219,7 +219,7 @@ public final class Magics {
      * @param isRook find rook magic, else bishop magic
      * @return magic number
      */
-    public static long findMagic(final int sq, final int bits, final boolean isRook) {
+    public static long findMagic(final byte sq, final int bits, final boolean isRook) {
         while (true) {
             final long magic = ThreadLocalRandom.current().nextLong();
             if (isMagic(magic, sq, bits, isRook)) return magic;
@@ -234,7 +234,7 @@ public final class Magics {
      * @param isRook is rook magic, else bishop magic
      * @return is magic
      */
-    public static boolean isMagic(final long magic, final int sq, final int bits, final boolean isRook) {
+    public static boolean isMagic(final long magic, final byte sq, final int bits, final boolean isRook) {
         final long mask = isRook ? ROOK_MASKS[sq] : BISHOP_MASKS[sq];
         final long piece = Bitboard.ofSquare(sq);
 
@@ -284,7 +284,7 @@ public final class Magics {
      * @param sq square index
      * @return occupancy mask
      */
-    private static long occupancyMask(final int sq, final boolean isRook) {
+    private static long occupancyMask(final byte sq, final boolean isRook) {
         final long bb = Bitboard.ofSquare(sq);
         return bb ^ (isRook ?   Bitboard.fillInto(bb, Direction.E,  ~Bitboard.FILE_H) |
                                 Bitboard.fillInto(bb, Direction.W,  ~Bitboard.FILE_A) |
@@ -304,7 +304,7 @@ public final class Magics {
      * @param isRook is rook magic, else bishop magic
      * @return attacks
      */
-    private static long[] attacks(final long magic, final int sq, final int bits, final boolean isRook) {
+    private static long[] attacks(final long magic, final byte sq, final int bits, final boolean isRook) {
         final long mask = occupancyMask(sq, isRook);
         final long piece = Bitboard.ofSquare(sq);
         final long[] attacks = new long[1 << bits];

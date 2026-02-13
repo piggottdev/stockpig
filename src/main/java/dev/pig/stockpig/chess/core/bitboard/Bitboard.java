@@ -70,7 +70,7 @@ public final class Bitboard {
      * @param square square
      * @return single occupancy bitboard
      */
-    public static long ofSquare(final int square) {
+    public static long ofSquare(final byte square) {
         return 1L << square;
     }
 
@@ -79,9 +79,9 @@ public final class Bitboard {
      * @param squares squares
      * @return bitboard
      */
-    public static long ofSquares(final int... squares) {
+    public static long ofSquares(final byte... squares) {
         long bb = 0L;
-        for (final int square : squares) {
+        for (final byte square : squares) {
             bb |= ofSquare(square);
         }
         return bb;
@@ -350,7 +350,7 @@ public final class Bitboard {
         final StringBuilder sb = new StringBuilder();
         for (int rank = 7; rank >= 0; rank--) {
             for (int file = 0; file < 8; file++) {
-                final long bit = ofSquare(rank*8+file);
+                final long bit = ofSquare((byte) (rank*8+file));
                 sb.append(isEmpty(bit & bb) ? "0 " : "1 ");
             }
             sb.append("\n");

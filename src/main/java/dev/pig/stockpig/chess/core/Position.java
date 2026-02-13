@@ -18,13 +18,13 @@ public final class Position {
     private final Board board;
     private Colour sideToMove;
     private byte castlingRights;
-    private int enPassantTarget;
+    private byte enPassantTarget;
     private int halfMoveClock;
     private int turn;
 
     // History
     private final List<State> history = new ArrayList<>(100);
-    private record State(int move, byte castlingRights, int enPassantTarget, int halfMoveClock){}
+    private record State(int move, byte castlingRights, byte enPassantTarget, int halfMoveClock) {}
 
     // Moves (+ check, attack and pin information)
     private final MoveGenerator moveGenerator = new MoveGenerator();
@@ -36,7 +36,7 @@ public final class Position {
     // ====================================================================================================
 
     public Position(final Board board, final Colour sideToMove, final byte castlingRights,
-                    final int enPassantTarget, final int halfMoveClock, final int turn) {
+                    final byte enPassantTarget, final int halfMoveClock, final int turn) {
         this.board = board;
         this.sideToMove = sideToMove;
         this.castlingRights = castlingRights;
@@ -87,7 +87,7 @@ public final class Position {
      * Get the en passant target, if any.
      * @return en passant target
      */
-    public int enPassantTarget() {
+    public byte enPassantTarget() {
         return this.enPassantTarget;
     }
 
@@ -184,7 +184,7 @@ public final class Position {
 
         this.board.makeMove(this.sideToMove, move);
         this.castlingRights = Castling.update(this.castlingRights, move);
-        this.enPassantTarget = Move.isDoublePush(move) ? Move.from(move) + this.sideToMove.forward().offset() : Square.EMPTY;
+        this.enPassantTarget = Move.isDoublePush(move) ? (byte) (Move.from(move) + this.sideToMove.forward().offset()) : Square.EMPTY;
         this.halfMoveClock = Move.isCapture(move) || Move.mover(move) == PieceType.PAWN ? 0 : this.halfMoveClock + 1;
         this.sideToMove = this.sideToMove.flip();
         if (this.sideToMove == Colour.WHITE) this.turn++;

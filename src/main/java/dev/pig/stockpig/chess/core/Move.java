@@ -18,8 +18,8 @@ package dev.pig.stockpig.chess.core;
 public final class Move {
 
     // Masks
-    private static final int SQUARE_MASK  = 0b111111;
-    private static final int PIECE_MASK   = 0b111;
+    private static final byte SQUARE_MASK  = 0b111111;
+    private static final byte PIECE_MASK   = 0b111;
 
     // Flag Masks
     private static final int DOUBLE_PUSH_MASK   = 1 << 21;
@@ -49,7 +49,7 @@ public final class Move {
      * @param mover moving piece type
      * @return move
      */
-    public static int basic(final int from, final int to, final byte mover) {
+    public static int basic(final byte from, final byte to, final byte mover) {
         return from | (to << TO_SHIFT) | (mover << MOVER_SHIFT);
     }
 
@@ -81,7 +81,7 @@ public final class Move {
      * @param capture captured piece type
      * @return capture move
      */
-    public static int capture(final int from, final int to, final byte mover, final byte capture) {
+    public static int capture(final byte from, final byte to, final byte mover, final byte capture) {
         return addCapture(basic(from, to, mover), capture);
     }
 
@@ -91,7 +91,7 @@ public final class Move {
      * @param to to square
      * @return double push move
      */
-    public static int doublePush(final int from, final int to) {
+    public static int doublePush(final byte from, final byte to) {
         return basic(from, to, PieceType.PAWN) | DOUBLE_PUSH_MASK;
     }
 
@@ -101,7 +101,7 @@ public final class Move {
      * @param to to square
      * @return castle move
      */
-    public static int castle(final int from, final int to) {
+    public static int castle(final byte from, final byte to) {
         return basic(from, to, PieceType.KING) | CASTLE_MASK;
     }
 
@@ -111,7 +111,7 @@ public final class Move {
      * @param to to square.
      * @return en passant move
      */
-    public static int enPassant(final int from, final int to) {
+    public static int enPassant(final byte from, final byte to) {
         return capture(from, to, PieceType.PAWN, PieceType.PAWN) | EN_PASSANT_MASK;
     }
 
@@ -135,8 +135,8 @@ public final class Move {
      * @param move move
      * @return from square
      */
-    public static int from(final int move) {
-        return move & SQUARE_MASK;
+    public static byte from(final int move) {
+        return (byte) (move & SQUARE_MASK);
     }
 
     /**
@@ -144,8 +144,8 @@ public final class Move {
      * @param move move
      * @return to square
      */
-    public static int to(final int move) {
-        return (move >>> TO_SHIFT) & SQUARE_MASK;
+    public static byte to(final int move) {
+        return (byte) ((move >>> TO_SHIFT) & SQUARE_MASK);
     }
 
     /**

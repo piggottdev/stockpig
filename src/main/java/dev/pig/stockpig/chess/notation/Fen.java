@@ -68,12 +68,12 @@ public final class Fen {
     private static Board parseBoard(final String fen) {
         final Board board = Board.empty();
 
-        int sq = 56;
+        byte sq = 56;
         for (int i = 0; i < fen.length(); i++) {
             final char c = fen.charAt(i);
 
             if      (c == '/')              sq -= 16;
-            else if (Character.isDigit(c))  sq += Character.digit(c, 10);
+            else if (Character.isDigit(c))  sq += (byte) Character.digit(c, 10);
             else {
                 final byte pt = parsePieceType(Character.toString(c));
                 board.addPiece(Colour.of(Character.isUpperCase(c)), pt, sq);
@@ -101,7 +101,7 @@ public final class Fen {
      * @param s en passant target part of FEN string
      * @return en passant target
      */
-    private static int parseEnPassantTarget(final String s) {
+    private static byte parseEnPassantTarget(final String s) {
         if ("-".equals(s)) return Square.EMPTY;
 
         if (s.length() != 2) throw new IllegalArgumentException("unknown square: " + s);
@@ -112,7 +112,7 @@ public final class Fen {
         if (file < 'a' || file > 'h') throw new IllegalArgumentException("unknown file: " + file);
         if (rank < '1' || rank > '8') throw new IllegalArgumentException("unknown rank: " + rank);
 
-        return (rank - '1')*8 + (file - 'a');
+        return (byte) ((rank - '1')*8 + (file - 'a'));
     }
 
     /**
@@ -163,7 +163,7 @@ public final class Fen {
         for (int rank = 7; rank >= 0; rank--) {
             int emptyRun = 0;
             for (int file = 0; file < 8; file++) {
-                final int sq = rank*8+file;
+                final byte sq = (byte) (rank*8+file);
                 final byte piece = board.pieceAt(sq);
                 if (piece == PieceType.EMPTY) {
                     emptyRun++;
@@ -194,7 +194,7 @@ public final class Fen {
      * @param sq square
      * @return en passant target FEN string
      */
-    private static String formatEnPassantTarget(final int sq) {
+    private static String formatEnPassantTarget(final byte sq) {
         if (sq == Square.EMPTY) return "-";
 
         final int file = sq & 7;

@@ -10,7 +10,7 @@ public final class Attack {
      * @param sq king square
      * @return king attack map
      */
-    public static long king(final int sq) {
+    public static long king(final byte sq) {
         return KING_ATTACKS[sq];
     }
 
@@ -19,7 +19,7 @@ public final class Attack {
      * @param sq knight square
      * @return knight attack map
      */
-    public static long knight(final int sq) {
+    public static long knight(final byte sq) {
         return KNIGHT_ATTACKS[sq];
     }
 
@@ -30,7 +30,7 @@ public final class Attack {
      * @param occupied occupied bitboard
      * @return bishop attack map
      */
-    public static long bishop(final int sq, final long occupied) {
+    public static long bishop(final byte sq, final long occupied) {
         return Magics.bAttack(sq, occupied);
     }
 
@@ -41,7 +41,7 @@ public final class Attack {
      * @param occupied occupied bitboard
      * @return rook attack map
      */
-    public static long rook(final int sq, final long occupied) {
+    public static long rook(final byte sq, final long occupied) {
         return Magics.rAttack(sq, occupied);
     }
 
@@ -52,7 +52,7 @@ public final class Attack {
      * @param occupied occupied bitboard
      * @return queen attack map
      */
-    public static long queen(final int sq, final long occupied) {
+    public static long queen(final byte sq, final long occupied) {
         return rook(sq, occupied) | bishop(sq, occupied);
     }
 
@@ -63,7 +63,7 @@ public final class Attack {
 
     private static final long[] KING_ATTACKS = new long[64];
     static {
-        for (int i = 0; i < KING_ATTACKS.length; i++) {
+        for (byte i = 0; i < KING_ATTACKS.length; i++) {
             final long king = Bitboard.ofSquare(i);
             KING_ATTACKS[i] =
                     Bitboard.shift(king, Direction.N)  |
@@ -79,7 +79,7 @@ public final class Attack {
 
     private static final long[] KNIGHT_ATTACKS = new long[64];
     static {
-        for (int i = 0; i < KNIGHT_ATTACKS.length; i++) {
+        for (byte i = 0; i < KNIGHT_ATTACKS.length; i++) {
             final long knight = Bitboard.ofSquare(i);
             KNIGHT_ATTACKS[i] =
                     Bitboard.shift(knight, Direction.NNE) |

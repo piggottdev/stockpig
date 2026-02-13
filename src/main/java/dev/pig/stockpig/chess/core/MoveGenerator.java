@@ -278,9 +278,9 @@ public final class MoveGenerator {
 
         // King moves - only king moves can get out of double check
 
-        final int kFrom = Square.ofBitboard(king);
+        final byte kFrom = Square.ofBitboard(king);
         Bitboard.forEach(Attack.king(kFrom) & ~this.attacked & (unoccupied | enemies), (final long attack) -> {
-            final int to = Square.ofBitboard(attack);
+            final byte to = Square.ofBitboard(attack);
             final int basic = Move.basic(kFrom, to, PieceType.KING);
             moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
         });
@@ -324,36 +324,36 @@ public final class MoveGenerator {
                 explodePawnCapture(pos, moves, attackDir2, attack, enPassantTarget, promotionRank));
 
         Bitboard.forEach(knights, (final long knight) -> {
-            final int from = Square.ofBitboard(knight);
+            final byte from = Square.ofBitboard(knight);
             Bitboard.forEach(Attack.knight(from) & legalTargetsOf(knight), (final long attack) -> {
-                final int to = Square.ofBitboard(attack);
+                final byte to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.KNIGHT);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
             });
         });
 
         Bitboard.forEach(queens, (final long queen) -> {
-            final int from = Square.ofBitboard(queen);
+            final byte from = Square.ofBitboard(queen);
             Bitboard.forEach(Attack.queen(from, occupied) & legalTargetsOf(queen), (final long attack) -> {
-                final int to = Square.ofBitboard(attack);
+                final byte to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.QUEEN);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
             });
         });
 
         Bitboard.forEach(rooks, (final long rook) -> {
-            final int from = Square.ofBitboard(rook);
+            final byte from = Square.ofBitboard(rook);
             Bitboard.forEach(Attack.rook(from, occupied) & legalTargetsOf(rook), (final long attack) -> {
-                final int to = Square.ofBitboard(attack);
+                final byte to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.ROOK);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
             });
         });
 
         Bitboard.forEach(bishops, (final long bishop) -> {
-            final int from = Square.ofBitboard(bishop);
+            final byte from = Square.ofBitboard(bishop);
             Bitboard.forEach(Attack.bishop(from, occupied) & legalTargetsOf(bishop), (final long attack) -> {
-                final int to = Square.ofBitboard(attack);
+                final byte to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.BISHOP);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
             });
@@ -424,8 +424,8 @@ public final class MoveGenerator {
      */
     private void explodePawnCapture(final Position pos, final MoveList moves, final Direction attackDir, final long attack, final long enPassantTarget, final long promotionRank) {
         final long pawn = Bitboard.shiftRev(attack, attackDir);
-        final int from = Square.ofBitboard(pawn);
-        final int to = Square.ofBitboard(attack);
+        final byte from = Square.ofBitboard(pawn);
+        final byte to = Square.ofBitboard(attack);
         if (attack == enPassantTarget) {
             if (isPinnedEnPassant(pos, pawn)) return;
             moves.add(Move.enPassant(from, to));

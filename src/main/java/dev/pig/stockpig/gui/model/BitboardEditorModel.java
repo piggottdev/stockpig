@@ -45,7 +45,7 @@ public final class BitboardEditorModel {
      * @param i square index
      */
     public void toggleBit(final int i) {
-        this.bitboard ^= Bitboard.ofSquare(i);
+        this.bitboard ^= Bitboard.ofSquare((byte) i);
     }
 
     /**

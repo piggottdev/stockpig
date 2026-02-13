@@ -16,9 +16,9 @@ public final class ChessModel {
     private Position position = Position.starting();
 
     private final MoveList legalMoves = new MoveList();
-    private int selected = Square.EMPTY;
-    private int from     = Square.EMPTY;
-    private int to       = Square.EMPTY;
+    private byte selected = Square.EMPTY;
+    private byte from     = Square.EMPTY;
+    private byte to       = Square.EMPTY;
     private int promotionMove;
 
     /**
@@ -115,7 +115,7 @@ public final class ChessModel {
             if (Move.from(move) == sq) this.legalMoves.add(move);
         }
 
-        if (!this.legalMoves.isEmpty()) this.selected = sq;
+        if (!this.legalMoves.isEmpty()) this.selected = (byte) sq;
         return GameEvent.SELECTION_CHANGE;
     }
 
@@ -152,8 +152,8 @@ public final class ChessModel {
      * @return piece
      */
     public byte pieceAt(final int i) {
-        return (byte) (this.position.board().pieceAt(i) +
-                        (Bitboard.intersects(Bitboard.ofSquare(i), this.position.board().pieces(Colour.BLACK)) ? 6 : 0));
+        return (byte) (this.position.board().pieceAt((byte) i) +
+                        (Bitboard.intersects(Bitboard.ofSquare((byte) i), this.position.board().pieces(Colour.BLACK)) ? 6 : 0));
     }
 
     /**
@@ -186,7 +186,7 @@ public final class ChessModel {
      */
     public List<Integer> destinations() {
         final List<Integer> destinations = new ArrayList<>(this.legalMoves.size());
-        this.legalMoves.forEach(move -> destinations.add(Move.to(move)));
+        this.legalMoves.forEach(move -> destinations.add((int) Move.to(move)));
         return destinations;
     }
 }

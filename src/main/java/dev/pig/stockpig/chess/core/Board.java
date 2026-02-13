@@ -44,7 +44,7 @@ public final class Board {
      * @param pt piece type
      * @param sq square
      */
-    public void addPiece(final Colour c, final byte pt, final int sq) {
+    public void addPiece(final Colour c, final byte pt, final byte sq) {
         final long bitboard = Bitboard.ofSquare(sq);
         this.squares[sq]                =   pt;
         this.colourBBs[c.ordinal()]     |=  bitboard;
@@ -58,7 +58,7 @@ public final class Board {
      * @param pt piece type
      * @param sq square
      */
-    public void removePiece(final Colour c, final byte pt, final int sq) {
+    public void removePiece(final Colour c, final byte pt, final byte sq) {
         final long bitboard = Bitboard.ofSquare(sq);
         this.squares[sq]                  =   PieceType.EMPTY;
         this.colourBBs[c.ordinal()]       &=~ bitboard;
@@ -125,7 +125,7 @@ public final class Board {
      * @param sq square
      * @return piece type
      */
-    public byte pieceAt(final int sq) {
+    public byte pieceAt(final byte sq) {
         return this.squares[sq];
     }
 
@@ -139,15 +139,15 @@ public final class Board {
      * @param move move
      */
     public void makeMove(final Colour c, final int move) {
-        final int from = Move.from(move);
-        final int to = Move.to(move);
-        final byte mover = Move.mover(move);
+        final byte from    = Move.from(move);
+        final byte to      = Move.to(move);
+        final byte mover   = Move.mover(move);
         final byte capture = Move.capture(move);
         final byte promote = Move.promote(move);
 
         // If this was a capture remove that piece from the board
         if (capture != PieceType.EMPTY) {
-            removePiece(c.flip(), capture, Move.isEnPassant(move) ? to + c.backward().offset() : to);
+            removePiece(c.flip(), capture, Move.isEnPassant(move) ? (byte) (to + c.backward().offset()) : to);
         }
 
         // Remove the moving piece from the start location and add it to the destination
@@ -167,11 +167,11 @@ public final class Board {
      * @param move move
      */
     public void unmakeMove(final Colour c, final int move) {
-        final int from = Move.from(move);
-        final int to = Move.to(move);
-        final byte mover = Move.mover(move);
-        final byte capture = Move.capture(move);
-        final byte promote = Move.promote(move);
+        final byte from     = Move.from(move);
+        final byte to       = Move.to(move);
+        final byte mover    = Move.mover(move);
+        final byte capture  = Move.capture(move);
+        final byte promote  = Move.promote(move);
 
         // If it's a castle move then move the rook
         if (Move.isCastle(move)) {
@@ -185,7 +185,7 @@ public final class Board {
 
         // If this was a capture add that piece to the board
         if (capture != PieceType.EMPTY) {
-            addPiece(c.flip(), capture, Move.isEnPassant(move) ? to + c.backward().offset() : to);
+            addPiece(c.flip(), capture, Move.isEnPassant(move) ? (byte) (to + c.backward().offset()) : to);
         }
     }
 
