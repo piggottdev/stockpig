@@ -23,3 +23,4 @@ Refactor,113845145,-2.3%
 Slide attack analysis uses attack lookups,124499813,+9.4%
 Knights use lookups for attacks,132736053,+6.6%
 Remove PieceType enum for byte,145414935,+9.6%
+Squares now bytes,140720025,-3.2%
