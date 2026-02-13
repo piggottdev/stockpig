@@ -239,16 +239,15 @@ public final class MoveGenerator {
         if (pinner == Bitboard.EMPTY) return; // No enemies that can pin
 
         final long pinned = line & team;
-        final long pinnedCount = Bitboard.count(pinned);
 
-        if (pinnedCount > 1) return; // More than one blocker
-
-        if (pinnedCount == 0) {
+        if (Bitboard.isEmpty(pinned)) {
             // No blockers, this is check
             this.checkers |= pinner;
             this.checkRay |= line;
             return;
         }
+
+        if (!Bitboard.isSingle(pinned)) return; // More than one blocker
 
         this.pins[ALL]  |= line;
         this.pins[axis] |= line;
