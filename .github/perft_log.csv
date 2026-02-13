@@ -24,3 +24,4 @@ Slide attack analysis uses attack lookups,124499813,+9.4%
 Knights use lookups for attacks,132736053,+6.6%
 Remove PieceType enum for byte,145414935,+9.6%
 Squares now bytes,140720025,-3.2%
+Remove Colour enum,142482210,+1.3%
