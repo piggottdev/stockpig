@@ -33,4 +33,7 @@ public final class PromotionPopup {
             default -> PieceType.EMPTY;
         };
     }
+
+
+    private PromotionPopup() {}
 }

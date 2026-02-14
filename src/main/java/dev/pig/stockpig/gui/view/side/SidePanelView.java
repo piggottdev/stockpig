@@ -41,6 +41,7 @@ public final class SidePanelView extends JTabbedPane {
      * @param model model
      */
     public void redraw(final StockpigModel model) {
+        this.gamePanel.redraw(model);
         this.bitboardEditor.redraw(model);
     }
 }

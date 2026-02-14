@@ -90,6 +90,15 @@ public final class StockpigController {
     }
 
     /**
+     * Event callback for clicking generate an AI move.
+     */
+    public void aiMove() {
+        final ChessModel.GameEvent event = this.model.chess.botMove();
+        if (event == ChessModel.GameEvent.MOVE) MoveSoundPlayer.play();
+        redraw();
+    }
+
+    /**
      * Event callback for clicking add for a bitboard.
      * @param selector bitboard selector
      */

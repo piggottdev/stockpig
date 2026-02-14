@@ -4,6 +4,8 @@ import dev.pig.stockpig.chess.core.*;
 import dev.pig.stockpig.chess.core.bitboard.Bitboard;
 import dev.pig.stockpig.chess.core.bitboard.Square;
 import dev.pig.stockpig.chess.notation.Fen;
+import dev.pig.stockpig.engine.evaluation.PositionEvaluator;
+import dev.pig.stockpig.engine.search.AlphaBetaSearcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,19 +64,19 @@ public final class ChessModel {
     }
 
     /**
-     * Undo the last move.
-     */
-    public void undo() {
-        this.position.undo();
-        clear();
-    }
-
-    /**
      * Get the current position's FEN string.
      * @return FEN string
      */
     public String fen() {
         return this.position.toFen();
+    }
+
+    /**
+     * Undo the last move.
+     */
+    public void undo() {
+        this.position.undo();
+        clear();
     }
 
     /**
@@ -139,6 +141,28 @@ public final class ChessModel {
         this.selected = Square.EMPTY;
         this.from = Move.from(move);
         this.to = Move.to(move);
+    }
+
+    /**
+     * Get the score of the current position using the evaluator.
+     * @return position evaluation score
+     */
+    public int score() {
+        return PositionEvaluator.eval(this.position, 0);
+    }
+
+    /**
+     * Make a move using the default evaluator and searcher.
+     * @return type of game event triggered by the move
+     */
+    public GameEvent botMove() {
+        final int move = AlphaBetaSearcher.search(this.position);
+        if (move == 0) return GameEvent.SELECTION_CHANGE;
+        this.position.makeMove(move);
+        clear();
+        this.from = Move.from(move);
+        this.to = Move.to(move);
+        return GameEvent.MOVE;
     }
 
 

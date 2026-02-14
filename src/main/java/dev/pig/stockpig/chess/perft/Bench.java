@@ -65,4 +65,7 @@ public final class Bench {
         """, totalRuntime, totalNodes, Math.round(totalNodes / (totalRuntime/1000000000d)) ));
         }
     }
+
+
+    private Bench() {}
 }

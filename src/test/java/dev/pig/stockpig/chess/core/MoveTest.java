@@ -23,6 +23,7 @@ public final class MoveTest {
         assertFalse(Move.isCastle(m));
         assertFalse(Move.isEnPassant(m));
         assertFalse(Move.isCapture(m));
+        assertFalse(Move.isPromotion(m));
     }
 
     @Test
@@ -38,6 +39,7 @@ public final class MoveTest {
         assertFalse(Move.isCastle(m));
         assertFalse(Move.isEnPassant(m));
         assertTrue(Move.isCapture(m));
+        assertFalse(Move.isPromotion(m));
     }
 
     @Test
@@ -53,6 +55,7 @@ public final class MoveTest {
         assertFalse(Move.isCastle(m));
         assertFalse(Move.isEnPassant(m));
         assertFalse(Move.isCapture(m));
+        assertTrue(Move.isPromotion(m));
     }
 
     @Test
@@ -68,6 +71,7 @@ public final class MoveTest {
         assertFalse(Move.isCastle(m));
         assertFalse(Move.isEnPassant(m));
         assertTrue(Move.isCapture(m));
+        assertTrue(Move.isPromotion(m));
     }
 
     @Test
@@ -83,6 +87,7 @@ public final class MoveTest {
         assertFalse(Move.isCastle(m));
         assertFalse(Move.isEnPassant(m));
         assertFalse(Move.isCapture(m));
+        assertFalse(Move.isPromotion(m));
     }
 
     @Test
@@ -98,6 +103,7 @@ public final class MoveTest {
         assertTrue(Move.isCastle(m));
         assertFalse(Move.isEnPassant(m));
         assertFalse(Move.isCapture(m));
+        assertFalse(Move.isPromotion(m));
     }
 
     @Test
@@ -113,5 +119,6 @@ public final class MoveTest {
         assertFalse(Move.isCastle(m));
         assertTrue(Move.isEnPassant(m));
         assertTrue(Move.isCapture(m));
+        assertFalse(Move.isPromotion(m));
     }
 }

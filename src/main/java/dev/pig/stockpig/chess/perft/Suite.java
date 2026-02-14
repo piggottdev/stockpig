@@ -43,4 +43,7 @@ public final class Suite {
                     164075551L
             )
     );
+
+
+    private Suite() {}
 }
