@@ -43,6 +43,7 @@ public final class Bitboard {
     public static final long FILE_F = 0x101010101010101L << 5;
     public static final long FILE_G = 0x101010101010101L << 6;
     public static final long FILE_H = 0x101010101010101L << 7;
+    private static final long[] FILE = new long[]{FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};
 
     // Ranks
     public static final long RANK_1 = 0xFFL << (8 * 0);
@@ -53,12 +54,18 @@ public final class Bitboard {
     public static final long RANK_6 = 0xFFL << (8 * 5);
     public static final long RANK_7 = 0xFFL << (8 * 6);
     public static final long RANK_8 = 0xFFL << (8 * 7);
+    private static final long[] RANK = new long[]{RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
 
     // Wrap Bounds
     public static final long NOT_FILE_A     = ~(FILE_A);
     public static final long NOT_FILE_H     = ~(FILE_H);
     public static final long NOT_FILE_AB    = ~(FILE_A | FILE_B);
     public static final long NOT_FILE_GH    = ~(FILE_G | FILE_H);
+
+    // Square Lookups
+    private static final long[][] BETWEEN = new long[64][64];
+    private static final long[][] LINE    = new long[64][64];
+    private static final long[][] RAY     = new long[64][64];
 
 
     // ====================================================================================================
@@ -134,25 +141,37 @@ public final class Bitboard {
 
 
     // ====================================================================================================
-    //                                  Population / Bit Count
+    //                                  Square Lookups
     // ====================================================================================================
 
     /**
-     * Get whether the bitboard contains only a single one bit.
-     * @param bb bitboard
-     * @return is single occupancy bitboard
+     * Get the bitboard of the ray between two squares, excluding the origin and destination.
+     * @param from from square
+     * @param to to square
+     * @return between bitboard
      */
-    public static boolean isSingle(final long bb) {
-        return Bitboard.isEmpty(bb ^ pop(bb));
+    public static long between(final byte from, final byte to) {
+        return BETWEEN[from][to];
     }
 
     /**
-     * Get the population/bit count of the bitboard, that is the number of one bits.
-     * @param bb bitboard
-     * @return bit count
+     * Get the bitboard of the ray between two squares, including the origin and destination.
+     * @param from from square
+     * @param to to square
+     * @return ray bitboard
      */
-    public static int count(final long bb) {
-        return Long.bitCount(bb);
+    public static long ray(final byte from, final byte to) {
+        return RAY[from][to];
+    }
+
+    /**
+     * Get the bitboard of the line that both squares sit on.
+     * @param from from square
+     * @param to to square
+     * @return line bitboard
+     */
+    public static long line(final byte from, final byte to) {
+        return LINE[from][to];
     }
 
 
@@ -275,28 +294,27 @@ public final class Bitboard {
                 slide(pieces, unoccupied, Direction.NW);
     }
 
+
+    // ====================================================================================================
+    //                                  Population / Bit Count
+    // ====================================================================================================
+
     /**
-     * Slide a bitboard in all directions (like a queen).
-     * @param pieces pieces bitboard
-     * @param unoccupied unoccupied bitboard
-     * @return pieces attack map
+     * Get whether the bitboard contains only a single one bit.
+     * @param bb bitboard
+     * @return is single occupancy bitboard
      */
-    public static long slideAll(final long pieces, final long unoccupied) {
-        return slideOrthogonal(pieces, unoccupied) | slideDiagonal(pieces, unoccupied);
+    public static boolean isSingle(final long bb) {
+        return Bitboard.isEmpty(bb ^ pop(bb));
     }
 
-
-    // ====================================================================================================
-    //                                  Mirrors and Flips
-    // ====================================================================================================
-
     /**
-     * Flip the bitboard vertically, that is mirror horizontally in the x-axis.
+     * Get the population/bit count of the bitboard, that is the number of one bits.
      * @param bb bitboard
-     * @return flipped bitboard
+     * @return bit count
      */
-    public static long mirrorx(final long bb) {
-        return Long.reverseBytes(bb);
+    public static int count(final long bb) {
+        return Long.bitCount(bb);
     }
 
 
@@ -338,6 +356,43 @@ public final class Bitboard {
 
 
     // ====================================================================================================
+    //                                  Rank and File
+    // ====================================================================================================
+
+    /**
+     * Get the rank bitboard for a rank index (0...7).
+     * @param i rank index
+     * @return rank bitboard
+     */
+    public static long rank(final int i) {
+        return RANK[i];
+    }
+
+    /**
+     * Get the file bitboard for a file index (0...7).
+     * @param i file index
+     * @return file bitboard
+     */
+    public static long file(final int i) {
+        return FILE[i];
+    }
+
+
+    // ====================================================================================================
+    //                                  Mirrors and Flips
+    // ====================================================================================================
+
+    /**
+     * Flip the bitboard vertically, that is mirror horizontally in the x-axis.
+     * @param bb bitboard
+     * @return flipped bitboard
+     */
+    public static long mirrorx(final long bb) {
+        return Long.reverseBytes(bb);
+    }
+
+
+    // ====================================================================================================
     //                                  String Utils
     // ====================================================================================================
 
@@ -356,6 +411,48 @@ public final class Bitboard {
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+
+    // ====================================================================================================
+    //                                  Pre-computed Lookups
+    // ====================================================================================================
+
+    static {
+        for (byte i = 0; i < 64; i++) {
+            for (byte j = 0; j < 64; j++) {
+                if (i == j) continue;
+
+                final long both        = Bitboard.ofSquares(i, j);
+                final long between     = (ALL << i) ^ (ALL << j);
+                final long lowest      = pop(between);
+                final long diag        = fill(lowest, Direction.NE) | fill(lowest, Direction.SW);
+                final long antiDiag    = fill(lowest, Direction.NW) | fill(lowest, Direction.SE);
+
+                // Same file
+                if ((i & 7) == (j & 7)) {
+                    LINE[i][j] = file(i & 7);
+                }
+
+                // Same rank
+                if ((i >>> 3) == (j >>> 3)) {
+                    LINE[i][j] = rank(i >>> 3);
+                }
+
+                // Same diagonal
+                if (Bitboard.contains(diag, both)) {
+                    LINE[i][j] = diag;
+                }
+
+                // Same anti-diagonal
+                if (Bitboard.contains(antiDiag, both)) {
+                    LINE[i][j] = antiDiag;
+                }
+
+                BETWEEN[i][j] = LINE[i][j] & between & ~both;
+                RAY[i][j]     = LINE[i][j] & between |  both;
+            }
+        }
     }
 
 

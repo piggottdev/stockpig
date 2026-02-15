@@ -4,7 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.LongConsumer;
 
 /**
- * Magics provides attack map lookups by occupancy using magic bitboards.
+ * Magics provides constants and functions for finding and using magic bitboard lookups.
  */
 public final class Magics {
 
@@ -110,8 +110,8 @@ public final class Magics {
 
         // Init rook masks and attacks
         for (byte i = 0; i < ROOK_MASKS.length; i++) {
-            ROOK_MASKS[i] = occupancyMask(i, true);
-            ROOK_ATTACKS[i] = attacks(ROOK_MAGICS[i], i, ROOK_BITS, true);
+            ROOK_MASKS[i]   = occupancyMask(i, true);
+            ROOK_ATTACKS[i] = values(ROOK_MAGICS[i], i, ROOK_BITS, ROOK_MASKS[i], attackFn(true));
         }
     }
 
@@ -188,8 +188,8 @@ public final class Magics {
 
         // Init bishop masks and attacks
         for (byte i = 0; i < BISHOP_MASKS.length; i++) {
-            BISHOP_MASKS[i] = occupancyMask(i, false);
-            BISHOP_ATTACKS[i] = attacks(BISHOP_MAGICS[i], i, BISHOP_BITS, false);
+            BISHOP_MASKS[i]   = occupancyMask(i, false);
+            BISHOP_ATTACKS[i] = values(BISHOP_MAGICS[i], i, BISHOP_BITS, BISHOP_MASKS[i], attackFn(false));
         }
     }
 
@@ -204,53 +204,64 @@ public final class Magics {
      */
     public static void main(final String[] args) {
         for (byte i = 0; i < 64; i++) {
-            System.out.printf("ROOK_MAGICS[%d] = %dL;%n", i, findMagic(i, 12, true));
+            System.out.printf("ROOK_MAGICS[%d] = %dL;%n", i, findAttackMagic(i, 12, true));
         }
         System.out.println();
         for (byte i = 0; i < 64; i++) {
-            System.out.printf("BISHOP_MAGICS[%d] = %dL;%n", i, findMagic(i, 10, false));
+            System.out.printf("BISHOP_MAGICS[%d] = %dL;%n", i, findAttackMagic(i, 10, false));
         }
     }
 
     /**
-     * Find a magic number for the given square with a given attack index bit size.
+     * Find a magic number for the given square with given index bit size for rook or bishop attacks.
      * @param sq square
-     * @param bits attack index bit size
-     * @param isRook find rook magic, else bishop magic
+     * @param bits index bit size
+     * @param isRook rook magic, else bishop magic
+     * @return attack magic number
+     */
+    public static long findAttackMagic(final byte sq, final int bits, final boolean isRook) {
+        return findMagic(sq, bits, occupancyMask(sq, isRook), attackFn(isRook));
+    }
+
+    /**
+     * Find a magic number for the given square and calculator function with a given index bit size.
+     * @param sq square
+     * @param bits index bit size
+     * @param mask occupancy mask
+     * @param f value calculator
      * @return magic number
      */
-    public static long findMagic(final byte sq, final int bits, final boolean isRook) {
+    public static long findMagic(final byte sq, final int bits, final long mask, final ValueCalculator f) {
         while (true) {
             final long magic = ThreadLocalRandom.current().nextLong();
-            if (isMagic(magic, sq, bits, isRook)) return magic;
+            if (isMagic(magic, sq, bits, mask, f)) return magic;
         }
     }
 
     /**
-     * Get whether a given number is a magic with given attack index bit size.
+     * Get whether a given number is a magic with given index bit size for a calculator function and square.
      * @param magic candidate magic number
      * @param sq square
-     * @param bits attack index bit size
-     * @param isRook is rook magic, else bishop magic
+     * @param bits index bit size
+     * @param mask occupancy mask
+     * @param f value calculator
      * @return is magic
      */
-    public static boolean isMagic(final long magic, final byte sq, final int bits, final boolean isRook) {
-        final long mask = isRook ? ROOK_MASKS[sq] : BISHOP_MASKS[sq];
+    public static boolean isMagic(final long magic, final byte sq, final int bits, final long mask, final ValueCalculator f) {
         final long piece = Bitboard.ofSquare(sq);
 
-        final long[] attacks = new long[1 << bits];
+        final long[] values = new long[1 << bits];
         final boolean[] used = new boolean[1 << bits];
 
         long occ = 0L;
         do {
             final int idx = (int) ((occ * magic) >>> (64 - bits));
-            final long unoccupied = ~(occ | piece);
-            final long attack = isRook ? Bitboard.slideOrthogonal(piece, unoccupied) : Bitboard.slideDiagonal(piece, unoccupied);
+            final long value = f.map(piece, occ);
 
             if (!used[idx]) {
-                attacks[idx] = attack;
+                values[idx] = value;
                 used[idx] = true;
-            } else if (attacks[idx] != attack) {
+            } else if (values[idx] != value) {
                 return false;
             }
 
@@ -258,6 +269,28 @@ public final class Magics {
         } while (occ != 0L);
 
         return true;
+    }
+
+
+    // ====================================================================================================
+    //                                  Magic Value Calculators
+    // ====================================================================================================
+
+    /**
+     * Function to calculate a filled value array from a magic number.
+     */
+    @FunctionalInterface public interface ValueCalculator { long map(final long bb, final long occ); }
+
+    /**
+     * Return a magic value calculator for rook or bishop attacks.
+     * @param isRook is rook attack calculator, else bishop attack calculator
+     * @return attack value calculator
+     */
+    private static ValueCalculator attackFn(final boolean isRook) {
+        return (bb, occ) -> {
+            final long unocc = ~(occ | bb);
+            return isRook ? Bitboard.slideOrthogonal(bb, unocc) : Bitboard.slideDiagonal(bb, unocc);
+        };
     }
 
 
@@ -298,25 +331,24 @@ public final class Magics {
     }
 
     /**
-     * Build the attack array for a given magic number and square.
+     * Generate a values array for a magic, square and index bit size.
      * @param magic magic number
      * @param sq square
-     * @param bits attack index bit size
-     * @param isRook is rook magic, else bishop magic
-     * @return attacks
+     * @param bits index bit size
+     * @param mask occupancy mask
+     * @param f value calculator
+     * @return values array
      */
-    private static long[] attacks(final long magic, final byte sq, final int bits, final boolean isRook) {
-        final long mask = occupancyMask(sq, isRook);
-        final long piece = Bitboard.ofSquare(sq);
-        final long[] attacks = new long[1 << bits];
+    private static long[] values(final long magic, final byte sq, final int bits, final long mask, final ValueCalculator f) {
+        final long bb = Bitboard.ofSquare(sq);
+        final long[] values = new long[1 << bits];
 
         forEachOccupancy(mask, occ -> {
-            final long unocc = ~(occ | piece);
             final int idx = (int) ((occ * magic) >>> (64 - bits));
-            attacks[idx] = isRook ? Bitboard.slideOrthogonal(piece, unocc) : Bitboard.slideDiagonal(piece, unocc);
+            values[idx] = f.map(bb, occ);
         });
 
-        return attacks;
+        return values;
     }
 
 
