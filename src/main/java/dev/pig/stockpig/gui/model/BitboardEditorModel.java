@@ -15,7 +15,7 @@ public final class BitboardEditorModel {
         Attacked,
         Target,
         Pinned,
-        Pins,
+        Pinners,
         Checkers,
         Checks,
         Unoccupied,
@@ -78,7 +78,7 @@ public final class BitboardEditorModel {
             case Attacked -> pos.moveGenerator().attacked();
             case Target -> pos.moveGenerator().target();
             case Pinned -> pos.moveGenerator().pinned();
-            case Pins -> pos.moveGenerator().pins();
+            case Pinners -> pos.moveGenerator().pinners();
             case Checkers -> pos.moveGenerator().checkers();
             case Checks -> pos.moveGenerator().checkray();
             case Unoccupied -> pos.board().unoccupied();

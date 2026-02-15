@@ -62,11 +62,6 @@ public final class Bitboard {
     public static final long NOT_FILE_AB    = ~(FILE_A | FILE_B);
     public static final long NOT_FILE_GH    = ~(FILE_G | FILE_H);
 
-    // Square Lookups
-    private static final long[][] BETWEEN = new long[64][64];
-    private static final long[][] LINE    = new long[64][64];
-    private static final long[][] RAY     = new long[64][64];
-
 
     // ====================================================================================================
     //                                  Constructors and Builders
@@ -137,41 +132,6 @@ public final class Bitboard {
      */
     public static boolean contains(final long area, final long bb) {
         return (area & bb) == bb;
-    }
-
-
-    // ====================================================================================================
-    //                                  Square Lookups
-    // ====================================================================================================
-
-    /**
-     * Get the bitboard of the ray between two squares, excluding the origin and destination.
-     * @param from from square
-     * @param to to square
-     * @return between bitboard
-     */
-    public static long between(final byte from, final byte to) {
-        return BETWEEN[from][to];
-    }
-
-    /**
-     * Get the bitboard of the ray between two squares, including the origin and destination.
-     * @param from from square
-     * @param to to square
-     * @return ray bitboard
-     */
-    public static long ray(final byte from, final byte to) {
-        return RAY[from][to];
-    }
-
-    /**
-     * Get the bitboard of the line that both squares sit on.
-     * @param from from square
-     * @param to to square
-     * @return line bitboard
-     */
-    public static long line(final byte from, final byte to) {
-        return LINE[from][to];
     }
 
 
@@ -296,6 +256,20 @@ public final class Bitboard {
 
 
     // ====================================================================================================
+    //                                  Mirrors and Flips
+    // ====================================================================================================
+
+    /**
+     * Flip the bitboard vertically, that is mirror horizontally in the x-axis.
+     * @param bb bitboard
+     * @return flipped bitboard
+     */
+    public static long mirrorx(final long bb) {
+        return Long.reverseBytes(bb);
+    }
+
+
+    // ====================================================================================================
     //                                  Population / Bit Count
     // ====================================================================================================
 
@@ -356,39 +330,78 @@ public final class Bitboard {
 
 
     // ====================================================================================================
-    //                                  Rank and File
+    //                                  Line Lookups
     // ====================================================================================================
 
     /**
-     * Get the rank bitboard for a rank index (0...7).
-     * @param i rank index
+     * Get the rank bitboard a square sits on.
+     * @param sq square
      * @return rank bitboard
      */
-    public static long rank(final int i) {
-        return RANK[i];
+    public static long rankOf(final byte sq) {
+        return SQUARE_RANK[sq];
     }
 
     /**
-     * Get the file bitboard for a file index (0...7).
-     * @param i file index
+     * Get the file bitboard a square sits on.
+     * @param sq square
      * @return file bitboard
      */
-    public static long file(final int i) {
-        return FILE[i];
+    public static long fileOf(final byte sq) {
+        return SQUARE_FILE[sq];
+    }
+
+    /**
+     * Get the diagonal bitboard a square sits on
+     * @param sq square
+     * @return diagonal bitboard
+     */
+    public static long diagonalOf(final byte sq) {
+        return SQUARE_DIAGONAL[sq];
+    }
+
+    /**
+     * Get the anti-diagonal bitboard a square sits on
+     * @param sq square
+     * @return anti-diagonal bitboard
+     */
+    public static long antiDiagonalOf(final byte sq) {
+        return SQUARE_ANTI_DIAGONAL[sq];
     }
 
 
     // ====================================================================================================
-    //                                  Mirrors and Flips
+    //                                  Square Lookups
     // ====================================================================================================
 
     /**
-     * Flip the bitboard vertically, that is mirror horizontally in the x-axis.
-     * @param bb bitboard
-     * @return flipped bitboard
+     * Get the bitboard of the ray between two squares, excluding the origin and destination.
+     * @param from from square
+     * @param to to square
+     * @return between bitboard
      */
-    public static long mirrorx(final long bb) {
-        return Long.reverseBytes(bb);
+    public static long between(final byte from, final byte to) {
+        return BETWEEN[from][to];
+    }
+
+    /**
+     * Get the bitboard of the ray between two squares, including the destination but not the origin.
+     * @param from from square
+     * @param to to square
+     * @return ray bitboard
+     */
+    public static long ray(final byte from, final byte to) {
+        return RAY[from][to];
+    }
+
+    /**
+     * Get the bitboard of the line that both squares sit on.
+     * @param from from square
+     * @param to to square
+     * @return line bitboard
+     */
+    public static long line(final byte from, final byte to) {
+        return LINE[from][to];
     }
 
 
@@ -418,39 +431,47 @@ public final class Bitboard {
     //                                  Pre-computed Lookups
     // ====================================================================================================
 
+    // Square Lookups
+    private static final long[] SQUARE_RANK          = new long[64];
+    private static final long[] SQUARE_FILE          = new long[64];
+    private static final long[] SQUARE_DIAGONAL      = new long[64];
+    private static final long[] SQUARE_ANTI_DIAGONAL = new long[64];
+    static {
+        for (byte i = 0; i < 64; i++) {
+            final long bb = ofSquare(i);
+
+            SQUARE_RANK[i]          = RANK[i >>> 3];
+            SQUARE_FILE[i]          = FILE[i & 7];
+            SQUARE_DIAGONAL[i]      = fill(bb, Direction.NE) | fill(bb, Direction.SW);
+            SQUARE_ANTI_DIAGONAL[i] = fill(bb, Direction.NW) | fill(bb, Direction.SE);
+        }
+    }
+
+    private static final long[][] BETWEEN            = new long[64][64];
+    private static final long[][] LINE               = new long[64][64];
+    private static final long[][] RAY                = new long[64][64];
     static {
         for (byte i = 0; i < 64; i++) {
             for (byte j = 0; j < 64; j++) {
                 if (i == j) continue;
 
                 final long both        = Bitboard.ofSquares(i, j);
-                final long between     = (ALL << i) ^ (ALL << j);
-                final long lowest      = pop(between);
-                final long diag        = fill(lowest, Direction.NE) | fill(lowest, Direction.SW);
-                final long antiDiag    = fill(lowest, Direction.NW) | fill(lowest, Direction.SE);
+                final long between     = ((ALL << i) ^ (ALL << j)) & ~both;
 
                 // Same file
-                if ((i & 7) == (j & 7)) {
-                    LINE[i][j] = file(i & 7);
-                }
+                if (Bitboard.contains(fileOf(i), both)) LINE[i][j] = fileOf(i);
 
                 // Same rank
-                if ((i >>> 3) == (j >>> 3)) {
-                    LINE[i][j] = rank(i >>> 3);
-                }
+                if (Bitboard.contains(rankOf(i), both)) LINE[i][j] = rankOf(i);
 
                 // Same diagonal
-                if (Bitboard.contains(diag, both)) {
-                    LINE[i][j] = diag;
-                }
+                if (Bitboard.contains(diagonalOf(i), both)) LINE[i][j] = diagonalOf(i);
 
                 // Same anti-diagonal
-                if (Bitboard.contains(antiDiag, both)) {
-                    LINE[i][j] = antiDiag;
-                }
+                if (Bitboard.contains(antiDiagonalOf(i), both)) LINE[i][j] = antiDiagonalOf(i);
 
-                BETWEEN[i][j] = LINE[i][j] & between & ~both;
-                RAY[i][j]     = LINE[i][j] & between |  both;
+                BETWEEN[i][j] = LINE[i][j] & between;
+                RAY[i][j]     = BETWEEN[i][j] | ofSquare(j);
             }
         }
     }

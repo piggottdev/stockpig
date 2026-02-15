@@ -18,15 +18,8 @@ public final class MoveGenerator {
     private long checkers;
     private long checkRay;
     private long pinned;
+    private long pinners;
     private long target;
-    private final long[] pins = new long[5];
-
-    // Pin Axis'
-    private static final int ALL            = 0;
-    private static final int HORIZONTAL     = 1;
-    private static final int VERTICAL       = 2;
-    private static final int DIAGONAL       = 3;
-    private static final int ANTI_DIAGONAL  = 4;
 
 
     // ====================================================================================================
@@ -66,15 +59,6 @@ public final class MoveGenerator {
     }
 
     /**
-     * Get the current side's target square bitboard. This is the checkray/checkers if
-     * the position is in check or all enemy and unoccupied squares if not.
-     * @return target bitboard
-     */
-    public long target() {
-        return this.target;
-    }
-
-    /**
      * Get the bitboard of currently pinned pieces.
      * @return pinned pieces bitboard
      */
@@ -83,11 +67,20 @@ public final class MoveGenerator {
     }
 
     /**
-     * Get all current pins.
-     * @return pins bitboard
+     * Get the bitboard of currently pinning pieces.
+     * @return pinning pieces bitboard
      */
-    public long pins() {
-        return this.pins[ALL];
+    public long pinners() {
+        return this.pinners;
+    }
+
+    /**
+     * Get the current side's target square bitboard. This is the checkray/checkers if
+     * the position is in check or all enemy and unoccupied squares if not.
+     * @return target bitboard
+     */
+    public long target() {
+        return this.target;
     }
 
 
@@ -109,12 +102,7 @@ public final class MoveGenerator {
         this.checkers = Bitboard.EMPTY;
         this.checkRay = Bitboard.EMPTY;
         this.pinned   = Bitboard.EMPTY;
-
-        this.pins[ALL]           = Bitboard.EMPTY;
-        this.pins[HORIZONTAL]    = Bitboard.EMPTY;
-        this.pins[VERTICAL]      = Bitboard.EMPTY;
-        this.pins[DIAGONAL]      = Bitboard.EMPTY;
-        this.pins[ANTI_DIAGONAL] = Bitboard.EMPTY;
+        this.pinners  = Bitboard.EMPTY;
     }
 
     /**
@@ -124,10 +112,13 @@ public final class MoveGenerator {
     public void attackAnalysis(final Position pos) {
         reset();
 
-        final boolean us = pos.sideToMove();
-        final long team  = pos.board().pieces(us);
-        final long king  = pos.board().pieces(PieceType.KING) & team;
+        // Side to move variables
+        final boolean us                = pos.sideToMove();
+        final long team                 = pos.board().pieces(us);
+        final long king                 = pos.board().pieces(PieceType.KING) & team;
+        final byte kingSq               = Square.ofBitboard(king);
 
+        // Enemy team variables
         final boolean them              = Colour.flip(us);
         final long enemies              = pos.board().pieces(them);
         final long eKing                = pos.board().pieces(PieceType.KING) & enemies;
@@ -141,9 +132,10 @@ public final class MoveGenerator {
         final Direction pawnAttackDir1  = Colour.pawnAttackDirection1(them);
         final Direction pawnAttackDir2  = Colour.pawnAttackDirection2(them);
 
-        final long unoccupied    = pos.board().unoccupied();
-        final long occupied      = ~unoccupied;
-        final long occupiedWKing = occupied ^ king;
+        // Board variables
+        final long unoccupied           = pos.board().unoccupied();
+        final long occupied             = ~unoccupied;
+        final long occupiedWithoutKing  = occupied ^ king;
 
 
         // Attacks
@@ -170,88 +162,46 @@ public final class MoveGenerator {
         }
 
         // Sliding Attacks
-
         long sliders = eDiagonals;
         while (sliders != 0L) {
             final long slider = Bitboard.pop(sliders);
-            this.attacked |= Attack.bishop(Square.ofBitboard(slider), occupiedWKing);
+            this.attacked |= Attack.bishop(Square.ofBitboard(slider), occupiedWithoutKing);
             sliders ^= slider;
         }
-
         sliders = eOrthogonals;
         while (sliders != 0L) {
             final long slider = Bitboard.pop(sliders);
-            this.attacked |= Attack.rook(Square.ofBitboard(slider), occupiedWKing);
+            this.attacked |= Attack.rook(Square.ofBitboard(slider), occupiedWithoutKing);
             sliders ^= slider;
         }
 
-        // TODO: Candidate optimisation: Move towards attack maps to calculate checks threats and pins
-        // TODO: Candidate optimisation: Adding a line[from][king] should remove the need to calculate pins in different directions
+        // Sliding pins and checks
+        long pinners = (Attack.bishop(kingSq, enemies) & eDiagonals) | (Attack.rook(kingSq, enemies) & eOrthogonals);
+        while (pinners != 0L) {
+            final long pinner = Bitboard.pop(pinners);
+            pinners ^= pinner;
 
-        // Pins
-        pins(king, team, enemies, eDiagonals, DIAGONAL, new Direction[]{
-                Direction.NE, Direction.SW
-        });
-        pins(king, team, enemies, eDiagonals, ANTI_DIAGONAL, new Direction[]{
-                Direction.NW, Direction.SE
-        });
-        pins(king, team, enemies, eOrthogonals, VERTICAL, new Direction[]{
-                Direction.N, Direction.S
-        });
-        pins(king, team, enemies, eOrthogonals, HORIZONTAL, new Direction[]{
-                Direction.E, Direction.W
-        });
+            final long pin = Bitboard.ray(kingSq, Square.ofBitboard(pinner));
+            final long pinned = pin & team;
+
+            // No blockers - this is check
+            if (Bitboard.isEmpty(pinned)) {
+                this.checkers |= pinner;
+                this.checkRay |= pin;
+                continue;
+            }
+
+            // Single blocker - this is pin
+            if (Bitboard.isSingle(pinned)) {
+                this.pinners |= pinner;
+                this.pinned |= pinned;
+            }
+        }
 
         this.isCheck = !Bitboard.isEmpty(this.checkers);
         this.isDoubleCheck = this.isCheck && !Bitboard.isSingle(this.checkers);
 
         this.target = this.isCheck ? this.checkRay | this.checkers : enemies | unoccupied;
-    }
-
-    /**
-     * Calculate any sliding checks or pins in given directions. This is done filling out from the king.
-     * @param king single occupancy king bitboard
-     * @param team current teams pieces
-     * @param enemies other teams pieces
-     * @param eSliders other teams pieces that can slide in the directions
-     * @param axis axis of the directions
-     * @param ds directions
-     */
-    private void pins(final long king, final long team, final long enemies, final long eSliders, final int axis, final Direction[] ds) {
-        for (final Direction d : ds) {
-            pin(king, team, enemies, eSliders, axis, d);
-        }
-    }
-
-    /**
-     * Calculate any sliding checks or pins in given direction.
-     * @param king single occupancy king bitboard
-     * @param team current teams pieces
-     * @param enemies other teams pieces
-     * @param eSliders other teams pieces that can slide in the direction
-     * @param axis axis of the direction
-     * @param d direction
-     */
-    private void pin(final long king, final long team, final long enemies, final long eSliders, final int axis, final Direction d) {
-        final long line = Bitboard.slide(king, ~enemies, d);
-        final long pinner = line & eSliders;
-
-        if (pinner == Bitboard.EMPTY) return; // No enemies that can pin
-
-        final long pinned = line & team;
-
-        if (Bitboard.isEmpty(pinned)) {
-            // No blockers, this is check
-            this.checkers |= pinner;
-            this.checkRay |= line;
-            return;
-        }
-
-        if (!Bitboard.isSingle(pinned)) return; // More than one blocker
-
-        this.pins[ALL]  |= line;
-        this.pins[axis] |= line;
-        this.pinned     |= pinned;
     }
 
 
@@ -303,7 +253,7 @@ public final class MoveGenerator {
         final long enPassantTarget  = pos.enPassantTarget() == Square.EMPTY ? Bitboard.EMPTY : Bitboard.ofSquare(pos.enPassantTarget());
 
         // Pawns that can push forward one
-        final long onePushedPawns = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[VERTICAL]), forward, unoccupied);
+        final long onePushedPawns = Bitboard.shiftInto(pawns & (~this.pinned | Bitboard.fileOf(kFrom)), forward, unoccupied);
         Bitboard.forEach(onePushedPawns & this.target, (final long destination) ->
                 explodePawnPromotions(moves, Move.basic(Square.ofBitboard(Bitboard.shiftRev(destination, forward)), Square.ofBitboard(destination), PieceType.PAWN), destination, promotionRank));
 
@@ -313,18 +263,18 @@ public final class MoveGenerator {
                 moves.add(Move.doublePush(Square.ofBitboard(Bitboard.shift(destination, forward.offset()*-2)), Square.ofBitboard(destination))));
 
         // Pawns that can attack in the diagonal direction
-        final long pawnAttacks1 = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[DIAGONAL]), attackDir1, (enemies & this.target) | enPassantTarget);
+        final long pawnAttacks1 = Bitboard.shiftInto(pawns & (~this.pinned | Bitboard.diagonalOf(kFrom)), attackDir1, (enemies & this.target) | enPassantTarget);
         Bitboard.forEach(pawnAttacks1, (final long attack) ->
                 explodePawnCapture(pos, moves, attackDir1, attack, enPassantTarget, promotionRank));
 
         // Pawns that can attack in the anti-diagonal direction
-        final long pawnAttacks2 = Bitboard.shiftInto(pawns & ~(this.pins[ALL] ^ this.pins[ANTI_DIAGONAL]), attackDir2, (enemies & this.target) | enPassantTarget);
+        final long pawnAttacks2 = Bitboard.shiftInto(pawns & (~this.pinned | Bitboard.antiDiagonalOf(kFrom)), attackDir2, (enemies & this.target) | enPassantTarget);
         Bitboard.forEach(pawnAttacks2, (final long attack) ->
                 explodePawnCapture(pos, moves, attackDir2, attack, enPassantTarget, promotionRank));
 
         Bitboard.forEach(knights, (final long knight) -> {
             final byte from = Square.ofBitboard(knight);
-            Bitboard.forEach(Attack.knight(from) & legalTargetsOf(knight), (final long attack) -> {
+            Bitboard.forEach(Attack.knight(from) & legalTargetsOf(knight, from, kFrom), (final long attack) -> {
                 final byte to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.KNIGHT);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
@@ -333,7 +283,7 @@ public final class MoveGenerator {
 
         Bitboard.forEach(queens, (final long queen) -> {
             final byte from = Square.ofBitboard(queen);
-            Bitboard.forEach(Attack.queen(from, occupied) & legalTargetsOf(queen), (final long attack) -> {
+            Bitboard.forEach(Attack.queen(from, occupied) & legalTargetsOf(queen, from, kFrom), (final long attack) -> {
                 final byte to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.QUEEN);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
@@ -342,7 +292,7 @@ public final class MoveGenerator {
 
         Bitboard.forEach(rooks, (final long rook) -> {
             final byte from = Square.ofBitboard(rook);
-            Bitboard.forEach(Attack.rook(from, occupied) & legalTargetsOf(rook), (final long attack) -> {
+            Bitboard.forEach(Attack.rook(from, occupied) & legalTargetsOf(rook, from, kFrom), (final long attack) -> {
                 final byte to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.ROOK);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
@@ -351,7 +301,7 @@ public final class MoveGenerator {
 
         Bitboard.forEach(bishops, (final long bishop) -> {
             final byte from = Square.ofBitboard(bishop);
-            Bitboard.forEach(Attack.bishop(from, occupied) & legalTargetsOf(bishop), (final long attack) -> {
+            Bitboard.forEach(Attack.bishop(from, occupied) & legalTargetsOf(bishop, from, kFrom), (final long attack) -> {
                 final byte to = Square.ofBitboard(attack);
                 final int basic = Move.basic(from, to, PieceType.BISHOP);
                 moves.add(Bitboard.intersects(unoccupied, attack) ? basic : Move.addCapture(basic, pos.board().pieceAt(to)));
@@ -373,43 +323,21 @@ public final class MoveGenerator {
     // ====================================================================================================
 
     /**
-     * Calculate the legal target squares for a given single occupancy piece bitboard.
+     * Calculate the legal target squares for a given piece square.
      * If a piece is pinned, it may only move in the direction of the pin.
      * @param piece single occupancy piece bitboard
+     * @param pieceSq piece square
+     * @param kingSq king square
      * @return legal piece targets
      */
-    public long legalTargetsOf(final long piece) {
-        if (Bitboard.disjoint(this.pins[ALL], piece))           return this.target;
-        if (Bitboard.contains(this.pins[HORIZONTAL], piece))    return this.target & this.pins[HORIZONTAL];
-        if (Bitboard.contains(this.pins[VERTICAL], piece))      return this.target & this.pins[VERTICAL];
-        if (Bitboard.contains(this.pins[DIAGONAL], piece))      return this.target & this.pins[DIAGONAL];
-        if (Bitboard.contains(this.pins[ANTI_DIAGONAL], piece)) return this.target & this.pins[ANTI_DIAGONAL];
-        return Bitboard.EMPTY;
+    public long legalTargetsOf(final long piece, final byte pieceSq, final byte kingSq) {
+        return Bitboard.disjoint(this.pinned, piece) ? this.target : this.target & Bitboard.line(kingSq, pieceSq);
     }
 
 
     // ====================================================================================================
-    //                                  Move Builders
+    //                                  Move Exploders
     // ====================================================================================================
-
-    /**
-     * If the pawn move ends in the promotion rank, then generate a move per promotion piece type
-     * into the move list, otherwise just add the passed move.
-     * @param moves move list
-     * @param move basic move
-     * @param to destination bitboard
-     * @param promotionRank promotion rank bitboard
-     */
-    private void explodePawnPromotions(final MoveList moves, final int move, final long to, final long promotionRank) {
-        if (Bitboard.contains(promotionRank, to)) {
-            moves.add(Move.addPromotion(move, PieceType.QUEEN));
-            moves.add(Move.addPromotion(move, PieceType.KNIGHT));
-            moves.add(Move.addPromotion(move, PieceType.ROOK));
-            moves.add(Move.addPromotion(move, PieceType.BISHOP));
-            return;
-        }
-        moves.add(move);
-    }
 
     /**
      * If the pawn capture is to the en passant target then add an en passant move to the list, otherwise
@@ -431,6 +359,25 @@ public final class MoveGenerator {
             return;
         }
         explodePawnPromotions(moves, Move.capture(from, to, PieceType.PAWN, pos.board().pieceAt(to)), attack, promotionRank);
+    }
+
+    /**
+     * If the pawn move ends in the promotion rank, then generate a move per promotion piece type
+     * into the move list, otherwise just add the passed move.
+     * @param moves move list
+     * @param move basic move
+     * @param to destination bitboard
+     * @param promotionRank promotion rank bitboard
+     */
+    private void explodePawnPromotions(final MoveList moves, final int move, final long to, final long promotionRank) {
+        if (Bitboard.contains(promotionRank, to)) {
+            moves.add(Move.addPromotion(move, PieceType.QUEEN));
+            moves.add(Move.addPromotion(move, PieceType.KNIGHT));
+            moves.add(Move.addPromotion(move, PieceType.ROOK));
+            moves.add(Move.addPromotion(move, PieceType.BISHOP));
+            return;
+        }
+        moves.add(move);
     }
 
 
