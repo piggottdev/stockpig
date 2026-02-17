@@ -129,6 +129,16 @@ public final class Board {
         return this.squares[sq];
     }
 
+    /**
+     * Get the colour at the square (returns black if the square is empty).
+     * @param sq square
+     * @return colour
+     */
+    public boolean colourAt(final byte sq) {
+        return Bitboard.intersects(pieces(Colour.WHITE), Bitboard.ofSquare(sq));
+    }
+
+
     // ====================================================================================================
     //                                  Move Make / Unmake
     // ====================================================================================================

@@ -15,6 +15,7 @@ public final class GamePanelView extends JPanel {
     private final JButton undo    = new JButton("Undo");
     private final JLabel  score   = new JLabel("", SwingConstants.CENTER);
     private final JButton aiMove  = new JButton("AI Move");
+    private final JLabel  hash    = new JLabel("Hash: ");
 
     public GamePanelView() {
         super(new GridLayout(8, 1, 0, 15));
@@ -29,6 +30,10 @@ public final class GamePanelView extends JPanel {
         scorePanel.add(this.score);
         scorePanel.add(this.aiMove);
         add(scorePanel);
+
+        final JPanel hashPanel = new JPanel();
+        hashPanel.add(this.hash);
+        add(hashPanel);
     }
 
     /**
@@ -52,5 +57,6 @@ public final class GamePanelView extends JPanel {
      */
     public void redraw(final StockpigModel model) {
         this.score.setText(String.format("%d", model.chess.score()));
+        this.hash.setText(String.format("Hash: %d", model.chess.zhash()));
     }
 }

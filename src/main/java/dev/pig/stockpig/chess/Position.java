@@ -30,6 +30,8 @@ public final class Position {
     private final MoveGenerator moveGenerator = new MoveGenerator();
     private final MoveList moves = new MoveList();
 
+    private long hash = 0L;
+
 
     // ====================================================================================================
     //                                  Constructors and Builders
@@ -43,6 +45,14 @@ public final class Position {
         this.enPassantTarget = enPassantTarget;
         this.halfMoveClock = halfMoveClock;
         this.turn = turn;
+        // Build the hash
+        this.hash ^= Zobrist.side(sideToMove);
+        this.hash ^= Zobrist.castlingRights(castlingRights);
+        this.hash ^= Zobrist.enPassantTarget(enPassantTarget);
+        for (byte i = 0; i < 64; i++) {
+            this.hash ^= Zobrist.pieceSquare(board().colourAt(i), board().pieceAt(i), i);
+        }
+        // Generate legal moves (analyse the position)
         generateMoves();
     }
 
@@ -236,5 +246,28 @@ public final class Position {
      */
     public static Position fromFen(final String fen) throws Fen.ParseException {
         return Fen.parse(fen);
+    }
+
+
+    // ====================================================================================================
+    //                                  Zobrist Hash
+    // ====================================================================================================
+
+    /**
+     * Get the long Zobrist hash of the position.
+     * @return position Zobrist hash
+     */
+    public long zhash() {
+        return this.hash;
+    }
+
+    /**
+     * Get the hash code of the position, this is the 32 least significant bits
+     * of the long Zobrist hash.
+     * @return int hash
+     */
+    @Override
+    public int hashCode() {
+        return (int) this.hash;
     }
 }

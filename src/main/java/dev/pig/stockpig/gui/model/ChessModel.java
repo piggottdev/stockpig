@@ -1,10 +1,6 @@
 package dev.pig.stockpig.gui.model;
 
-import dev.pig.stockpig.chess.Colour;
-import dev.pig.stockpig.chess.Move;
-import dev.pig.stockpig.chess.MoveList;
-import dev.pig.stockpig.chess.Position;
-import dev.pig.stockpig.chess.bitboard.Bitboard;
+import dev.pig.stockpig.chess.*;
 import dev.pig.stockpig.chess.bitboard.Square;
 import dev.pig.stockpig.chess.notation.Fen;
 import dev.pig.stockpig.engine.evaluation.PositionEvaluator;
@@ -155,6 +151,14 @@ public final class ChessModel {
     }
 
     /**
+     * Get the Zobrist hash of the position.
+     * @return Zobrist hash
+     */
+    public long zhash() {
+        return this.position.zhash();
+    }
+
+    /**
      * Make a move using the default evaluator and searcher.
      * @return type of game event triggered by the move
      */
@@ -179,8 +183,8 @@ public final class ChessModel {
      * @return piece
      */
     public byte pieceAt(final int i) {
-        return (byte) (this.position.board().pieceAt((byte) i) +
-                        (Bitboard.intersects(Bitboard.ofSquare((byte) i), this.position.board().pieces(Colour.BLACK)) ? 6 : 0));
+        final byte pt = this.position.board().pieceAt((byte) i);
+        return pt == PieceType.EMPTY ? pt : (byte) (this.position.board().colourAt((byte) i) ? pt : pt + 6);
     }
 
     /**
