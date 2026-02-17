@@ -24,12 +24,13 @@ public final class Position {
 
     // History
     private final List<State> history = new ArrayList<>(100);
-    private record State(int move, byte castlingRights, byte enPassantTarget, int halfMoveClock) {}
+    private record State(int move, byte castlingRights, byte enPassantTarget, int halfMoveClock, long hash) {}
 
     // Moves (+ check, attack and pin information)
     private final MoveGenerator moveGenerator = new MoveGenerator();
     private final MoveList moves = new MoveList();
 
+    // Zobrist Hash
     private long hash = 0L;
 
 
@@ -47,12 +48,10 @@ public final class Position {
         this.turn = turn;
         // Build the hash
         this.hash ^= Zobrist.side(sideToMove);
+        this.hash ^= board.zhash();
         this.hash ^= Zobrist.castlingRights(castlingRights);
         this.hash ^= Zobrist.enPassantTarget(enPassantTarget);
-        for (byte i = 0; i < 64; i++) {
-            this.hash ^= Zobrist.pieceSquare(board().colourAt(i), board().pieceAt(i), i);
-        }
-        // Generate legal moves (analyse the position)
+        // Generate legal moves (analyse position)
         generateMoves();
     }
 
@@ -190,14 +189,26 @@ public final class Position {
      * @param move move
      */
     public void makeMove(final int move) {
-        this.history.add(new State(move, this.castlingRights, this.enPassantTarget, this.halfMoveClock));
+        this.history.add(new State(move, this.castlingRights, this.enPassantTarget, this.halfMoveClock, this.hash));
 
+        // Make the move on the board and update the hash
+        this.hash ^= this.board.zhash();
         this.board.makeMove(this.sideToMove, move);
-        this.castlingRights = Castling.update(this.castlingRights, move);
+        this.hash ^= this.board.zhash();
+
+        // Update the hash from none board changes
+        this.hash ^= Zobrist.castlingRights(this.castlingRights);
+        this.hash ^= Zobrist.enPassantTarget(this.enPassantTarget);
+        this.hash ^= Zobrist.side(Colour.BLACK); // Flip the colour bits every move
+
+        // Update position state
+        this.castlingRights  = Castling.update(this.castlingRights, move);
         this.enPassantTarget = Move.isDoublePush(move) ? (byte) (Move.from(move) + Colour.forward(this.sideToMove).offset()) : Square.EMPTY;
-        this.halfMoveClock = Move.isCapture(move) || Move.mover(move) == PieceType.PAWN ? 0 : this.halfMoveClock + 1;
-        this.sideToMove = Colour.flip(this.sideToMove);
+        this.halfMoveClock   = Move.isCapture(move) || Move.mover(move) == PieceType.PAWN ? 0 : this.halfMoveClock + 1;
+        this.sideToMove      = Colour.flip(this.sideToMove);
         if (this.sideToMove == Colour.WHITE) this.turn++;
+
+        // Generate legal moves (analyse position)
         generateMoves();
     }
 
@@ -223,6 +234,7 @@ public final class Position {
         this.enPassantTarget = prev.enPassantTarget;
         this.halfMoveClock = prev.halfMoveClock;
         if (this.sideToMove == Colour.BLACK) this.turn--;
+        this.hash = prev.hash;
     }
 
 

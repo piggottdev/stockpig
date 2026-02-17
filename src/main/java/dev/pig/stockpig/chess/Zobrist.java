@@ -1,5 +1,7 @@
 package dev.pig.stockpig.chess;
 
+import dev.pig.stockpig.chess.bitboard.Square;
+
 import java.util.Random;
 
 public final class Zobrist {
@@ -39,7 +41,7 @@ public final class Zobrist {
      * @return en passant target hash
      */
     static long enPassantTarget(final byte enPassantTarget) {
-        return EN_PASSANT_FILE_HASH[enPassantTarget & 7];
+        return enPassantTarget == Square.EMPTY ? 0L : EN_PASSANT_FILE_HASH[enPassantTarget & 7];
     }
 
 

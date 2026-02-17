@@ -15,6 +15,8 @@ public final class Board {
 
     private final byte[] squares = new byte[64];
 
+    private long hash;
+
 
     // ====================================================================================================
     //                                  Constructors and Builders
@@ -50,6 +52,7 @@ public final class Board {
         this.colourBBs[c ? 1 : 0]       |=  bitboard;
         this.pieceBBs[pt]               |=  bitboard;
         this.pieceBBs[PieceType.EMPTY]  &=~ bitboard;
+        this.hash ^= Zobrist.pieceSquare(c, pt, sq);
     }
 
     /**
@@ -64,6 +67,7 @@ public final class Board {
         this.colourBBs[c ? 1 : 0]         &=~ bitboard;
         this.pieceBBs[pt]                 &=~ bitboard;
         this.pieceBBs[PieceType.EMPTY]    |=  bitboard;
+        this.hash ^= Zobrist.pieceSquare(c, pt, sq);
     }
 
 
@@ -238,6 +242,29 @@ public final class Board {
         // Dead if bishops are on same colour
         final long bishopsOnWhite = bishops & Bitboard.WHITE_SQUARES;
         return bishopsOnWhite == bishops || bishopsOnWhite == Bitboard.EMPTY;
+    }
+
+
+    // ====================================================================================================
+    //                                  Zobrist Hash
+    // ====================================================================================================
+
+    /**
+     * Get the long Zobrist hash of the board.
+     * @return board Zobrist hash
+     */
+    public long zhash() {
+        return this.hash;
+    }
+
+    /**
+     * Get the hash code of the board, this is the 32 least significant bits
+     * of the long Zobrist hash.
+     * @return int hash
+     */
+    @Override
+    public int hashCode() {
+        return (int) this.hash;
     }
 }
 
