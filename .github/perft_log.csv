@@ -29,3 +29,4 @@ Optimise pinned count check,130139552,-8.7%
 Simple alpha-beta move search,125523413,-3.5%
 Pins use lookups,153489025,+22.3%
 Refactor packages,153362253,-0.1%
+Zobrist Hashing,145256340,-5.3%
