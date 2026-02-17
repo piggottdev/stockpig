@@ -1,10 +1,10 @@
 package dev.pig.stockpig.engine.evaluation;
 
-import dev.pig.stockpig.chess.core.Colour;
-import dev.pig.stockpig.chess.core.PieceType;
-import dev.pig.stockpig.chess.core.Position;
-import dev.pig.stockpig.chess.core.bitboard.Bitboard;
-import dev.pig.stockpig.chess.core.bitboard.Square;
+import dev.pig.stockpig.chess.Colour;
+import dev.pig.stockpig.chess.PieceType;
+import dev.pig.stockpig.chess.Position;
+import dev.pig.stockpig.chess.bitboard.Bitboard;
+import dev.pig.stockpig.chess.bitboard.Square;
 
 public final class PositionEvaluator {
 

@@ -1,8 +1,8 @@
 package dev.pig.stockpig.engine.search;
 
-import dev.pig.stockpig.chess.core.Colour;
-import dev.pig.stockpig.chess.core.MoveList;
-import dev.pig.stockpig.chess.core.Position;
+import dev.pig.stockpig.chess.Colour;
+import dev.pig.stockpig.chess.MoveList;
+import dev.pig.stockpig.chess.Position;
 import dev.pig.stockpig.engine.evaluation.PositionEvaluator;
 
 public final class AlphaBetaSearcher {

@@ -1,6 +1,6 @@
 package dev.pig.stockpig.gui.controller;
 
-import dev.pig.stockpig.chess.core.PieceType;
+import dev.pig.stockpig.chess.PieceType;
 import dev.pig.stockpig.chess.notation.Fen;
 import dev.pig.stockpig.gui.model.BitboardEditorModel;
 import dev.pig.stockpig.gui.model.ChessModel;

@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess.core.bitboard;
+package dev.pig.stockpig.chess.bitboard;
 
 /**
  * Square provides an enumeration of all squares on a chess board.

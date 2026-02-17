@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess.core;
+package dev.pig.stockpig.chess;
 
 import java.util.function.IntConsumer;
 

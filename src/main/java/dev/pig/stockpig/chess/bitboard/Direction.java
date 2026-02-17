@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess.core.bitboard;
+package dev.pig.stockpig.chess.bitboard;
 
 /**
  * Direction is an enum of all possible directions a piece can move on a chess board,

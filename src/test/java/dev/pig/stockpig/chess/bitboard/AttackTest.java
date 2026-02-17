@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess.core.bitboard;
+package dev.pig.stockpig.chess.bitboard;
 
 import org.junit.jupiter.api.Test;
 

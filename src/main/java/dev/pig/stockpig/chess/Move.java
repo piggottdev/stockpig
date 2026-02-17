@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess.core;
+package dev.pig.stockpig.chess;
 
 /**
  * Moves are encoded as a single 32-bit integer.

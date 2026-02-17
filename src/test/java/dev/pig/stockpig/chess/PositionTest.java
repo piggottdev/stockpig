@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess.core;
+package dev.pig.stockpig.chess;
 
 import dev.pig.stockpig.chess.notation.Fen;
 import org.junit.jupiter.api.Test;

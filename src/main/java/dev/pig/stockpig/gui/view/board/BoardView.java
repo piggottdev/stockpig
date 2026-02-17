@@ -1,7 +1,7 @@
 package dev.pig.stockpig.gui.view.board;
 
-import dev.pig.stockpig.chess.core.bitboard.Bitboard;
-import dev.pig.stockpig.chess.core.bitboard.Square;
+import dev.pig.stockpig.chess.bitboard.Bitboard;
+import dev.pig.stockpig.chess.bitboard.Square;
 import dev.pig.stockpig.gui.controller.StockpigController;
 import dev.pig.stockpig.gui.model.StockpigModel;
 

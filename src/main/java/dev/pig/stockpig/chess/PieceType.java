@@ -1,4 +1,4 @@
-package dev.pig.stockpig.chess.core;
+package dev.pig.stockpig.chess;
 
 /**
  * Piece type provides an enumeration of all piece types including the empty piece.

@@ -1,7 +1,7 @@
 package dev.pig.stockpig.gui.model;
 
-import dev.pig.stockpig.chess.core.Position;
-import dev.pig.stockpig.chess.core.bitboard.Bitboard;
+import dev.pig.stockpig.chess.Position;
+import dev.pig.stockpig.chess.bitboard.Bitboard;
 
 /**
  * Bitboard editor model for tracking and editing selected bitboard.

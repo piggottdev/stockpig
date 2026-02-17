@@ -1,7 +1,7 @@
-package dev.pig.stockpig.chess.core;
+package dev.pig.stockpig.chess;
 
-import dev.pig.stockpig.chess.core.bitboard.Bitboard;
-import dev.pig.stockpig.chess.core.bitboard.Square;
+import dev.pig.stockpig.chess.bitboard.Bitboard;
+import dev.pig.stockpig.chess.bitboard.Square;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,8 +1,8 @@
 package dev.pig.stockpig.chess.notation;
 
-import dev.pig.stockpig.chess.core.*;
-import dev.pig.stockpig.chess.core.bitboard.Bitboard;
-import dev.pig.stockpig.chess.core.bitboard.Square;
+import dev.pig.stockpig.chess.*;
+import dev.pig.stockpig.chess.bitboard.Bitboard;
+import dev.pig.stockpig.chess.bitboard.Square;
 
 /**
  * Fen (Forsyth-Edwards Notation) provides functions for encoding and decoding FEN strings.

@@ -1,6 +1,6 @@
-package dev.pig.stockpig.chess.core;
+package dev.pig.stockpig.chess;
 
-import dev.pig.stockpig.chess.core.bitboard.Square;
+import dev.pig.stockpig.chess.bitboard.Square;
 import dev.pig.stockpig.chess.notation.Fen;
 
 import java.util.ArrayList;

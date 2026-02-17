@@ -1,8 +1,11 @@
 package dev.pig.stockpig.gui.model;
 
-import dev.pig.stockpig.chess.core.*;
-import dev.pig.stockpig.chess.core.bitboard.Bitboard;
-import dev.pig.stockpig.chess.core.bitboard.Square;
+import dev.pig.stockpig.chess.Colour;
+import dev.pig.stockpig.chess.Move;
+import dev.pig.stockpig.chess.MoveList;
+import dev.pig.stockpig.chess.Position;
+import dev.pig.stockpig.chess.bitboard.Bitboard;
+import dev.pig.stockpig.chess.bitboard.Square;
 import dev.pig.stockpig.chess.notation.Fen;
 import dev.pig.stockpig.engine.evaluation.PositionEvaluator;
 import dev.pig.stockpig.engine.search.AlphaBetaSearcher;
